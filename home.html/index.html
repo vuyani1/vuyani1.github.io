@@ -5,27 +5,177 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VGAMES - Home</title>
     <link rel="stylesheet" href="style.css">
-</head>
-<body class="christmas-theme">
-    <!-- Falling Snowflakes -->
-    <div id="snowflakes">
-        <div class="snowflake">*</div>
-        <div class="snowflake">*</div>
-        <div class="snowflake">*</div>
-        <div class="snowflake">*</div>
-        <div class="snowflake">*</div>
-    </div>
+    <style>
+        /* General Styles */
+        body {
+            background-color: #f0f0f0;
+            color: #000;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
 
+        /* Spring/Fall Theme */
+        body.spring-fall-theme {
+            background-color: #f4e5c2;
+            color: #5a3e36;
+        }
+
+        .spring-fall-theme .game-button {
+            background-color: #d4a373;
+            color: #5a3e36;
+        }
+
+        .spring-fall-theme .game-button:hover {
+            background-color: #b5834f;
+        }
+
+        .spring-fall-theme #logout-button {
+            background-color: #8b5e3c;
+        }
+
+        .spring-fall-theme #logout-button:hover {
+            background-color: #6b4a2f;
+        }
+
+        /* User Info and Login Styles */
+        #user-info {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            text-align: right;
+        }
+
+        #login-link {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        #login-link:hover {
+            text-decoration: underline;
+        }
+
+        #logged-in {
+            display: none;
+        }
+
+        #username {
+            cursor: pointer;
+            color: #000;
+            text-decoration: underline;
+            font-weight: bold;
+        }
+
+        #logout-button {
+            background-color: #ff4444;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-left: 10px;
+        }
+
+        #logout-button:hover {
+            background-color: #cc0000;
+        }
+
+        /* Welcome Container Styles */
+        .welcome-container {
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .welcome-container img {
+            height: 100px;
+            margin-bottom: 20px;
+        }
+
+        .main-heading {
+            font-size: 2.5rem;
+            margin: 10px 0;
+        }
+
+        .welcome-text {
+            font-size: 1.5rem;
+            color: #555;
+        }
+
+        /* Button Grid Styles */
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 20px auto;
+            max-width: 600px;
+            padding: 20px;
+        }
+
+        .game-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .game-button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Time Display Styles */
+        #time-display {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        /* Theme Toggle Button Styles */
+        #theme-toggle {
+            position: absolute;
+            top: 10px;
+            left: 120px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        #theme-toggle:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
     <!-- Time Display -->
     <div id="time-display"></div>
 
     <!-- Theme Toggle Button -->
     <button id="theme-toggle" class="theme-button">Toggle Theme</button>
 
-    <!-- Welcome Screen with Christmas Heading -->
+    <!-- User Info and Login -->
+    <div id="user-info">
+        <a id="login-link" href="https://vuyani1.github.io/login.html" target="_blank">Login</a>
+        <div id="logged-in">
+            <span id="username">User</span>
+            <button id="logout-button" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <!-- Welcome Screen -->
     <div class="welcome-container">
-        <h1 class="main-heading" id="device-heading">🎄 Vilakazi Games 🎅</h1>
-        <h2 class="welcome-text">🎁 MERRY CHRISTMAS 🎁</h2>
+        <img src="https://vgames1.github.io/vgameswhite.png" alt="VGAMES Logo">
+        <h1 class="main-heading" id="device-heading">Vilakazi Games</h1>
+        <h2 class="welcome-text">Welcome to VGAMES</h2>
     </div>
 
     <!-- Button Grid -->
@@ -35,19 +185,23 @@
         <button class="game-button" onclick="location.href='https://vuyani1.github.io/home.html/game3.html'">🎮 Game 3</button>
         <button class="game-button" onclick="location.href='https://vuyani1.github.io/home.html/game4.html'">🎮 Game 4</button>
         <button class="game-button" onclick="location.href='https://vuyani1.github.io/home.html/game5.html'">🎮 Game 5</button>
-        <button class="game-button" onclick="location.href='https://vuyani1.github.io/home.html/game6.html'">🎮 Game 6</button>
-        <button class="game-button" onclick="location.href='https://vuyani1.github.io/home.html/game7.html'">🎮 Game 7</button>
-        <button class="game-button" onclick="location.href='https://vuyani1.github.io/home.html/game8.html'">🎮 Game 8</button>
-        <button class="game-button" onclick="location.href='https://vuyani1.github.io/home.html/game9.html'">🎮 Game 9</button>
-        <button class="game-button" onclick="location.href='https://vuyani1.github.io/home.html/game10.html'">🎮 Game 10</button>
-        <button class="game-button" onclick="location.href='https://vuyani1.github.io/home.html/game11.html'">🎮 Game 11</button>
-        <button class="game-button" onclick="location.href='https://vuyani1.github.io/home.html/game12.html'">🎮 Game 12</button>
     </div>
 
-    <!-- JavaScript for Time Display and Theme Toggle -->
+    <!-- JavaScript for Time Display, Theme Toggle, and Login Functionality -->
     <script>
-        const deviceHeading = document.getElementById("device-heading");
+        const loginLink = document.getElementById("login-link");
+        const loggedInDiv = document.getElementById("logged-in");
+        const usernameSpan = document.getElementById("username");
+        const logoutButton = document.getElementById("logout-button");
         const themeToggle = document.getElementById("theme-toggle");
+
+        // Check localStorage for saved login
+        const savedUsername = localStorage.getItem("username");
+        if (savedUsername) {
+            loginLink.style.display = "none";
+            loggedInDiv.style.display = "block";
+            usernameSpan.innerText = savedUsername;
+        }
 
         // Time Display
         function updateTime() {
@@ -60,25 +214,33 @@
 
         // Theme Toggle
         themeToggle.addEventListener("click", () => {
-            document.body.classList.toggle("alternate-theme");
+            document.body.classList.toggle("spring-fall-theme");
         });
+
+        // Login Functionality
+        window.addEventListener("message", (event) => {
+            if (event.origin !== "https://vgames1.github.io") return;
+
+            if (event.data.status === "verified") {
+                loginLink.style.display = "none";
+                loggedInDiv.style.display = "block";
+                usernameSpan.innerText = event.data.username;
+                localStorage.setItem("username", event.data.username);
+            }
+        });
+
+        // Username Click
+        usernameSpan.addEventListener("click", () => {
+            alert("Powered By VGAMES");
+        });
+
+        // Logout Function
+        function logout() {
+            loginLink.style.display = "inline";
+            loggedInDiv.style.display = "none";
+            usernameSpan.innerText = "User";
+            localStorage.removeItem("username");
+        }
     </script>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VGAMES - Home</title>
-    <!-- Embed the Christmas widget -->
-    <script async src="https://vuyani1.github.io/christmas-widget.js"></script>
-</head>
-<body>
-    <div id="content">
-        <!-- Website content goes here -->
-        <h1>Welcome to VGAMES!</h1>
-        <p>Explore our amazing collection of games and updates.</p>
-    </div>
 </body>
 </html>
