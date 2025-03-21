@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VGAMES Browser</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1a1a1a;
+            color: #fff;
+        }
+
+        /* Browser Header */
+        .browser-header {
+            background-color: #333;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .browser-header input {
+            width: 70%;
+            padding: 5px;
+            border: none;
+            border-radius: 5px;
+            background-color: #444;
+            color: #fff;
+        }
+
+        .browser-header button {
+            background-color: #ff4b2b;
+            border: none;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            background-color: #444;
+            padding: 5px;
+        }
+
+        .tab {
+            display: flex;
+            align-items: center;
+            background-color: #555;
+            padding: 5px 10px;
+            margin-right: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .tab img {
+            width: 16px;
+            height: 16px;
+            margin-right: 5px;
+        }
+
+        .tab .close {
+            margin-left: 10px;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        /* Browser Content */
+        .browser-content {
+            padding: 20px;
+        }
+
+        /* Network Info */
+        .network-info {
+            margin-bottom: 20px;
+        }
+
+        .network-info h2 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .network-info p {
+            margin: 5px 0;
+        }
+
+        /* Login Section */
+        .login-section {
+            margin-top: 20px;
+        }
+
+        .login-section h2 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .login-section button {
+            background-color: #4caf50;
+            border: none;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <!-- Browser Header -->
+    <div class="browser-header">
+        <input type="text" id="url-input" placeholder="Enter URL">
+        <button onclick="navigate()">Go</button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs" id="tabs">
+        <div class="tab active" data-url="https://vgames1.github.io">
+            <img src="https://vgames1.github.io/vgamesblack.png" alt="Favicon">
+            VGAMES
+            <span class="close" onclick="closeTab(this)">✕</span>
+        </div>
+    </div>
+
+    <!-- Browser Content -->
+    <div class="browser-content">
+        <!-- Network Info -->
+        <div class="network-info">
+            <h2>Network Information</h2>
+            <p id="ip-address">IP Address: Loading...</p>
+            <p id="network-status">Network Status: Loading...</p>
+        </div>
+
+        <!-- Login Section -->
+        <div class="login-section">
+            <h2>Login</h2>
+            <button onclick="openLogin()">Login with VGAMES</button>
+        </div>
+    </div>
+
+    <script>
+        // Fetch IP Address and Network Status
+        async function fetchNetworkInfo() {
+            try {
+                const ipResponse = await fetch('https://api.ipify.org?format=json');
+                const ipData = await ipResponse.json();
+                document.getElementById('ip-address').textContent = `IP Address: ${ipData.ip}`;
+
+                const networkStatus = navigator.onLine ? "Online" : "Offline";
+                document.getElementById('network-status').textContent = `Network Status: ${networkStatus}`;
+            } catch (error) {
+                console.error("Error fetching network info:", error);
+            }
+        }
+
+        // Navigate to URL
+        function navigate() {
+            const url = document.getElementById('url-input').value;
+            if (url) {
+                const newTab = createTab(url);
+                document.getElementById('tabs').appendChild(newTab);
+                setActiveTab(newTab);
+            }
+        }
+
+        // Create a New Tab
+        function createTab(url) {
+            const tab = document.createElement('div');
+            tab.className = 'tab';
+            tab.dataset.url = url;
+
+            const favicon = document.createElement('img');
+            favicon.src = `https://www.google.com/s2/favicons?domain=${url}`;
+            tab.appendChild(favicon);
+
+            const tabTitle = document.createTextNode(new URL(url).hostname);
+            tab.appendChild(tabTitle);
+
+            const closeButton = document.createElement('span');
+            closeButton.className = 'close';
+            closeButton.textContent = '✕';
+            closeButton.onclick = () => closeTab(closeButton);
+            tab.appendChild(closeButton);
+
+            return tab;
+        }
+
+        // Set Active Tab
+        function setActiveTab(tab) {
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+        }
+
+        // Close Tab
+        function closeTab(closeButton) {
+            const tab = closeButton.parentElement;
+            tab.remove();
+        }
+
+        // Open Login Page
+        function openLogin() {
+            const loginTab = createTab('https://vgames1.github.io/login.html');
+            document.getElementById('tabs').appendChild(loginTab);
+            setActiveTab(loginTab);
+        }
+
+        // Initialize
+        fetchNetworkInfo();
+    </script>
+</body>
+</html>
