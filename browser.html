@@ -70,6 +70,10 @@
             cursor: pointer;
         }
 
+        .tab.active {
+            background-color: #666;
+        }
+
         /* Browser Content */
         .browser-content {
             padding: 20px;
@@ -107,6 +111,15 @@
             border-radius: 5px;
             cursor: pointer;
         }
+
+        /* Iframe for Website Content */
+        iframe {
+            width: 100%;
+            height: 500px;
+            border: none;
+            background-color: #fff;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
@@ -118,7 +131,7 @@
 
     <!-- Tabs -->
     <div class="tabs" id="tabs">
-        <div class="tab active" data-url="https://vgames1.github.io">
+        <div class="tab active" data-url="https://vgames1.github.io" onclick="switchTab(this)">
             <img src="https://vgames1.github.io/vgamesblack.png" alt="Favicon">
             VGAMES
             <span class="close" onclick="closeTab(this)">✕</span>
@@ -133,6 +146,9 @@
             <p id="ip-address">IP Address: Loading...</p>
             <p id="network-status">Network Status: Loading...</p>
         </div>
+
+        <!-- Iframe for Website Content -->
+        <iframe id="website-frame" src="https://vgames1.github.io"></iframe>
 
         <!-- Login Section -->
         <div class="login-section">
@@ -163,6 +179,7 @@
                 const newTab = createTab(url);
                 document.getElementById('tabs').appendChild(newTab);
                 setActiveTab(newTab);
+                loadWebsite(url);
             }
         }
 
@@ -171,6 +188,7 @@
             const tab = document.createElement('div');
             tab.className = 'tab';
             tab.dataset.url = url;
+            tab.onclick = () => switchTab(tab);
 
             const favicon = document.createElement('img');
             favicon.src = `https://www.google.com/s2/favicons?domain=${url}`;
@@ -182,7 +200,10 @@
             const closeButton = document.createElement('span');
             closeButton.className = 'close';
             closeButton.textContent = '✕';
-            closeButton.onclick = () => closeTab(closeButton);
+            closeButton.onclick = (e) => {
+                e.stopPropagation(); // Prevent tab switch when closing
+                closeTab(closeButton);
+            };
             tab.appendChild(closeButton);
 
             return tab;
@@ -195,10 +216,32 @@
             tab.classList.add('active');
         }
 
+        // Switch Tab
+        function switchTab(tab) {
+            setActiveTab(tab);
+            const url = tab.dataset.url;
+            loadWebsite(url);
+        }
+
         // Close Tab
         function closeTab(closeButton) {
             const tab = closeButton.parentElement;
             tab.remove();
+
+            // If the closed tab was active, switch to the first tab
+            const tabs = document.querySelectorAll('.tab');
+            if (tabs.length > 0) {
+                setActiveTab(tabs[0]);
+                loadWebsite(tabs[0].dataset.url);
+            } else {
+                // No tabs left, clear the iframe
+                document.getElementById('website-frame').src = '';
+            }
+        }
+
+        // Load Website in Iframe
+        function loadWebsite(url) {
+            document.getElementById('website-frame').src = url;
         }
 
         // Open Login Page
@@ -206,6 +249,7 @@
             const loginTab = createTab('https://vgames1.github.io/login.html');
             document.getElementById('tabs').appendChild(loginTab);
             setActiveTab(loginTab);
+            loadWebsite('https://vgames1.github.io/login.html');
         }
 
         // Initialize
