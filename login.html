@@ -114,7 +114,13 @@
 
         // GitHub Login
         function loginWithGitHub() {
-            window.location.href = "https://auth.poki.io/auth/signin/github?return=https%3A%2F%2Fapp.poki.dev%2Fauth%2Fgithub&service=pokifordevs";
+            const clientId = "Ov23liTmXxODuCZWusYM"; // Your GitHub Client ID
+            const redirectUri = encodeURIComponent("https://vgames1.github.io/callback.html");
+            const scope = encodeURIComponent("user:email"); // Requested permissions
+            const state = "vgames_login"; // Optional: Add a state parameter for security
+
+            const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&state=${state}`;
+            window.location.href = githubAuthUrl;
         }
 
         // VGAMES Login
