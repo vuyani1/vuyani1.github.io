@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OAuth Callback</title>
+    <script>
+        // Parse the OAuth response from the URL hash or query parameters
+        function parseOAuthResponse() {
+            const hash = window.location.hash.substring(1); // Remove the '#' from the hash
+            const query = window.location.search.substring(1); // Remove the '?' from the query
+            const params = new URLSearchParams(hash || query);
+
+            // Extract the access token or authorization code
+            const accessToken = params.get("access_token");
+            const code = params.get("code");
+            const error = params.get("error");
+
+            if (error) {
+                // Handle OAuth error
+                window.opener.postMessage({
+                    status: "error",
+                    error: error,
+                    errorDescription: params.get("error_description")
+                }, "https://vgames1.github.io");
+            } else if (accessToken) {
+                // Handle access token
+                window.opener.postMessage({
+                    status: "success",
+                    accessToken: accessToken
+                }, "https://vgames1.github.io");
+            } else if (code) {
+                // Handle authorization code
+                window.opener.postMessage({
+                    status: "success",
+                    code: code
+                }, "https://vgames1.github.io");
+            } else {
+                // No valid response
+                window.opener.postMessage({
+                    status: "error",
+                    error: "invalid_response"
+                }, "https://vgames1.github.io");
+            }
+
+            // Close the callback window
+            window.close();
+        }
+
+        // Run the OAuth response parser when the page loads
+        window.onload = parseOAuthResponse;
+    </script>
+</head>
+<body>
+    <p>Processing OAuth response...</p>
+</body>
+</html>
