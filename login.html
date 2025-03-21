@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="icon" type="image/png" href="https://vgames1.github.io/vgamesblack.png">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #1a1a1a;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .login-container {
+            background-color: #333;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            width: 350px;
+        }
+        .login-container img {
+            width: 100px;
+            margin-bottom: 20px;
+        }
+        .login-container h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #ff4b2b;
+        }
+        .login-option {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #444;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .login-option:hover {
+            background-color: #555;
+        }
+        .login-option svg {
+            width: 24px;
+            height: 24px;
+            margin-right: 10px;
+        }
+        .login-option img {
+            width: 24px;
+            height: 24px;
+            margin-right: 10px;
+        }
+        .login-option span {
+            font-size: 16px;
+        }
+        .loading-message {
+            color: #4caf50;
+            font-size: 16px;
+            margin-top: 10px;
+            display: none; /* Hidden by default */
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <img src="https://vgames1.github.io/vgamesblack.png" alt="Logo">
+        <h2>Login</h2>
+        <!-- Google Login -->
+        <div class="login-option" onclick="loginWithGoogle()">
+            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="48" height="48" viewBox="0 0 48 48">
+                <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path>
+                <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path>
+                <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"></path>
+                <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"></path>
+            </svg>
+            <span>Login with Google</span>
+        </div>
+        <!-- Discord Login -->
+        <div class="login-option" onclick="loginWithDiscord()">
+            <img src="https://assets-global.website-files.com/6257adef93867e50d84d30e2/636e0b5061df29d55a92d945_full_logo_white_RGB.svg" alt="Discord Icon" style="width: 24px; height: 24px;">
+            <span>Login with Discord</span>
+        </div>
+        <!-- GitHub Login -->
+        <div class="login-option" onclick="loginWithGitHub()">
+            <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub Icon" style="width: 24px; height: 24px;">
+            <span>Login with GitHub</span>
+        </div>
+        <!-- VGAMES Login -->
+        <div class="login-option" onclick="loginWithVGAMES()">
+            <img src="https://vgames1.github.io/vgamesblack.png" alt="VGAMES Icon">
+            <span>Login with VGAMES</span>
+        </div>
+        <!-- Loading Message -->
+        <div id="loading-message" class="loading-message">Redirecting to VGAMES Login...</div>
+    </div>
+
+    <script>
+        // Google Login
+        function loginWithGoogle() {
+            window.location.href = "https://auth.poki.io/auth/signin/google?return=https%3A%2F%2Fapp.poki.dev%2Fauth%2Fgoogle&service=pokifordevs";
+        }
+
+        // Discord Login
+        function loginWithDiscord() {
+            window.location.href = "https://auth.poki.io/auth/signin/discord?return=https%3A%2F%2Fapp.poki.dev%2Fauth%2Fdiscord&service=pokifordevs";
+        }
+
+        // GitHub Login
+        function loginWithGitHub() {
+            window.location.href = "https://auth.poki.io/auth/signin/github?return=https%3A%2F%2Fapp.poki.dev%2Fauth%2Fgithub&service=pokifordevs";
+        }
+
+        // VGAMES Login
+        function loginWithVGAMES() {
+            const loadingMessage = document.getElementById("loading-message");
+            loadingMessage.style.display = "block"; // Show loading message
+
+            // Redirect to VGAMES Login
+            window.location.href = "https://vgames1.github.io/login.html";
+        }
+
+        // Listen for postMessage from VGAMES Login
+        window.addEventListener("message", (event) => {
+            if (event.origin !== "https://vgames1.github.io") return;
+
+            if (event.data.status === "verified") {
+                const username = event.data.username;
+                const emoji = event.data.emoji;
+
+                // Display the username and emoji in the parent window
+                alert(`Welcome back, ${username} ${emoji}!`);
+
+                // Close the login window after 2 seconds
+                setTimeout(() => {
+                    window.close();
+                }, 2000);
+            }
+        });
+    </script>
+</body>
+</html>
