@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>VS TOPS Articles</title>
+    <link rel="icon" href="https://vgames.run.place/favicon.ico" type="image/x-icon">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--theme-bg, #f7f7f7);
+            color: var(--theme-text, #000);
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+        }
+        .article {
+            margin-bottom: 40px;
+        }
+        .article p {
+            white-space: pre-wrap;
+            line-height: 1.6;
+        }
+        a {
+            color: var(--theme-link, #0077cc);
+        }
+        .article-link {
+            display: block;
+            margin: 10px 0;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .logo {
+            display: block;
+            margin: 0 auto 20px;
+            width: 100px;
+        }
+        .search {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        #searchInput {
+            width: 80%;
+            padding: 8px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="https://vgames.run.place/vgstu.png" alt="VGAMES Logo" class="logo">
+        <h1>VS TOPS - Articles</h1>
+        <div class="search">
+            <input type="text" id="searchInput" placeholder="Search articles by name...">
+        </div>
+        <div id="articles"></div>
+    </div>
+
+<script>
+const folderURL = 'https://vgames.run.place/art/';
+const fileList = ['most-hated-games.txt', 'most-played-video-games.txt']; // Fallback due to server not allowing directory listing
+const colors = {
+    blue: '#0077cc',
+    red: '#cc0000',
+    green: '#008000'
+};
+
+function setTheme(color) {
+    document.body.style.setProperty('--theme-bg', color + '11');
+    document.body.style.setProperty('--theme-text', color);
+    document.body.style.setProperty('--theme-link', color);
+}
+
+function parseColorTheme(text) {
+    const match = text.match(/^`{3}(.*?)`{3}/);
+    if (match && match[1]) {
+        const themes = match[1].split(',');
+        return themes[0].trim();
+    }
+    return null;
+}
+
+function cleanContent(text) {
+    return text.replace(/^`{3}.*?`{3}\n?/, '');
+}
+
+function showArticle(filename, text) {
+    const color = parseColorTheme(text);
+    if (color && colors[color]) setTheme(colors[color]);
+
+    const htmlText = cleanContent(text).replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
+
+    const container = document.getElementById('articles');
+    container.innerHTML = `
+        <div class="article">
+            <a class="article-link">${filename}</a>
+            <p>${htmlText}</p>
+        </div>
+    `;
+}
+
+function updateURL(filename) {
+    const url = new URL(window.location);
+    url.searchParams.set('file', filename);
+    window.history.pushState({}, '', url);
+}
+
+let storedFilenames = [...fileList];
+
+async function loadArticles() {
+    const container = document.getElementById('articles');
+    const fileParam = new URLSearchParams(window.location.search).get('file');
+
+    if (fileParam && fileList.includes(fileParam)) {
+        try {
+            const response = await fetch(folderURL + fileParam);
+            const text = await response.text();
+            showArticle(fileParam, text);
+        } catch (err) {
+            container.innerHTML = '<p>Failed to load article.</p>';
+        }
+        return;
+    }
+
+    displayArticleLinks(fileList);
+}
+
+function displayArticleLinks(filenames) {
+    const container = document.getElementById('articles');
+    container.innerHTML = '';
+    for (let filename of filenames.reverse()) {
+        const articleLink = document.createElement('a');
+        articleLink.className = 'article-link';
+        articleLink.textContent = filename;
+        articleLink.onclick = async () => {
+            try {
+                const res = await fetch(folderURL + filename);
+                const txt = await res.text();
+                updateURL(filename);
+                showArticle(filename, txt);
+            } catch (err) {
+                container.innerHTML = '<p>Error loading article: ' + filename + '</p>';
+            }
+        };
+        container.appendChild(articleLink);
+    }
+}
+
+const searchInput = document.getElementById('searchInput');
+searchInput.addEventListener('input', () => {
+    const query = searchInput.value.toLowerCase();
+    const filtered = fileList.filter(name => name.toLowerCase().includes(query));
+    displayArticleLinks(filtered);
+});
+
+loadArticles();
+</script>
+</body>
+</html>
