@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VS</title>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
     <!-- Google Tag -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-QXCTMJCPKJ"></script>
@@ -18,21 +19,34 @@
     <script async src="https://script.adquake.com/js/adquake.js" adquake-key="ZFuNz52EU0KA00pHNsA4VQ=="></script>
 </head>
 <body>
+    <div id="particles-js"></div>
     <div class="container">
         <header>
-            <img src="vstudio.png" alt="VStudio Logo" class="logo">
+            <img src="vstudio.png" alt="VStudio Logo" class="logo glitch" data-text="VSTUDIO">
         </header>
         <main>
-            <h1>Welcome to <span class="highlight">VILAKAZI STUDIO</span></h1>
-            <p>Explore our world of creativity and innovation.</p>
+            <h1 class="neon-text">WELCOME TO <span class="cyberpunk">VSTUDIO</span></h1>
+            <p class="subtitle">WE BUILD THE FUTURE</p>
             <div class="buttons">
-                <a href="https://gs.vstudio.work.gd" class="btn btn-games">GAMES</a>
-                <a href="https://vgames.run.place/about" class="btn btn-about">ABOUT US</a>
+                <a href="https://gs.vstudio.work.gd" class="btn btn-games pulse">
+                    <i class="fas fa-gamepad"></i> GAMES
+                </a>
+                <a href="https://vgames.run.place/about" class="btn btn-about hover-glow">
+                    <i class="fas fa-info-circle"></i> ABOUT US
+                </a>
             </div>
         </main>
         <footer>
-            <p>&copy; 2025 VILAKAZI STUDIO. All rights reserved.</p>
+            <div class="socials">
+                <a href="https://www.twitch.tv/vuyanisiyandavilakazi"><i class="fab fa-discord"></i></a>
+                <a href="https://x.com/SiyandaVuyani"><i class="fab fa-twitter"></i></a>
+                <a href="https://www.youtube.com/@vilakazivuyanii"><i class="fab fa-youtube"></i></a>
+            </div>
+            <p>&copy; 2025 VSTUDIO. ALL RIGHTS RESERVED.</p>
         </footer>
     </div>
+    <!-- Particle.js for background -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
