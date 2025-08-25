@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TyVila Games Login</title>
+<link rel="icon" href="https://www.tyvila.online/cdn/favicon.ico">
+<link rel="stylesheet" href="assets/css/style.css">
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<div class="login-container">
+<h1>TyVila Games</h1>
+<input type="email" id="email" placeholder="Email">
+<input type="password" id="password" placeholder="Password">
+<div class="buttons">
+<button onclick="login()">Login</button>
+<button onclick="signup()">Sign Up</button>
+</div>
+<p id="message"></p>
+</div>
+<script src="assets/js/main.js"></script>
+<script>
+const supabaseUrl = "https://wwcedhbbdoyrmquokyjj.supabase.co";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4";
+const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+async function login() {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if(error) { document.getElementById("message").innerText = error.message; return; }
+    const user = data.user;
+    if(user && user.email_confirmed_at) window.location.href = "dashboard.html";
+    else alert("Please verify your email before logging in.");
+}
+
+async function signup() {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    const username = email.split("@")[0];
+    const { data, error } = await supabase.auth.signUp({ email, password });
+    if(error) { document.getElementById("message").innerText = error.message; return; }
+    await fetch("/.netlify/functions/create_user_page", { method: "POST", body: JSON.stringify({ email, username, password }) });
+    alert("Signup successful! Verify your email.");
+}
+</script>
+</body>
+</html>
