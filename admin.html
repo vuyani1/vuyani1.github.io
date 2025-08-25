@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TyVila Admin</title>
+<link rel="stylesheet" href="assets/css/style.css">
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<header><h1>Admin Panel</h1><button onclick="logout()">Logout</button></header>
+<div class="container">
+<div class="admin-section">
+<h2>Manage Games</h2>
+<input id="game-name" placeholder="Game Name">
+<input id="game-desc" placeholder="Description">
+<input id="game-embed" placeholder="Embed Link">
+<input id="game-img" placeholder="Image Link">
+<button onclick="addGame()">Add Game</button>
+<div id="games-admin-list"></div>
+</div>
+<div class="admin-section">
+<h2>Manage Users</h2>
+<div id="users-list"></div>
+</div>
+<div class="admin-section">
+<h2>Ads / Widgets</h2>
+<input id="ad-link" placeholder="Ad link or script">
+<button onclick="pushAd()">Push Ad</button>
+</div>
+</div>
+<script src="assets/js/main.js"></script>
+<script>
+const supabaseUrl = "https://wwcedhbbdoyrmquokyjj.supabase.co";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4";
+const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+async function logout() { await supabase.auth.signOut(); window.location.href="index.html"; }
+
+async function addGame() {
+    const name = document.getElementById("game-name").value;
+    const desc = document.getElementById("game-desc").value;
+    const embed = document.getElementById("game-embed").value;
+    const img = document.getElementById("game-img").value;
+    await supabase.from("games").insert([{ name, description: desc, embed_link: embed, image_link: img }]);
+    loadGamesAdmin();
+}
+
+async function loadGamesAdmin() {
+    const { data } = await supabase.from("games").select("*");
+    const container = document.getElementById("games-admin-list");
+    container.innerHTML = "";
+    data.forEach(g => {
+        const div = document.createElement("div");
+        div.innerHTML = `<b>${g.name}</b> <button onclick="removeGame('${g.id}')">Remove</button>`;
+        container.appendChild(div);
+    });
+}
+
+async function removeGame(id) {
+    await supabase.from("games").delete().eq("id", id);
+    loadGamesAdmin();
+}
+
+async function loadUsersAdmin() {
+    const { data } = await supabase.from("users").select("*");
+    const container = document.getElementById("users-list");
+    container.innerHTML = "";
+    data.forEach(u => {
+        const div = document.createElement("div");
+        div.innerHTML = `<b>${u.username}</b> - ${u.status} 
+        <button onclick="suspendUser('${u.id}')">Suspend</button> 
+        <button onclick="banUser('${u.id}')">Ban</button>`;
+        container.appendChild(div);
+    });
+}
+
+async function suspendUser(id) {
+    await supabase.from("users").update({ status: "suspended" }).eq("id", id);
+    loadUsersAdmin();
+}
+
+async function banUser(id) {
+    await supabase.from("users").update({ status: "banned" }).eq("id", id);
+    loadUsersAdmin();
+}
+
+function pushAd() { alert("Ad pushed! Integrate widget as needed."); }
+
+loadGamesAdmin();
+loadUsersAdmin();
+</script>
+</body>
+</html>
