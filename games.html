@@ -2,32 +2,39 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>TyVila Games</title>
+<title>Games - TyVila</title>
 <link rel="icon" href="https://www.tyvila.online/cdn/favicon.ico">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Play the best TyVila games, earn points, and chat with friends!">
+<meta name="description" content="Play games, earn points, and chat with friends on TyVila.">
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <style>
-body { margin:0; font-family:'Segoe UI',sans-serif; background:#0a0a0a; color:white; }
+body { margin:0; font-family:'Segoe UI',sans-serif; background:linear-gradient(135deg,#000,#1a1a1a); color:white; display:flex; flex-direction:column; height:100vh; }
 header { display:flex; justify-content:space-between; align-items:center; padding:10px 20px; background:#111; border-bottom:2px solid #ff6600; flex-wrap:wrap; }
-header button { background:#ff6600; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; color:white; margin:5px; }
+header button { background:#ff6600; border:none; padding:10px 15px; border-radius:8px; cursor:pointer; color:white; margin:5px; font-size:14px; }
 header button:hover { background:#e65c00; }
-.container { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:15px; padding:20px; }
-.game-card { background:#1e1e1e; border-radius:16px; padding:15px; box-shadow:0 0 20px rgba(255,102,0,0.4); display:flex; flex-direction:column; }
-.game-card img { width:100%; border-radius:12px; margin-bottom:10px; }
-.game-card iframe { width:100%; height:200px; border:none; border-radius:12px; margin-bottom:10px; }
-.game-card h3 { margin:5px 0; }
-.game-card p { font-size:14px; color:#ccc; flex-grow:1; }
-.comments { background:#111; border-radius:10px; padding:10px; max-height:150px; overflow-y:auto; margin-bottom:10px; }
-.comment { border-bottom:1px solid #333; padding:5px; }
-.comment button { background:red; border:none; border-radius:6px; color:white; cursor:pointer; font-size:12px; float:right; }
-input.comment-input { width:calc(100% - 20px); padding:8px; margin-top:5px; border-radius:6px; border:none; background:#2a2a2a; color:white; }
-button.comment-btn { padding:6px 10px; margin-top:5px; border:none; border-radius:6px; background:#ff6600; color:white; cursor:pointer; }
-@media(max-width:600px){ .game-card iframe{ height:150px; } }
+.main-container { display:flex; flex:1; overflow:hidden; }
+.sidebar { width:300px; background:#1e1e1e; overflow-y:auto; border-right:2px solid #ff6600; padding:15px; }
+.sidebar h2 { text-align:center; margin:10px 0; }
+.sidebar ul { list-style:none; padding:0; margin:0; }
+.sidebar li { padding:10px; background:#2a2a2a; margin:5px 0; border-radius:8px; cursor:pointer; }
+.sidebar li:hover { background:#ff6600; }
+.game-area { flex:1; display:flex; flex-direction:column; padding:15px; }
+.game-window { flex:1; border:2px solid #ff6600; border-radius:12px; background:#000; display:flex; align-items:center; justify-content:center; }
+.game-window iframe { width:100%; height:100%; border:none; border-radius:12px; }
+.comment-section { background:#1e1e1e; border-radius:12px; padding:15px; margin-top:10px; flex-shrink:0; }
+.comment-section h3 { margin-top:0; }
+.comment-list { max-height:150px; overflow-y:auto; margin-bottom:10px; }
+.comment-list div { padding:8px; border-bottom:1px solid #333; }
+.comment-list div b { color:#ff6600; }
+input, textarea, button { padding:8px; border:none; border-radius:6px; margin:4px 0; }
+input, textarea { width:100%; background:#2a2a2a; color:white; }
+button { background:#ff6600; color:white; cursor:pointer; }
+button:hover { background:#e65c00; }
+@media(max-width:900px){ .main-container{flex-direction:column;} .sidebar{width:100%; border-right:none; border-bottom:2px solid #ff6600;} }
 </style>
 <script>
-document.addEventListener("contextmenu", e => e.preventDefault());
-document.onkeydown = function(e){ if(e.ctrlKey&&(e.key==="u"||e.key==="U"||e.key==="s"||e.key==="S")) e.preventDefault(); }
+document.addEventListener("contextmenu", e=>e.preventDefault());
+document.onkeydown=function(e){if(e.ctrlKey&&(e.key==="u"||e.key==="s"||e.key==="S")) e.preventDefault();}
 </script>
 </head>
 <body>
@@ -35,8 +42,25 @@ document.onkeydown = function(e){ if(e.ctrlKey&&(e.key==="u"||e.key==="U"||e.key
   <button onclick="window.location.href='account.html'">Account</button>
   <div id="username-display">Username</div>
   <div id="points-display">Points: 0</div>
+  <button onclick="logout()">Logout</button>
 </header>
-<div class="container" id="games-container">Loading games...</div>
+
+<div class="main-container">
+  <div class="sidebar">
+    <h2>Games</h2>
+    <ul id="games-list"><li>Loading...</li></ul>
+  </div>
+  <div class="game-area">
+    <div class="game-window" id="game-window"><p>Select a game to play</p></div>
+    <div class="comment-section">
+      <h3>Comments</h3>
+      <div id="comment-list" class="comment-list"><p>No comments</p></div>
+      <textarea id="comment-input" placeholder="Write a comment..."></textarea>
+      <button onclick="postComment()">Post Comment</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const { createClient } = supabase;
 const supabaseClient = createClient(
@@ -44,69 +68,63 @@ const supabaseClient = createClient(
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4"
 );
 let currentUser=null;
+let currentGameId=null;
 
 async function loadUser(){
-  const { data: { user } } = await supabaseClient.auth.getUser();
+  const { data:{user} } = await supabaseClient.auth.getUser();
   if(!user) return window.location.href='login.html';
   currentUser=user;
   const { data } = await supabaseClient.from("profiles").select("*").eq("id",user.id).single();
-  document.getElementById("username-display").innerText = data.username||user.email;
-  document.getElementById("points-display").innerText = "Points: "+(data.points||0);
+  document.getElementById("username-display").innerText=data.username||user.email;
+  document.getElementById("points-display").innerText="Points: "+(data.points||0);
 }
 
 async function loadGames(){
-  const { data } = await supabaseClient.from("games").select("*").order("plays",{ascending:false});
-  const container = document.getElementById("games-container");
-  container.innerHTML="";
+  const { data } = await supabaseClient.from("games").select("*");
+  const list=document.getElementById("games-list");
+  list.innerHTML="";
+  if(!data||data.length===0){ list.innerHTML="<li>No games available</li>"; return;}
   data.forEach(game=>{
-    const card=document.createElement("div");
-    card.className="game-card";
-    card.innerHTML=`
-      <img src="${game.image}" alt="${game.name}">
-      <h3>${game.name}</h3>
-      <p>${game.description}</p>
-      <iframe src="${game.embed}" allowfullscreen></iframe>
-      <div class="comments" id="comments-${game.id}">Loading comments...</div>
-      <input class="comment-input" id="input-${game.id}" placeholder="Add a comment...">
-      <button class="comment-btn" onclick="addComment('${game.id}')">Post</button>
-    `;
-    container.appendChild(card);
-    loadComments(game.id);
+    const li=document.createElement("li");
+    li.innerText=game.name;
+    li.onclick=()=>playGame(game);
+    list.appendChild(li);
   });
 }
 
-async function loadComments(gameId){
-  const { data } = await supabaseClient.from("comments").select("*").eq("game_id",gameId).order("created_at",{ascending:true});
-  const box=document.getElementById(`comments-${gameId}`);
-  box.innerHTML="";
-  if(data){
-    data.forEach(c=>{
-      const div=document.createElement("div");
-      div.className="comment";
-      div.innerHTML=`<b>${c.username}</b>: ${c.content}`;
-      if(currentUser.email==="admin@tyvila.online"){
-        const btn=document.createElement("button");
-        btn.innerText="Delete";
-        btn.onclick=async()=>{ await supabaseClient.from("comments").delete().eq("id",c.id); loadComments(gameId); };
-        div.appendChild(btn);
-      }
-      box.appendChild(div);
-    });
-  }
+function playGame(game){
+  currentGameId=game.id;
+  document.getElementById("game-window").innerHTML=`<iframe src="${game.embed_link}" title="${game.name}"></iframe>`;
+  loadComments();
 }
 
-async function addComment(gameId){
-  const input=document.getElementById(`input-${gameId}`);
+async function loadComments(){
+  if(!currentGameId) return;
+  const { data } = await supabaseClient.from("comments").select("*").eq("game_id",currentGameId).order("created_at",{ascending:true});
+  const list=document.getElementById("comment-list");
+  list.innerHTML="";
+  if(!data||data.length===0){ list.innerHTML="<p>No comments</p>"; return;}
+  data.forEach(c=>{
+    const div=document.createElement("div");
+    div.innerHTML=`<b>${c.username||c.user_email}:</b> ${c.content}`;
+    list.appendChild(div);
+  });
+}
+
+async function postComment(){
+  if(!currentGameId) return;
+  const input=document.getElementById("comment-input");
   const content=input.value.trim();
   if(!content) return;
-  await supabaseClient.from("comments").insert([{game_id:gameId,user_id:currentUser.id,username:currentUser.email,content}]);
+  await supabaseClient.from("comments").insert([{game_id:currentGameId,user_id:currentUser.id,user_email:currentUser.email,username:document.getElementById("username-display").innerText,content}]);
   input.value="";
-  loadComments(gameId);
+  loadComments();
 }
+
+function logout(){ supabaseClient.auth.signOut(); window.location.href='login.html'; }
 
 loadUser();
 loadGames();
-setInterval(loadGames,10000);
 </script>
 </body>
 </html>
