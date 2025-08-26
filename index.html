@@ -1,49 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>TyVila Games Login</title>
-<link rel="icon" href="https://www.tyvila.online/cdn/favicon.ico">
-<link rel="stylesheet" href="assets/css/style.css">
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <meta charset="UTF-8">
+  <title>TyVila Games</title>
+  <link rel="icon" href="https://www.tyvila.online/cdn/favicon.ico">
+  <meta name="description" content="Explore TyVila games gallery. Accept cookies and check our terms and privacy policy.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <style>
+    body { margin:0; font-family:'Segoe UI',sans-serif; background:#0a0a0a; color:white; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:10px; padding:20px; }
+    .game-card { position:relative; height:200px; border-radius:16px; overflow:hidden; cursor:pointer; }
+    .game-card img { width:100%; height:100%; object-fit:cover; filter:brightness(0.6); transition:0.3s; }
+    .game-card:hover img { filter:brightness(1); transform:scale(1.05); }
+    .game-card h3 { position:absolute; bottom:40px; left:10px; margin:0; color:white; text-shadow:1px 1px 5px black; }
+    .game-card button { position:absolute; bottom:10px; left:10px; padding:6px 12px; border:none; border-radius:8px; background:#ff6600; color:white; cursor:pointer; }
+    .game-card button:hover { background:#e65c00; }
+    /* Cookies popup */
+    #cookie-popup { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#1e1e1e; padding:15px 25px; border-radius:12px; box-shadow:0 0 20px rgba(255,102,0,0.5); display:flex; align-items:center; gap:15px; }
+    #cookie-popup button { padding:6px 12px; border:none; border-radius:8px; background:#ff6600; color:white; cursor:pointer; }
+    #cookie-popup a { color:#ff6600; text-decoration:underline; }
+  </style>
 </head>
 <body>
-<div class="login-container">
-<h1>TyVila Games</h1>
-<input type="email" id="email" placeholder="Email">
-<input type="password" id="password" placeholder="Password">
-<div class="buttons">
-<button onclick="login()">Login</button>
-<button onclick="signup()">Sign Up</button>
-</div>
-<p id="message"></p>
-</div>
-<script src="assets/js/main.js"></script>
-<script>
-const supabaseUrl = "https://wwcedhbbdoyrmquokyjj.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4";
-const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+  <div class="grid" id="games-grid">Loading...</div>
 
-async function login() {
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if(error) { document.getElementById("message").innerText = error.message; return; }
-    const user = data.user;
-    if(user && user.email_confirmed_at) window.location.href = "dashboard.html";
-    else alert("Please verify your email before logging in.");
-}
+  <!-- Cookies popup -->
+  <div id="cookie-popup">
+    <span>We use cookies. By continuing, you agree to our <a href="terms.html" target="_blank">Terms & Conditions</a> and <a href="privacy.html" target="_blank">Privacy Policy</a>.</span>
+    <button onclick="acceptCookies()">Accept</button>
+  </div>
 
-async function signup() {
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-    const username = email.split("@")[0];
-    const { data, error } = await supabase.auth.signUp({ email, password });
-    if(error) { document.getElementById("message").innerText = error.message; return; }
-    await fetch("/.netlify/functions/create_user_page", { method: "POST", body: JSON.stringify({ email, username, password }) });
-    alert("Signup successful! Verify your email.");
-}
-</script>
+  <script>
+    const { createClient } = supabase;
+    const supabaseClient = createClient(
+      "https://wwcedhbbdoyrmquokyjj.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cmxxeWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4"
+    );
+
+    async function loadGames() {
+      const { data } = await supabaseClient.from("games").select("*").order("plays",{ascending:false});
+      const grid = document.getElementById("games-grid");
+      grid.innerHTML="";
+      data.forEach(game=>{
+        const div=document.createElement("div");
+        div.className="game-card";
+        div.innerHTML=`
+          <img src="${game.image}" alt="${game.name}">
+          <h3>${game.name}</h3>
+          <button onclick="playGame('${game.embed}')">Play</button>
+        `;
+        grid.appendChild(div);
+      });
+    }
+
+    function playGame(embedUrl){
+      window.location.href = "games.html"; 
+    }
+
+    loadGames();
+
+    function acceptCookies(){
+      localStorage.setItem("tyvila_cookies_accepted","true");
+      document.getElementById("cookie-popup").style.display="none";
+    }
+
+    if(localStorage.getItem("tyvila_cookies_accepted")) document.getElementById("cookie-popup").style.display="none";
+  </script>
 </body>
 </html>
