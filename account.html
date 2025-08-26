@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Account - TyVila</title>
+  <link rel="icon" href="https://www.tyvila.online/cdn/favicon.ico">
+  <meta name="description" content="Your TyVila account dashboard: profile, points, rank, and friends chat.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <style>
+    body {
+      margin:0; font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0a0a0a, #1a1a1a);
+      color:white; display:flex; flex-direction:column; align-items:center;
+    }
+    header {
+      width:100%; padding:15px; text-align:center;
+      background:#111; border-bottom:2px solid #ff6600;
+    }
+    header img { height:50px; }
+    .profile-card {
+      margin:20px; padding:20px; border-radius:16px;
+      background:#1e1e1e; box-shadow:0 0 20px rgba(255,102,0,0.4);
+      width:90%; max-width:800px; text-align:center;
+    }
+    .profile-pic {
+      width:120px; height:120px; border-radius:50%;
+      border:3px solid #ff6600; object-fit:cover;
+    }
+    .stats {
+      display:flex; justify-content:space-around; margin-top:15px;
+    }
+    .stat-box {
+      background:#2a2a2a; padding:15px; border-radius:12px;
+      width:30%; text-align:center;
+    }
+    .friends, .chat {
+      margin-top:25px; background:#1e1e1e; padding:20px;
+      border-radius:16px; box-shadow:0 0 15px rgba(255,102,0,0.3);
+    }
+    .friends ul { list-style:none; padding:0; }
+    .friends li {
+      padding:10px; border-bottom:1px solid #333; cursor:pointer;
+    }
+    .chat-box {
+      border:1px solid #333; padding:10px; height:200px; overflow-y:auto;
+      background:#111; border-radius:10px; margin-bottom:10px;
+    }
+    input, button {
+      padding:10px; border:none; border-radius:8px; margin:5px;
+    }
+    input { width:70%; background:#2a2a2a; color:white; }
+    button { background:#ff6600; color:white; cursor:pointer; }
+    button:hover { background:#e65c00; }
+  </style>
+  <script>
+    // Security
+    document.addEventListener("contextmenu", e => e.preventDefault());
+    document.onkeydown = function(e){
+      if(e.ctrlKey && (e.key === "u" || e.key === "U" || e.key === "s" || e.key === "S")) e.preventDefault();
+    }
+  </script>
+</head>
+<body>
+  <header>
+    <img src="https://www.tyvila.online/cdn/ty.webp" alt="TyVila Logo">
+  </header>
+
+  <div class="profile-card">
+    <img id="profile-pic" class="profile-pic" src="https://api.dicebear.com/9.x/thumbs/svg" alt="Profile Picture">
+    <h2 id="username">Loading...</h2>
+    <p id="email">Loading...</p>
+
+    <div class="stats">
+      <div class="stat-box">
+        <h3 id="points">0</h3>
+        <p>Points</p>
+      </div>
+      <div class="stat-box">
+        <h3 id="rank">-</h3>
+        <p>Rank</p>
+      </div>
+      <div class="stat-box">
+        <h3 id="friends-count">0</h3>
+        <p>Friends</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="friends">
+    <h3>Friends List</h3>
+    <ul id="friends-list">
+      <li>No friends yet</li>
+    </ul>
+  </div>
+
+  <div class="chat">
+    <h3>Chat</h3>
+    <div class="chat-box" id="chat-box"></div>
+    <input type="text" id="chat-input" placeholder="Type a message...">
+    <button onclick="sendMessage()">Send</button>
+  </div>
+
+  <script>
+    const { createClient } = supabase;
+    const supabaseClient = createClient(
+      "https://wwcedhbbdoyrmquokyjj.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4"
+    );
+
+    async function loadProfile() {
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
+      document.getElementById("email").innerText = user.email;
+
+      const { data, error } = await supabaseClient
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single();
+
+      if (data) {
+        document.getElementById("username").innerText = data.username || "Unknown";
+        document.getElementById("points").innerText = data.points || 0;
+        document.getElementById("rank").innerText = data.rank || "-";
+        document.getElementById("profile-pic").src = data.avatar_url || "https://api.dicebear.com/9.x/thumbs/svg";
+      }
+    }
+
+    async function loadFriends() {
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      const { data } = await supabaseClient
+        .from("friends")
+        .select("friend_username")
+        .eq("user_id", user.id);
+
+      const list = document.getElementById("friends-list");
+      list.innerHTML = "";
+      if (data.length === 0) {
+        list.innerHTML = "<li>No friends yet</li>";
+      } else {
+        data.forEach(f => {
+          let li = document.createElement("li");
+          li.innerText = f.friend_username;
+          list.appendChild(li);
+        });
+        document.getElementById("friends-count").innerText = data.length;
+      }
+    }
+
+    async function loadChat() {
+      const { data } = await supabaseClient
+        .from("messages")
+        .select("sender, content, created_at")
+        .order("created_at", { ascending: true })
+        .limit(50);
+
+      const box = document.getElementById("chat-box");
+      box.innerHTML = "";
+      data.forEach(msg => {
+        let div = document.createElement("div");
+        div.innerHTML = `<b>${msg.sender}:</b> ${msg.content}`;
+        box.appendChild(div);
+      });
+      box.scrollTop = box.scrollHeight;
+    }
+
+    async function sendMessage() {
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      const input = document.getElementById("chat-input");
+      const message = input.value.trim();
+      if (!message) return;
+
+      await supabaseClient.from("messages").insert([{
+        sender: user.email,
+        content: message
+      }]);
+
+      input.value = "";
+      loadChat();
+    }
+
+    loadProfile();
+    loadFriends();
+    loadChat();
+    setInterval(loadChat, 5000);
+  </script>
+</body>
+</html>
