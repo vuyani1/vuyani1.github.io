@@ -2,128 +2,147 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Admin Dashboard - TyVila</title>
+<title>Admin - TyVila</title>
 <link rel="icon" href="https://www.tyvila.online/cdn/favicon.ico">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="TyVila Admin Panel">
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <style>
-body{margin:0;font-family:'Segoe UI',sans-serif;background:#0a0a0a;color:white;display:flex;flex-direction:column;align-items:center;}
-header{width:100%;padding:15px;text-align:center;background:#111;border-bottom:2px solid #ff6600;}
-header img{height:50px;}
-.container{display:flex;flex-wrap:wrap;gap:20px;padding:20px;justify-content:center;}
-.card{background:#1e1e1e;border-radius:16px;padding:20px;box-shadow:0 0 20px rgba(255,102,0,0.4);width:300px;text-align:center;}
-.card button{margin-top:10px;padding:8px 12px;border:none;border-radius:8px;background:#ff6600;color:white;cursor:pointer;}
-.card button:hover{background:#e65c00;}
-input{width:100%;padding:8px;margin:5px;border-radius:6px;border:none;background:#2a2a2a;color:white;}
-table{width:100%;border-collapse:collapse;margin-top:10px;}
-th,td{border-bottom:1px solid #333;padding:6px;text-align:left;}
+body{margin:0;font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#000,#1a1a1a);color:white;display:flex;flex-direction:column;min-height:100vh}
+header{display:flex;justify-content:space-between;align-items:center;padding:10px 20px;background:#111;border-bottom:2px solid #ff6600;flex-wrap:wrap}
+header h1{margin:0;font-size:20px;color:#ff6600}
+header button{background:#ff6600;border:none;padding:10px 15px;border-radius:8px;cursor:pointer;color:white;margin:5px;font-size:14px}
+header button:hover{background:#e65c00}
+.container{flex:1;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px;padding:20px}
+.card{background:#1e1e1e;border-radius:12px;padding:15px;box-shadow:0 0 10px rgba(0,0,0,0.6);overflow:auto}
+.card h2{margin-top:0;color:#ff6600}
+input,textarea,select,button{width:100%;padding:8px;margin:5px 0;border:none;border-radius:6px}
+input,textarea,select{background:#2a2a2a;color:white}
+button{background:#ff6600;color:white;cursor:pointer}
+button:hover{background:#e65c00}
+.list{max-height:300px;overflow-y:auto}
+.list div{padding:8px;border-bottom:1px solid #333}
+.list div b{color:#ff6600}
+@media(max-width:700px){header{flex-direction:column;align-items:flex-start}}
 </style>
 <script>
-document.addEventListener("contextmenu", e => e.preventDefault());
-document.onkeydown = function(e){ if(e.ctrlKey&&(e.key==="u"||e.key==="U"||e.key==="s"||e.key==="S")) e.preventDefault(); }
+document.addEventListener("contextmenu",e=>e.preventDefault());
+document.onkeydown=function(e){if(e.ctrlKey&&(e.key==="u"||e.key==="s"||e.key==="S"))e.preventDefault();}
 </script>
 </head>
 <body>
-<header><img src="https://www.tyvila.online/cdn/ty.webp" alt="TyVila Admin"><h2>Admin Dashboard</h2></header>
-<div id="login-card" class="container">
-  <div class="card">
-    <h3>Admin Login</h3>
-    <input type="email" id="admin-email" placeholder="Email">
-    <input type="password" id="admin-password" placeholder="Password">
-    <button onclick="adminLogin()">Login</button>
+<header>
+  <h1>Admin Panel</h1>
+  <div>
+    <button onclick="window.location.href='games.html'">Back to Games</button>
+    <button onclick="window.location.href='reset.html'">Reset</button>
+    <button onclick="logout()">Logout</button>
   </div>
-</div>
-<div id="admin-content" class="container" style="display:none;">
+</header>
+
+<div class="container">
   <div class="card">
-    <h3>Manage Games</h3>
-    <button onclick="loadAllGames()">View Games</button>
+    <h2>Users</h2>
+    <div id="users-list" class="list"><p>Loading users...</p></div>
+  </div>
+
+  <div class="card">
+    <h2>Manage Games</h2>
+    <h3>Add Game</h3>
+    <input id="game-name" placeholder="Game Name">
+    <textarea id="game-desc" placeholder="Game Description"></textarea>
+    <input id="game-img" placeholder="Image Link">
+    <input id="game-embed" placeholder="Embed Link">
     <button onclick="addGame()">Add Game</button>
-    <button onclick="removeGame()">Remove Game</button>
-    <div id="games-list"></div>
+    <h3>Remove Game</h3>
+    <select id="remove-game-select"><option>Loading...</option></select>
+    <button onclick="removeGame()">Remove Selected Game</button>
   </div>
+
   <div class="card">
-    <h3>Comments</h3>
-    <button onclick="loadAllComments()">Load Comments</button>
-    <div id="comments-list"></div>
-  </div>
-  <div class="card">
-    <h3>Users</h3>
-    <input type="text" id="search-user" placeholder="Search username/email">
-    <button onclick="searchUser()">Search</button>
-    <div id="users-list"></div>
-  </div>
-  <div class="card">
-    <h3>Push Messages</h3>
-    <textarea id="push-content" placeholder="Enter push message"></textarea>
-    <button onclick="sendPush()">Send Push</button>
+    <h2>Comments</h2>
+    <div id="comments-list" class="list"><p>Loading comments...</p></div>
   </div>
 </div>
+
 <script>
 const { createClient } = supabase;
 const supabaseClient = createClient(
   "https://wwcedhbbdoyrmquokyjj.supabase.co",
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4"
 );
-let currentAdmin=null;
 
-async function adminLogin(){
-  const email=document.getElementById("admin-email").value;
-  const password=document.getElementById("admin-password").value;
-  if(email!=="admin@tyvila.online"){ alert("Not authorized"); return; }
-  const { data, error } = await supabaseClient.auth.signInWithPassword({email,password});
-  if(error){ alert("Login failed"); return; }
-  currentAdmin=data.user;
-  document.getElementById("login-card").style.display="none";
-  document.getElementById("admin-content").style.display="flex";
+async function loadUsers(){
+  const { data,error } = await supabaseClient.from("profiles").select("username,email");
+  const list=document.getElementById("users-list");
+  list.innerHTML="";
+  if(error||!data){list.innerHTML="<p>Error loading users</p>";return;}
+  data.forEach(u=>{
+    const div=document.createElement("div");
+    div.innerHTML=`<b>${u.username||"Unnamed"}</b> - ${u.email}`;
+    list.appendChild(div);
+  });
 }
 
-async function loadAllGames(){
-  const { data } = await supabaseClient.from("games").select("*");
-  const list=document.getElementById("games-list");
-  list.innerHTML="";
-  data.forEach(g=>{ list.innerHTML+=`<p>${g.name} <button onclick="deleteGame('${g.id}')">Delete</button></p>`; });
+async function loadGames(){
+  const { data,error } = await supabaseClient.from("games").select("*");
+  const select=document.getElementById("remove-game-select");
+  select.innerHTML="";
+  if(error||!data||data.length===0){select.innerHTML="<option>No games</option>";return;}
+  data.forEach(g=>{
+    const opt=document.createElement("option");
+    opt.value=g.id;
+    opt.text=g.name;
+    select.appendChild(opt);
+  });
 }
 
 async function addGame(){
-  const name=prompt("Game name:");
-  const description=prompt("Description:");
-  const image=prompt("Image URL:");
-  const embed=prompt("Embed URL:");
-  await supabaseClient.from("games").insert([{name,description,image,embed,plays:0,wins:0}]);
-  loadAllGames();
+  const name=document.getElementById("game-name").value.trim();
+  const desc=document.getElementById("game-desc").value.trim();
+  const img=document.getElementById("game-img").value.trim();
+  const embed=document.getElementById("game-embed").value.trim();
+  if(!name||!embed) return alert("Name and embed link required");
+  await supabaseClient.from("games").insert([{name,description:desc,image_link:img,embed_link:embed}]);
+  alert("Game added");
+  document.getElementById("game-name").value="";
+  document.getElementById("game-desc").value="";
+  document.getElementById("game-img").value="";
+  document.getElementById("game-embed").value="";
+  loadGames();
 }
 
-async function removeGame(){ alert("Use Delete button in list"); }
+async function removeGame(){
+  const id=document.getElementById("remove-game-select").value;
+  if(!id) return;
+  if(!confirm("Are you sure you want to delete this game?")) return;
+  await supabaseClient.from("games").delete().eq("id",id);
+  alert("Game removed");
+  loadGames();
+}
 
-async function deleteGame(id){ await supabaseClient.from("games").delete().eq("id",id); loadAllGames(); }
-
-async function loadAllComments(){
-  const { data } = await supabaseClient.from("comments").select("*").order("created_at",{ascending:false});
+async function loadComments(){
+  const { data,error } = await supabaseClient.from("comments").select("*").order("created_at",{ascending:false});
   const list=document.getElementById("comments-list");
   list.innerHTML="";
-  data.forEach(c=>{ list.innerHTML+=`<p>${c.username}: ${c.content} <button onclick="deleteComment('${c.id}')">Delete</button></p>`; });
+  if(error||!data){list.innerHTML="<p>Error loading comments</p>";return;}
+  data.forEach(c=>{
+    const div=document.createElement("div");
+    div.innerHTML=`<b>${c.username||c.user_email}:</b> ${c.content} <button onclick="deleteComment('${c.id}')">Delete</button>`;
+    list.appendChild(div);
+  });
 }
 
-async function deleteComment(id){ await supabaseClient.from("comments").delete().eq("id",id); loadAllComments(); }
-
-async function searchUser(){
-  const val=document.getElementById("search-user").value;
-  const { data } = await supabaseClient.from("profiles").select("*").or(`username.ilike.%${val}%,email.ilike.%${val}%`);
-  const list=document.getElementById("users-list");
-  list.innerHTML="";
-  data.forEach(u=>{ list.innerHTML+=`<p>${u.username} (${u.email}) <button onclick="blockUser('${u.id}')">Block</button></p>`; });  
+async function deleteComment(id){
+  if(!confirm("Delete this comment?")) return;
+  await supabaseClient.from("comments").delete().eq("id",id);
+  loadComments();
 }
 
-async function blockUser(id){ await supabaseClient.from("profiles").update({banned:true}).eq("id",id); searchUser(); }
+function logout(){ supabaseClient.auth.signOut(); window.location.href='login.html'; }
 
-async function sendPush(){
-  const content=document.getElementById("push-content").value;
-  if(!content) return;
-  await supabaseClient.from("messages").insert([{sender:"admin",content,type:"push"}]);
-  document.getElementById("push-content").value="";
-  alert("Push sent!");
-}
+loadUsers();
+loadGames();
+loadComments();
 </script>
 </body>
 </html>
