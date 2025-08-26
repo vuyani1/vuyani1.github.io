@@ -1,94 +1,219 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>TyVila Admin</title>
-<link rel="stylesheet" href="assets/css/style.css">
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <meta charset="UTF-8">
+  <title>Admin Dashboard - TyVila</title>
+  <link rel="icon" href="https://www.tyvila.online/cdn/favicon.ico">
+  <meta name="description" content="TyVila Admin Dashboard: manage games, users, comments, ads, and communicate with players.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <style>
+    body { margin:0; font-family:'Segoe UI',sans-serif; background:#0a0a0a; color:white; }
+    header { background:#111; padding:15px; text-align:center; border-bottom:2px solid #ff6600; }
+    header img { height:50px; }
+    .container { display:flex; flex-wrap:wrap; gap:20px; padding:20px; justify-content:center; }
+    .card { background:#1e1e1e; border-radius:16px; padding:20px; box-shadow:0 0 20px rgba(255,102,0,0.4); width:300px; }
+    input, textarea, select, button { width:100%; padding:10px; margin:5px 0; border-radius:8px; border:none; }
+    input, textarea, select { background:#2a2a2a; color:white; }
+    button { background:#ff6600; color:white; cursor:pointer; }
+    button:hover { background:#e65c00; }
+    .section { margin-bottom:25px; }
+    table { width:100%; border-collapse:collapse; margin-top:10px; }
+    th, td { padding:8px; border-bottom:1px solid #333; text-align:left; }
+    .chat-box { height:150px; overflow-y:auto; background:#111; padding:10px; border-radius:8px; margin-bottom:5px; }
+    .message { margin:5px 0; }
+  </style>
+  <script>
+    document.addEventListener("contextmenu", e => e.preventDefault());
+    document.onkeydown = function(e){
+      if(e.ctrlKey && (e.key==="u" || e.key==="U" || e.key==="s" || e.key==="S")) e.preventDefault();
+    }
+  </script>
 </head>
 <body>
-<header><h1>Admin Panel</h1><button onclick="logout()">Logout</button></header>
-<div class="container">
-<div class="admin-section">
-<h2>Manage Games</h2>
-<input id="game-name" placeholder="Game Name">
-<input id="game-desc" placeholder="Description">
-<input id="game-embed" placeholder="Embed Link">
-<input id="game-img" placeholder="Image Link">
-<button onclick="addGame()">Add Game</button>
-<div id="games-admin-list"></div>
-</div>
-<div class="admin-section">
-<h2>Manage Users</h2>
-<div id="users-list"></div>
-</div>
-<div class="admin-section">
-<h2>Ads / Widgets</h2>
-<input id="ad-link" placeholder="Ad link or script">
-<button onclick="pushAd()">Push Ad</button>
-</div>
-</div>
-<script src="assets/js/main.js"></script>
-<script>
-const supabaseUrl = "https://wwcedhbbdoyrmquokyjj.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4";
-const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+  <header>
+    <img src="https://www.tyvila.online/cdn/ty.webp" alt="TyVila Admin">
+    <h2>Admin Dashboard</h2>
+  </header>
 
-async function logout() { await supabase.auth.signOut(); window.location.href="index.html"; }
+  <div class="container" id="admin-container">
+    <div class="card" id="login-card">
+      <h3>Admin Login</h3>
+      <input type="email" id="admin-email" placeholder="Email">
+      <input type="password" id="admin-password" placeholder="Password">
+      <button onclick="adminLogin()">Login</button>
+    </div>
 
-async function addGame() {
-    const name = document.getElementById("game-name").value;
-    const desc = document.getElementById("game-desc").value;
-    const embed = document.getElementById("game-embed").value;
-    const img = document.getElementById("game-img").value;
-    await supabase.from("games").insert([{ name, description: desc, embed_link: embed, image_link: img }]);
-    loadGamesAdmin();
-}
+    <div id="admin-content" style="display:none; width:100%; max-width:1200px;">
+      <!-- Upload Game -->
+      <div class="card section">
+        <h3>Upload Game</h3>
+        <input type="text" id="game-name" placeholder="Game Name">
+        <input type="text" id="game-description" placeholder="Description">
+        <input type="text" id="game-image" placeholder="Game Image URL">
+        <input type="text" id="game-embed" placeholder="Game Embed URL">
+        <input type="text" id="game-icon" placeholder="Game Icon URL">
+        <button onclick="uploadGame()">Upload</button>
+      </div>
 
-async function loadGamesAdmin() {
-    const { data } = await supabase.from("games").select("*");
-    const container = document.getElementById("games-admin-list");
-    container.innerHTML = "";
-    data.forEach(g => {
+      <!-- Manage Users -->
+      <div class="card section">
+        <h3>Manage Users</h3>
+        <input type="text" id="search-user" placeholder="Search by username/email">
+        <button onclick="searchUser()">Search</button>
+        <div id="users-list"></div>
+      </div>
+
+      <!-- Manage Comments -->
+      <div class="card section">
+        <h3>Manage Comments</h3>
+        <button onclick="loadAllComments()">Load All Comments</button>
+        <div id="comments-list"></div>
+      </div>
+
+      <!-- Admin Chat -->
+      <div class="card section">
+        <h3>Admin Chat</h3>
+        <select id="chat-user"></select>
+        <div class="chat-box" id="chat-box"></div>
+        <input type="text" id="chat-message" placeholder="Type message">
+        <button onclick="sendAdminMessage()">Send</button>
+      </div>
+
+      <!-- Send Widget Ad -->
+      <div class="card section">
+        <h3>Send Widget / Ad</h3>
+        <textarea id="ad-content" placeholder="Enter ad content"></textarea>
+        <button onclick="sendWidget()">Send Widget</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const { createClient } = supabase;
+    const supabaseClient = createClient(
+      "https://wwcedhbbdoyrmquokyjj.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4"
+    );
+
+    let currentAdmin = null;
+
+    async function adminLogin(){
+      const email = document.getElementById("admin-email").value;
+      const password = document.getElementById("admin-password").value;
+
+      const { data, error } = await supabaseClient.auth.signInWithPassword({email,password});
+      if(error){ alert("Login failed: "+error.message); return; }
+      currentAdmin = data.user;
+      document.getElementById("login-card").style.display="none";
+      document.getElementById("admin-content").style.display="flex";
+      loadUsers();
+      loadAllComments();
+      loadChatUsers();
+    }
+
+    async function uploadGame(){
+      const name = document.getElementById("game-name").value;
+      const desc = document.getElementById("game-description").value;
+      const img = document.getElementById("game-image").value;
+      const embed = document.getElementById("game-embed").value;
+      const icon = document.getElementById("game-icon").value;
+
+      await supabaseClient.from("games").insert([{name,description:desc,image:img,embed,icon,plays:0}]);
+      alert("Game uploaded!");
+      document.getElementById("game-name").value="";
+      document.getElementById("game-description").value="";
+      document.getElementById("game-image").value="";
+      document.getElementById("game-embed").value="";
+      document.getElementById("game-icon").value="";
+    }
+
+    async function searchUser(){
+      const search = document.getElementById("search-user").value;
+      const { data } = await supabaseClient.from("profiles").select("*")
+        .or(`username.ilike.%${search}%,email.ilike.%${search}%`);
+
+      const list = document.getElementById("users-list");
+      list.innerHTML="";
+      data.forEach(u=>{
         const div = document.createElement("div");
-        div.innerHTML = `<b>${g.name}</b> <button onclick="removeGame('${g.id}')">Remove</button>`;
-        container.appendChild(div);
-    });
-}
+        div.innerHTML = `
+          <b>${u.username}</b> (${u.email}) <br>
+          <button onclick="banUser('${u.id}')">Ban</button>
+          <button onclick="suspendUser('${u.id}')">Suspend 1 day</button>
+          <button onclick="messageUser('${u.email}')">Message</button>
+        `;
+        div.style.borderBottom="1px solid #333"; div.style.padding="8px";
+        list.appendChild(div);
+      });
+    }
 
-async function removeGame(id) {
-    await supabase.from("games").delete().eq("id", id);
-    loadGamesAdmin();
-}
+    async function banUser(userId){
+      await supabaseClient.from("profiles").update({banned:true}).eq("id",userId);
+      alert("User banned!");
+      searchUser();
+    }
 
-async function loadUsersAdmin() {
-    const { data } = await supabase.from("users").select("*");
-    const container = document.getElementById("users-list");
-    container.innerHTML = "";
-    data.forEach(u => {
-        const div = document.createElement("div");
-        div.innerHTML = `<b>${u.username}</b> - ${u.status} 
-        <button onclick="suspendUser('${u.id}')">Suspend</button> 
-        <button onclick="banUser('${u.id}')">Ban</button>`;
-        container.appendChild(div);
-    });
-}
+    async function suspendUser(userId){
+      const until = new Date(Date.now()+24*60*60*1000).toISOString();
+      await supabaseClient.from("profiles").update({suspended_until:until}).eq("id",userId);
+      alert("User suspended 24h!");
+      searchUser();
+    }
 
-async function suspendUser(id) {
-    await supabase.from("users").update({ status: "suspended" }).eq("id", id);
-    loadUsersAdmin();
-}
+    function messageUser(email){ 
+      const msg = prompt("Enter message to user:"); 
+      if(msg) supabaseClient.from("messages").insert([{sender:currentAdmin.email,receiver:email,content:msg}]);
+    }
 
-async function banUser(id) {
-    await supabase.from("users").update({ status: "banned" }).eq("id", id);
-    loadUsersAdmin();
-}
+    async function loadUsers(){
+      const { data } = await supabaseClient.from("profiles").select("*");
+      const select = document.getElementById("chat-user");
+      select.innerHTML="";
+      data.forEach(u=>{
+        const opt = document.createElement("option");
+        opt.value=u.email; opt.text=u.username;
+        select.appendChild(opt);
+      });
+    }
 
-function pushAd() { alert("Ad pushed! Integrate widget as needed."); }
+    async function loadAllComments(){
+      const { data } = await supabaseClient.from("comments").select("*");
+      const list = document.getElementById("comments-list");
+      list.innerHTML="";
+      data.forEach(c=>{
+        const div=document.createElement("div");
+        div.innerHTML=`<b>${c.username}</b>: ${c.content} <button onclick="deleteComment('${c.id}')">Delete</button>`;
+        div.style.borderBottom="1px solid #333"; div.style.padding="5px";
+        list.appendChild(div);
+      });
+    }
 
-loadGamesAdmin();
-loadUsersAdmin();
-</script>
+    async function deleteComment(id){
+      await supabaseClient.from("comments").delete().eq("id",id);
+      loadAllComments();
+    }
+
+    async function sendAdminMessage(){
+      const to = document.getElementById("chat-user").value;
+      const msg = document.getElementById("chat-message").value;
+      if(!msg) return;
+      await supabaseClient.from("messages").insert([{sender:currentAdmin.email,receiver:to,content:msg}]);
+      document.getElementById("chat-message").value="";
+      alert("Message sent!");
+    }
+
+    async function loadChatUsers(){
+      await loadUsers();
+    }
+
+    async function sendWidget(){
+      const content = document.getElementById("ad-content").value;
+      if(!content) return;
+      await supabaseClient.from("widgets").insert([{content}]);
+      alert("Widget/Ad sent!");
+      document.getElementById("ad-content").value="";
+    }
+  </script>
 </body>
 </html>
