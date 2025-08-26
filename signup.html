@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sign Up - TyVila</title>
+  <link rel="icon" href="https://www.tyvila.online/cdn/favicon.ico">
+  <meta name="description" content="Create your TyVila account. Unique username, profile pic, and more!">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <style>
+    body { margin:0; font-family:'Segoe UI',sans-serif; background:#0a0a0a; color:white; display:flex; justify-content:center; align-items:center; height:100vh; }
+    .signup-card { background:#1e1e1e; padding:30px; border-radius:16px; box-shadow:0 0 20px rgba(255,102,0,0.5); width:320px; }
+    input, button { width:100%; padding:10px; margin:8px 0; border-radius:8px; border:none; }
+    input { background:#2a2a2a; color:white; }
+    button { background:#ff6600; color:white; cursor:pointer; }
+    button:hover { background:#e65c00; }
+  </style>
+</head>
+<body>
+  <div class="signup-card">
+    <h2>Sign Up</h2>
+    <input type="text" id="username" placeholder="Username" required>
+    <input type="email" id="email" placeholder="Email" required>
+    <input type="password" id="password" placeholder="Password" required>
+    <input type="file" id="profile-pic">
+    <button onclick="signUp()">Create Account</button>
+    <p id="status"></p>
+  </div>
+
+  <script>
+    const { createClient } = supabase;
+    const supabaseClient = createClient(
+      "https://wwcedhbbdoyrmquokyjj.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cmxxeWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4"
+    );
+
+    async function signUp() {
+      const username = document.getElementById("username").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      const picFile = document.getElementById("profile-pic").files[0];
+
+      if(!username || !email || !password){ document.getElementById("status").innerText="Fill all fields"; return; }
+
+      const { data:userExists } = await supabaseClient.from("profiles").select().eq("username",username);
+      if(userExists.length>0){ document.getElementById("status").innerText="Username already taken"; return; }
+
+      const { data, error } = await supabaseClient.auth.signUp({ email, password });
+      if(error){ document.getElementById("status").innerText=error.message; return; }
+
+      let avatar_url = "";
+      if(picFile){
+        const { data:fileData, error:fileErr } = await supabaseClient.storage
+          .from("avatars")
+          .upload(`public/${data.user.id}-${picFile.name}`, picFile);
+        if(!fileErr) avatar_url = supabaseClient.storage.from("avatars").getPublicUrl(fileData.path).publicUrl;
+      }
+
+      await supabaseClient.from("profiles").insert([{id:data.user.id,username,profile_pic:avatar_url}]);
+      document.getElementById("status").innerText="Account created! Redirecting...";
+      setTimeout(()=>{ window.location.href="login.html"; },1500);
+    }
+  </script>
+</body>
+</html>
