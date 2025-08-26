@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Email Verification - TyVila</title>
+<link rel="icon" href="https://www.tyvila.online/cdn/favicon.ico">
+<meta name="description" content="Verify your TyVila account email with OTP.">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg1:#071029;--bg2:#071822;--card:rgba(255,255,255,0.03);--accent:linear-gradient(90deg,#7c3aed,#06b6d4);--muted:#9fb3c8}
+html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;color:#e6f0f8}
+body{background:radial-gradient(1200px 600px at 10% 10%, rgba(124,58,237,0.12), transparent),radial-gradient(900px 500px at 90% 90%, rgba(6,182,212,0.07), transparent),linear-gradient(180deg,var(--bg1),var(--bg2));display:grid;place-items:center;padding:28px}
+.card{background:var(--card);padding:28px;border-radius:16px;box-shadow:0 8px 30px rgba(2,6,23,0.6);backdrop-filter: blur(6px);max-width:400px;width:100%;text-align:center}
+h1{margin:0 0 12px 0;font-size:28px;text-align:center}
+p{margin:10px 0;color:var(--muted)}
+input{width:100%;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;margin-top:8px;font-size:15px}
+button.primary{margin-top:18px;width:100%;padding:12px;border-radius:12px;border:0;color:white;background-image:var(--accent);cursor:pointer;font-weight:600;font-size:15px}
+.error{color:#ff7777;margin-top:10px;text-align:center}
+.link{color:#cfeffd;text-decoration:none;margin-top:12px;display:block}
+</style>
+</head>
+<body>
+<div class="card" id="emailCard">
+<h1>Verify Your Email</h1>
+<p>Enter your account email to continue.</p>
+<input type="email" id="emailInput" placeholder="you@example.com">
+<button class="primary" id="checkEmailBtn">Next</button>
+<div class="error" id="errorMsg"></div>
+<p class="link" id="signupLink">Don't have an account? Sign Up</p>
+</div>
+
+<div class="card" id="otpCard" style="display:none">
+<h1>Enter OTP</h1>
+<p>We sent a one-time code to your email.</p>
+<input type="text" id="otpInput" placeholder="Enter OTP">
+<button class="primary" id="verifyOtpBtn">Verify</button>
+<div class="error" id="otpErrorMsg"></div>
+<p class="link" id="resendOtpLink">Resend OTP</p>
+</div>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+const supabase = createClient(
+'https://wwcedhbbdoyrmquokyjj.supabase.co',
+'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4'
+)
+
+let currentUserId = null
+let currentEmail = null
+
+async function sendOtp(userId){
+  const code = Math.floor(100000 + Math.random() * 900000).toString()
+  await supabase.from('verification_codes').upsert({user_id:userId, code})
+  alert('OTP sent! Check your email (simulated in DB).')
+}
+
+async function checkEmail(){
+  const email = document.getElementById('emailInput').value.trim()
+  document.getElementById('errorMsg').textContent = ''
+  if(!email){document.getElementById('errorMsg').textContent='Enter your email'; return}
+  const { data: user, error } = await supabase.from('profiles').select('*').eq('email', email).maybeSingle()
+  if(error){document.getElementById('errorMsg').textContent='Error checking email'; return}
+  if(!user){window.location.href='signup.html'; return}
+  if(user.email_verified){window.location.href='login.html'; return}
+  currentUserId = user.id
+  currentEmail = email
+  await sendOtp(currentUserId)
+  document.getElementById('emailCard').style.display='none'
+  document.getElementById('otpCard').style.display='block'
+}
+
+async function verifyOtp(){
+  const otp = document.getElementById('otpInput').value.trim()
+  document.getElementById('otpErrorMsg').textContent = ''
+  if(!otp){document.getElementById('otpErrorMsg').textContent='Enter OTP'; return}
+  const { data, error } = await supabase.from('verification_codes').select('code').eq('user_id',currentUserId).maybeSingle()
+  if(error || !data){document.getElementById('otpErrorMsg').textContent='Error fetching OTP'; return}
+  if(data.code !== otp){document.getElementById('otpErrorMsg').textContent='Invalid OTP'; return}
+  await supabase.from('profiles').update({email_verified:true}).eq('id',currentUserId)
+  await supabase.from('verification_codes').delete().eq('user_id',currentUserId)
+  alert('Email verified! You can now login.')
+  window.location.href='login.html'
+}
+
+document.getElementById('checkEmailBtn').addEventListener('click',checkEmail)
+document.getElementById('verifyOtpBtn').addEventListener('click',verifyOtp)
+document.getElementById('resendOtpLink').addEventListener('click',()=>sendOtp(currentUserId))
+document.getElementById('signupLink').addEventListener('click',()=>window.location.href='signup.html')
+</script>
+</body>
+</html>
