@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Password Reset — TyVila</title>
+<link rel="icon" href="https://www.tyvila.online/cdn/favicon.ico">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg1:#0a0a0f; --bg2:#0d0d1a; --accent:linear-gradient(90deg,#7c3aed,#06b6d4);
+  --muted:#9fb3c8; --card-bg:rgba(255,255,255,0.03);
+}
+*{box-sizing:border-box;}
+body{margin:0;font-family:'Inter',sans-serif;color:white;background:radial-gradient(1200px 600px at 10% 10%, rgba(124,58,237,0.12), transparent),radial-gradient(900px 500px at 90% 90%, rgba(6,182,212,0.07), transparent),linear-gradient(180deg,var(--bg1),var(--bg2));display:flex;justify-content:center;align-items:center;height:100vh;padding:20px;}
+.container{width:100%;max-width:450px;background:var(--card-bg);border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,0.6);padding:40px;display:flex;flex-direction:column;gap:20px;}
+h1{text-align:center;font-size:32px;margin:0;}
+p{color:var(--muted);text-align:center;margin:0 0 20px 0;}
+.input-group{display:flex;flex-direction:column;gap:8px;}
+input{padding:14px;border-radius:12px;border:none;background: rgba(255,255,255,0.05);color:white;font-size:16px;}
+button.primary{padding:14px;border-radius:12px;border:none;font-size:16px;font-weight:700;color:white;background-image: var(--accent);cursor:pointer;transition:all 0.3s;}
+button.primary:hover{transform: scale(1.05);}
+.message{min-height:20px;text-align:center;font-weight:600;}
+@media(max-width:500px){.container{padding:30px;}}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Reset Your Password</h1>
+  <p>Set a new password for your account.</p>
+  <div class="message" id="msg"></div>
+  <div class="input-group">
+    <label for="newPassword">New Password</label>
+    <input type="password" id="newPassword" placeholder="Enter new password" required>
+  </div>
+  <div class="input-group">
+    <label for="confirmPassword">Confirm Password</label>
+    <input type="password" id="confirmPassword" placeholder="Confirm new password" required>
+  </div>
+  <button class="primary" id="resetBtn">Reset Password</button>
+</div>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+const supabase = createClient(
+  'https://wwcedhbbdoyrmquokyjj.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4'
+)
+
+const msgDiv = document.getElementById('msg')
+const urlParams = new URLSearchParams(window.location.search)
+const token = urlParams.get('ref')
+if(!token){ msgDiv.textContent='Invalid or missing token'; throw new Error('No token') }
+
+async function checkToken(){
+  const { data, error } = await supabase.from('magic_links').select('*').eq('token',token).maybeSingle()
+  if(error || !data){ msgDiv.textContent='Token not found'; throw new Error('Token error') }
+  const now = new Date()
+  if(new Date(data.expires) < now){ msgDiv.textContent='Token expired'; throw new Error('Token expired') }
+  return data.email
+}
+
+document.getElementById('resetBtn').addEventListener('click', async ()=>{
+  msgDiv.textContent=''
+  const newPass = document.getElementById('newPassword').value
+  const confirmPass = document.getElementById('confirmPassword').value
+  if(!newPass||!confirmPass){ msgDiv.textContent='Fill both fields'; return }
+  if(newPass!==confirmPass){ msgDiv.textContent='Passwords do not match'; return }
+
+  try{
+    const email = await checkToken()
+    const { data, error } = await supabase.auth.admin.updateUserByEmail(email,{password:newPass})
+    if(error){ msgDiv.textContent=error.message; return }
+    await supabase.from('magic_links').delete().eq('token',token)
+    msgDiv.style.color='#7cf59b'
+    msgDiv.textContent='Password updated! Redirecting to login...'
+    setTimeout(()=>window.location.href='login.html',1500)
+  }catch(err){ console.log(err) }
+})
+</script>
+</body>
+</html>
