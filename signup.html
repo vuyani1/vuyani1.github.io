@@ -1,97 +1,177 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>TyVila Sign Up</title>
-  <link rel="icon" href="https://www.tyvila.online/cdn/favicon.ico">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Sign up — TyVila</title>
+  <link rel="icon" href="https://www.tyvila.online/cdn/favicon.ico" />
+  <meta name="description" content="Create an account for TyVila" />
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <style>
-    body { font-family: 'Segoe UI', sans-serif; background:#0a0a0a; color:white; display:flex; justify-content:center; align-items:center; height:100vh; }
-    .signup-card { background:#1e1e1e; padding:30px; border-radius:16px; width:350px; box-shadow:0 0 20px rgba(255,102,0,0.5); }
-    .signup-card h2 { text-align:center; margin-bottom:20px; }
-    .signup-card input { width:100%; padding:10px; margin-bottom:15px; border-radius:8px; border:none; }
-    .signup-card button { width:100%; padding:10px; background:#ff6600; border:none; border-radius:8px; color:white; cursor:pointer; font-size:16px; }
-    .signup-card button:hover { background:#e65c00; }
+    :root{--bg:#071022;--card:#0b1220;--accent:#ff6600}
+    body{margin:0;height:100vh;display:grid;place-items:center;background:linear-gradient(180deg,#071029,#071822);font-family:Inter,system-ui,Segoe UI,Roboto,Arial;color:#e6eef6}
+    .card{width:360px;background:rgba(255,255,255,0.02);padding:22px;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,0.6)}
+    h2{margin:0 0 8px 0}
+    input[type="text"],input[type="email"],input[type="password"]{width:100%;padding:10px;margin:8px 0;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+    input[type="file"]{margin:8px 0;color:inherit}
+    button{width:100%;padding:10px;border-radius:10px;border:none;background:linear-gradient(90deg,#7c3aed,#06b6d4);color:white;font-weight:600;cursor:pointer}
+    .muted{font-size:13px;color:#9fb3c8;margin-top:8px}
+    .error{color:#ff7777;margin-top:10px}
+    a.link{color:#cfeffd;text-decoration:none;display:inline-block;margin-top:8px}
   </style>
 </head>
 <body>
+  <div class="card" role="main" aria-labelledby="signup-title">
+    <h2 id="signup-title">Create your TyVila account</h2>
 
-<div class="signup-card">
-  <h2>Sign Up</h2>
-  <input type="text" id="username" placeholder="Username" required>
-  <input type="email" id="email" placeholder="Email" required>
-  <input type="password" id="password" placeholder="Password" required>
-  <input type="file" id="profilePic" accept="image/*">
-  <button onclick="signup()">Sign Up</button>
-  <p id="message" style="color:red; text-align:center;"></p>
-</div>
+    <label for="username">Username (3–20 letters, numbers, underscore)</label>
+    <input id="username" type="text" inputmode="text" autocomplete="username" placeholder="unique_username">
 
-<script>
-  const supabaseUrl = "https://wwcedhbbdoyrmquokyjj.supabase.co";
-  const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cmxxeWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4";
-  const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+    <label for="email">Email</label>
+    <input id="email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com">
 
-  async function signup() {
-    const username = document.getElementById("username").value.trim();
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value.trim();
-    const profilePicFile = document.getElementById("profilePic").files[0];
+    <label for="password">Password (min 8 chars)</label>
+    <input id="password" type="password" autocomplete="new-password" placeholder="Choose a strong password">
 
-    if (!username || !email || !password) {
-      document.getElementById("message").textContent = "All fields are required!";
-      return;
-    }
+    <label for="avatar">Profile picture (optional)</label>
+    <input id="avatar" type="file" accept="image/*">
 
-    const { data: existing } = await supabase.from("profiles").select("username").eq("username", username);
-    if(existing.length > 0){
-      document.getElementById("message").textContent = "Username already taken!";
-      return;
-    }
+    <button id="signupBtn" type="button">Create account</button>
 
-    const { data, error } = await supabase.auth.signUp({
-      email: email,
-      password: password
-    });
+    <div id="msg" class="muted" role="status" aria-live="polite"></div>
+    <div id="err" class="error" aria-live="assertive"></div>
 
-    if (error) {
-      document.getElementById("message").textContent = error.message;
-      return;
-    }
+    <div class="muted"><a class="link" href="login.html">Already have an account? Login</a></div>
+  </div>
 
-    let profilePicUrl = "";
-    if(profilePicFile){
-      const fileExt = profilePicFile.name.split('.').pop();
-      const fileName = `${username}_${Date.now()}.${fileExt}`;
-      const { data: uploadData, error: uploadError } = await supabase.storage.from('profiles').upload(fileName, profilePicFile);
-      if(uploadError){
-        document.getElementById("message").textContent = "Profile picture upload failed";
-      } else {
-        profilePicUrl = supabase.storage.from('profiles').getPublicUrl(fileName).data.publicUrl;
-      }
-    }
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-    const { error: profileError } = await supabase.from("profiles").insert([{
-      id: data.user.id,
-      username: username,
-      bio: "",
-      points: 0,
-      rank: "Beginner",
-      profile_pic: profilePicUrl,
-      banned: false,
-      suspended_until: null
-    }]);
+  const SUPABASE_URL = 'https://wwcedhbbdoyrmquokyjj.supabase.co'
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cmxxeWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4'
 
-    if(profileError){
-      document.getElementById("message").textContent = profileError.message;
-      return;
-    }
+  const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 
-    alert("Account created successfully!");
-    window.location.href = "login.html";
+  const USERNAME_RE = /^[A-Za-z0-9_]{3,20}$/
+  const MIN_PASSWORD_LENGTH = 8
+
+  const $username = document.getElementById('username')
+  const $email = document.getElementById('email')
+  const $password = document.getElementById('password')
+  const $avatar = document.getElementById('avatar')
+  const $btn = document.getElementById('signupBtn')
+  const $msg = document.getElementById('msg')
+  const $err = document.getElementById('err')
+
+  function clearStatus(){ $msg.textContent=''; $err.textContent='' }
+
+  async function fileToDataUrl(file){
+    return await new Promise((res, rej) => {
+      const r = new FileReader()
+      r.onload = () => res(r.result)
+      r.onerror = () => rej(new Error('Could not read file'))
+      r.readAsDataURL(file)
+    })
   }
-</script>
 
+  $btn.addEventListener('click', async () => {
+    clearStatus()
+    const username = $username.value.trim()
+    const email = $email.value.trim().toLowerCase()
+    const password = $password.value
+
+    if(!USERNAME_RE.test(username)){
+      $err.textContent = 'Username invalid — use 3–20 letters/numbers/underscore only.'
+      return
+    }
+    if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+      $err.textContent = 'Enter a valid email address.'
+      return
+    }
+    if(!password || password.length < MIN_PASSWORD_LENGTH){
+      $err.textContent = 'Password must be at least 8 characters.'
+      return
+    }
+
+    $msg.textContent = 'Checking username...'
+    try{
+      const { data: existing, error: qErr } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('username', username)
+        .limit(1)
+
+      if(qErr){
+        console.warn('username check error:', qErr.message)
+      } else if(existing && existing.length > 0){
+        $err.textContent = 'That username is already taken.'
+        return
+      }
+
+      $msg.textContent = 'Creating authentication account...'
+
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password
+      })
+
+      if(error){
+        $err.textContent = error?.message || 'Sign up failed.'
+        return
+      }
+
+      let userId = data?.user?.id || null
+      if(!userId){
+
+        const { data: gUser } = await supabase.auth.getUser()
+        userId = gUser?.data?.user?.id || null
+      }
+
+      if(!userId){
+        $msg.textContent = 'Account created — check your email to confirm. After confirming, visit Account page to finish setup.'
+        return
+      }
+
+      const profileObj = { id: userId, username }
+
+      $msg.textContent = 'Saving profile...'
+      let { error: profileError } = await supabase
+        .from('profiles')
+        .insert([ profileObj ])
+
+      if(profileError){
+        console.warn('profile insert error:', profileError.message)
+        if(profileError.message && profileError.message.toLowerCase().includes('duplicate')){
+          $err.textContent = 'Username already taken (race). Please try a different username.'
+          return
+        }
+        $msg.textContent = 'Profile insert returned an error (non-fatal). You can complete profile later in Account.'
+      }
+
+      if($avatar.files && $avatar.files[0]){
+        try{
+          $msg.textContent = 'Uploading avatar (keeps local copy)...'
+          const dataUrl = await fileToDataUrl($avatar.files[0])
+          const { error: updErr } = await supabase
+            .from('profiles')
+            .update({ profile_pic: dataUrl })
+            .eq('id', userId)
+          if(updErr){
+            console.warn('avatar update ignored:', updErr.message)
+          }
+        }catch(e){
+          console.warn('avatar processing error', e)
+        }
+      }
+
+      $msg.textContent = 'Account created. Redirecting to login...'
+      setTimeout(()=>{ window.location.href = 'login.html' }, 1100)
+
+    }catch(e){
+      console.error(e)
+      $err.textContent = 'Unexpected error. Check console for details.'
+    }
+  })
+</script>
 </body>
 </html>
