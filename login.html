@@ -1,78 +1,112 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Login — TyVila</title>
-<meta name="description" content="Login to TyVila to play games, earn points and chat with friends." />
-<link rel="icon" href="https://www.tyvila.online/cdn/favicon.ico" />
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="icon" href="https://www.tyvila.online/cdn/favicon.ico">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg1:#071029;--bg2:#071822;--card:rgba(255,255,255,0.03);--accent:linear-gradient(90deg,#7c3aed,#06b6d4);--muted:#9fb3c8}
-html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;color:#e6f0f8}
-body{background:radial-gradient(1200px 600px at 10% 10%, rgba(124,58,237,0.12), transparent),radial-gradient(900px 500px at 90% 90%, rgba(6,182,212,0.07), transparent),linear-gradient(180deg,var(--bg1),var(--bg2));display:grid;place-items:center;padding:28px;}
-.card{background:var(--card);padding:22px;border-radius:14px;box-shadow: 0 6px 20px rgba(2,6,23,0.55);min-width:320px;}
-.form-title{font-size:20px;margin:6px 0 14px 0}
-label{display:block;font-size:13px;color:var(--muted);margin-top:10px}
-input[type="email"], input[type="password"]{width:100%;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;margin-top:8px;font-size:15px}
-button.primary{margin-top:18px;width:100%;padding:12px;border-radius:12px;border:0;color:white;background-image: var(--accent);cursor:pointer;font-weight:600;font-size:15px}
-.row{display:flex;gap:12px;margin-top:12px;align-items:center;justify-content:space-between}
-.small{font-size:13px;color:var(--muted)}
-.link{color:#cfeffd;text-decoration:none}
-.divider{height:1px;background:rgba(255,255,255,0.02);margin:14px 0;border-radius:4px}
+:root{
+  --bg1:#0a0a0f; --bg2:#0d0d1a; --accent:linear-gradient(90deg,#7c3aed,#06b6d4);
+  --muted:#9fb3c8; --card-bg:rgba(255,255,255,0.03);
+}
+*{box-sizing:border-box;}
+body{margin:0;font-family: 'Inter',sans-serif;color:white;background:radial-gradient(1200px 600px at 10% 10%, rgba(124,58,237,0.12), transparent),radial-gradient(900px 500px at 90% 90%, rgba(6,182,212,0.07), transparent),linear-gradient(180deg,var(--bg1),var(--bg2));display:flex;justify-content:center;align-items:center;height:100vh;}
+.container{display:flex;width:90%;max-width:1200px;background:var(--card-bg);border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,0.6);overflow:hidden;}
+.left-panel{flex:1;background: linear-gradient(135deg,#7c3aed,#06b6d4);padding:40px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:20px;}
+.left-panel h1{font-size:48px;font-weight:700;}
+.left-panel p{font-size:18px;color:rgba(255,255,255,0.9);text-align:center;}
+.left-panel img{width:120px;border-radius:16px;}
+.right-panel{flex:1;padding:50px 40px;display:flex;flex-direction:column;justify-content:center;gap:20px;}
+.right-panel h2{margin:0;font-size:32px;font-weight:700;text-align:center;}
+.input-group{display:flex;flex-direction:column;gap:8px;margin-top:12px;}
+.input-group input{padding:14px;border-radius:12px;border:none;background: rgba(255,255,255,0.05);color:white;font-size:16px;}
+button.primary{margin-top:18px;padding:14px;border-radius:12px;border:none;font-size:16px;font-weight:700;color:white;background-image: var(--accent);cursor:pointer;transition: all 0.3s ease;}
+button.primary:hover{transform: scale(1.05);}
+.links{display:flex;justify-content:space-between;font-size:14px;margin-top:12px;}
+.links a{color:#cfeffd;text-decoration:none;}
+.error-msg{color:#ff7777;text-align:center;margin-top:6px;min-height:18px;}
+.success-msg{color:#7cf59b;text-align:center;margin-top:6px;min-height:18px;}
+@media(max-width:900px){.container{flex-direction:column;}.left-panel,.right-panel{padding:30px;}}
 </style>
 </head>
 <body>
-<div class="card">
-<div class="form-title">Sign in</div>
-<label for="email">Email</label>
-<input id="email" name="email" type="email" inputmode="email" required placeholder="you@example.com" />
-<label for="password">Password</label>
-<input id="password" name="password" type="password" required placeholder="Enter your password" />
-<button class="primary" id="signinBtn">Continue</button>
-<div class="row">
-<a class="small link" href="signup.html">Create account</a>
-<a class="small link" href="#" id="forgotLink">Forgot password?</a>
-</div>
-<div class="divider"></div>
-<div class="small">By signing in you agree to TyVila's terms. For admin access use <a class="link" href="admin.html">admin page</a>.</div>
+<div class="container">
+  <div class="left-panel">
+    <img src="https://www.tyvila.online/cdn/ty.webp" alt="TyVila">
+    <h1>TyVila</h1>
+    <p>Play games, earn points, climb the leaderboard.</p>
+  </div>
+
+  <form class="right-panel" id="loginForm">
+    <h2>Sign In</h2>
+    <div class="error-msg" id="loginError"></div>
+    <div class="success-msg" id="loginSuccess"></div>
+
+    <div class="input-group">
+      <label for="email">Email</label>
+      <input id="email" type="email" placeholder="you@example.com" required>
+    </div>
+
+    <div class="input-group">
+      <label for="password">Password</label>
+      <input id="password" type="password" placeholder="Enter password" required>
+    </div>
+
+    <button class="primary" type="submit">Login</button>
+
+    <div class="links">
+      <a href="signup.html">Create account</a>
+      <a href="#" id="forgotLink">Forgot password?</a>
+    </div>
+  </form>
 </div>
 
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
 const supabase = createClient(
-'https://wwcedhbbdoyrmquokyjj.supabase.co',
-'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4'
+  'https://wwcedhbbdoyrmquokyjj.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4'
 )
 
-document.getElementById('signinBtn').addEventListener('click', async () => {
-const email = document.getElementById('email').value.trim()
-const password = document.getElementById('password').value
-if(!email || !password){alert('Enter email and password');return}
+function generateToken(){ return Math.floor(Math.random()*1e18)+Date.now() }
 
-const { data, error } = await supabase.auth.signInWithPassword({email,password})
-if(error){alert(error.message);return}
-const user = data?.user
-if(!user){alert('Login failed');return}
+document.getElementById('loginForm').addEventListener('submit', async e=>{
+  e.preventDefault()
+  const email = document.getElementById('email').value.trim()
+  const password = document.getElementById('password').value
+  const errorDiv = document.getElementById('loginError')
+  const successDiv = document.getElementById('loginSuccess')
+  errorDiv.textContent = ''; successDiv.textContent = ''
 
-const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).maybeSingle()
+  if(!email||!password){ errorDiv.textContent='Enter email and password'; return }
 
-if(profile?.banned){alert('Your account is banned. Contact admin.');await supabase.auth.signOut();return}
-if(profile?.suspended_until){const until = new Date(profile.suspended_until); if(until > new Date()){alert('Account suspended until '+until.toLocaleString()); await supabase.auth.signOut(); return}}
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+  if(error){ errorDiv.textContent = error.message; return }
 
-if(!user.email_confirmed_at){alert('Email not verified. You can continue playing, but we recommend verifying your email.')} 
+  const user = data.user
+  if(!user){ errorDiv.textContent='Login failed'; return }
 
-window.location.href='account.html'
+  const { data: profile } = await supabase.from('profiles').select('*').eq('id',user.id).maybeSingle()
+  if(profile?.banned){ errorDiv.textContent='Your account is banned'; await supabase.auth.signOut(); return }
+  if(profile?.suspended_until){ const until = new Date(profile.suspended_until); if(until>new Date()){ errorDiv.textContent=`Account suspended until ${until.toLocaleTimeString()}`; await supabase.auth.signOut(); return } }
+
+  successDiv.textContent='Login successful! Redirecting…'
+  setTimeout(()=>window.location.href='account.html',800)
 })
 
-document.getElementById('forgotLink').addEventListener('click', async (ev)=>{
-ev.preventDefault()
-const email = prompt('Enter your account email to receive a password reset link')
-if(!email) return
-const { error } = await supabase.auth.resetPasswordForEmail(email)
-if(error){alert(error.message || 'Could not send reset email')} else {alert('If this email exists you will receive a password reset link shortly.')}
+document.getElementById('forgotLink').addEventListener('click', async e=>{
+  e.preventDefault()
+  const email = prompt('Enter your email to receive a reset link')
+  if(!email) return
+  const token = generateToken()
+  const expires = new Date(Date.now()+2*60*1000).toISOString()
+  await supabase.from('magic_links').insert([{email,token,expires}])
+  await supabase.functions.invoke('send_magic_link',{body:{email,link:`https://www.tyvila.online/trek333.html?ref=${token}`}})
+  document.getElementById('loginError').textContent=''
+  document.getElementById('loginSuccess').textContent='Magic link sent! Expires in 2 minutes.'
 })
 </script>
 </body>
