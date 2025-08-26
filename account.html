@@ -4,72 +4,72 @@
 <meta charset="UTF-8">
 <title>My Account - TyVila</title>
 <link rel="icon" href="https://www.tyvila.online/cdn/favicon.ico">
-<meta name="description" content="TyVila account dashboard with friends, chat, points, and rank.">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Your TyVila account: profile, friends, chat, points, and play games.">
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <style>
-body {margin:0;font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#0a0a0a,#1a1a1a);color:white;display:flex;flex-direction:column;min-height:100vh;}
-header {background:#111;padding:15px;text-align:center;border-bottom:2px solid #ff6600;}
-header img{height:50px;}
-.container{display:flex;flex-wrap:wrap;justify-content:center;gap:20px;padding:20px;}
-.profile-card{background:#1e1e1e;padding:20px;border-radius:16px;box-shadow:0 0 20px rgba(255,102,0,0.4);width:90%;max-width:800px;text-align:center;}
-.profile-pic{width:120px;height:120px;border-radius:50%;border:3px solid #ff6600;object-fit:cover;}
-.stats{display:flex;justify-content:space-around;margin-top:15px;}
-.stat-box{background:#2a2a2a;padding:15px;border-radius:12px;width:30%;text-align:center;}
-.sidebar{background:#111;width:250px;min-width:250px;padding:15px;border-radius:16px;flex-shrink:0;}
-.main-content{flex:1;display:flex;flex-direction:column;gap:20px;}
-.friends,.friend-requests,.chat{background:#1e1e1e;padding:15px;border-radius:16px;box-shadow:0 0 15px rgba(255,102,0,0.3);}
-.friends ul,.friend-requests ul{list-style:none;padding:0;margin:0;}
-.friends li,.friend-requests li{padding:8px;border-bottom:1px solid #333;display:flex;justify-content:space-between;align-items:center;}
-input,button{padding:10px;border:none;border-radius:8px;margin:5px;}
-input{width:70%;background:#2a2a2a;color:white;}
-button{background:#ff6600;color:white;cursor:pointer;}
-button:hover{background:#e65c00;}
-.chat-box{border:1px solid #333;padding:10px;height:200px;overflow-y:auto;background:#111;border-radius:10px;margin-bottom:10px;}
-@media(max-width:768px){.container{flex-direction:column;}.sidebar{width:100%;min-width:auto;}}
+body { margin:0; font-family:'Segoe UI',sans-serif; background:linear-gradient(135deg,#0a0a0a,#1a1a1a); color:white; display:flex; flex-direction:column; }
+header { display:flex; justify-content:space-between; align-items:center; padding:10px 20px; background:#111; border-bottom:2px solid #ff6600; flex-wrap:wrap; }
+header button { background:#ff6600; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; color:white; margin:5px; }
+header button:hover { background:#e65c00; }
+.main-container { display:flex; flex-wrap:wrap; padding:20px; justify-content:center; gap:20px; }
+.profile-card { background:#1e1e1e; border-radius:16px; padding:20px; box-shadow:0 0 20px rgba(255,102,0,0.4); width:300px; text-align:center; }
+.profile-pic { width:120px; height:120px; border-radius:50%; border:3px solid #ff6600; object-fit:cover; }
+.stats { display:flex; justify-content:space-around; margin-top:15px; }
+.stat-box { background:#2a2a2a; padding:10px; border-radius:12px; width:30%; text-align:center; }
+.friends, .requests, .chat { background:#1e1e1e; padding:15px; border-radius:16px; box-shadow:0 0 15px rgba(255,102,0,0.3); width:300px; max-width:100%; }
+.friends ul, .requests ul { list-style:none; padding:0; margin:0; max-height:200px; overflow-y:auto; }
+.friends li, .requests li { padding:8px; border-bottom:1px solid #333; display:flex; justify-content:space-between; align-items:center; }
+.chat-box { border:1px solid #333; padding:10px; height:200px; overflow-y:auto; background:#111; border-radius:10px; margin-bottom:10px; }
+input, button, textarea { padding:8px; margin:5px 0; border-radius:6px; border:none; }
+input, textarea { width:100%; background:#2a2a2a; color:white; }
+button { background:#ff6600; color:white; cursor:pointer; }
+button:hover { background:#e65c00; }
+@media(max-width:600px){ .main-container{flex-direction:column; align-items:center;} }
 </style>
 <script>
-document.addEventListener("contextmenu",e=>e.preventDefault());
-document.onkeydown=function(e){if(e.ctrlKey&&(e.key==="u"||e.key==="U"||e.key==="s"||e.key==="S"))e.preventDefault();}
+document.addEventListener("contextmenu", e=>e.preventDefault());
+document.onkeydown=function(e){if(e.ctrlKey&&(e.key==="u"||e.key==="U"||e.key==="s"||e.key==="S")) e.preventDefault();}
 </script>
 </head>
 <body>
-<header><img src="https://www.tyvila.online/cdn/ty.webp" alt="TyVila Logo"></header>
-<div class="container">
-<div class="sidebar">
-<h3 id="display-username">Username</h3>
-<p id="display-email">Email</p>
-<p id="display-points">Points: 0</p>
-<p id="display-rank">Rank: -</p>
-<button onclick="goToGames()">Play Games</button>
-<button onclick="logout()">Logout</button>
-<button onclick="deleteAccount()">Delete Account</button>
-<h3>Friend Requests</h3>
-<div class="friend-requests"><ul id="friend-requests-list"><li>No requests</li></ul></div>
+<header>
+  <button onclick="window.location.href='games.html'">Play Games</button>
+  <div id="username-display">Username</div>
+  <div id="points-display">Points: 0</div>
+  <button onclick="logout()">Logout</button>
+</header>
+
+<div class="main-container">
+  <div class="profile-card">
+    <img id="profile-pic" class="profile-pic" src="https://api.dicebear.com/9.x/thumbs/svg" alt="Profile Picture">
+    <h2 id="username">Loading...</h2>
+    <p id="email">Loading...</p>
+    <div class="stats">
+      <div class="stat-box"><h3 id="points">0</h3><p>Points</p></div>
+      <div class="stat-box"><h3 id="rank">-</h3><p>Rank</p></div>
+      <div class="stat-box"><h3 id="friends-count">0</h3><p>Friends</p></div>
+    </div>
+  </div>
+
+  <div class="requests">
+    <h3>Friend Requests</h3>
+    <ul id="requests-list"><li>No requests</li></ul>
+  </div>
+
+  <div class="friends">
+    <h3>Friends</h3>
+    <ul id="friends-list"><li>No friends yet</li></ul>
+  </div>
+
+  <div class="chat">
+    <h3>Chat</h3>
+    <div class="chat-box" id="chat-box"></div>
+    <input type="text" id="chat-input" placeholder="Type a message...">
+    <button onclick="sendMessage()">Send</button>
+  </div>
 </div>
-<div class="main-content">
-<div class="profile-card">
-<img id="profile-pic" class="profile-pic" src="https://api.dicebear.com/9.x/thumbs/svg" alt="Profile Picture">
-<h2 id="profile-username">Loading...</h2>
-<p id="profile-email">Loading...</p>
-<div class="stats">
-<div class="stat-box"><h3 id="points">0</h3><p>Points</p></div>
-<div class="stat-box"><h3 id="rank">-</h3><p>Rank</p></div>
-<div class="stat-box"><h3 id="friends-count">0</h3><p>Friends</p></div>
-</div>
-</div>
-<div class="friends">
-<h3>Friends List</h3>
-<ul id="friends-list"><li>No friends yet</li></ul>
-</div>
-<div class="chat">
-<h3>Chat</h3>
-<div class="chat-box" id="chat-box"></div>
-<input type="text" id="chat-input" placeholder="Type a message...">
-<button onclick="sendMessage()">Send</button>
-</div>
-</div>
-</div>
+
 <script>
 const { createClient } = supabase;
 const supabaseClient = createClient(
@@ -77,46 +77,83 @@ const supabaseClient = createClient(
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4"
 );
 let currentUser=null;
-async function loadUser(){
+
+async function loadProfile(){
   const { data:{user} } = await supabaseClient.auth.getUser();
-  if(!user) window.location.href="login.html";
+  if(!user) return window.location.href='login.html';
   currentUser=user;
   const { data } = await supabaseClient.from("profiles").select("*").eq("id",user.id).single();
-  if(data){
-    document.getElementById("display-username").innerText=data.username;
-    document.getElementById("display-email").innerText=user.email;
-    document.getElementById("display-points").innerText="Points: "+(data.points||0);
-    document.getElementById("display-rank").innerText="Rank: "+(data.rank||"-");
-    document.getElementById("profile-pic").src=data.avatar_url||"https://api.dicebear.com/9.x/thumbs/svg";
-    document.getElementById("profile-username").innerText=data.username;
-    document.getElementById("profile-email").innerText=user.email;
-  }
+  document.getElementById("username").innerText = data.username||user.email;
+  document.getElementById("email").innerText = user.email;
+  document.getElementById("points").innerText = data.points||0;
+  document.getElementById("rank").innerText = data.rank||"-";
+  document.getElementById("points-display").innerText = "Points: "+(data.points||0);
+  document.getElementById("username-display").innerText = data.username||user.email;
+  document.getElementById("profile-pic").src = data.avatar_url||"https://api.dicebear.com/9.x/thumbs/svg";
   loadFriends();
-  loadFriendRequests();
+  loadRequests();
   loadChat();
-  setInterval(loadChat,5000);
-  setInterval(loadFriendRequests,10000);
 }
+
 async function loadFriends(){
-  const { data } = await supabaseClient.from("friends").select("friend_username").eq("user_id",currentUser.id);
-  const list=document.getElementById("friends-list");list.innerHTML="";
-  if(!data||data.length===0){list.innerHTML="<li>No friends yet</li>";document.getElementById("friends-count").innerText=0;}
-  else{data.forEach(f=>{let li=document.createElement("li");li.innerText=f.friend_username;list.appendChild(li);});document.getElementById("friends-count").innerText=data.length;}
+  const { data } = await supabaseClient.from("friends").select("*").eq("user_id",currentUser.id);
+  const list=document.getElementById("friends-list");
+  list.innerHTML="";
+  if(!data||data.length===0){ list.innerHTML="<li>No friends yet</li>"; document.getElementById("friends-count").innerText=0; return;}
+  data.forEach(f=>{
+    const li=document.createElement("li");
+    li.innerText=f.friend_username;
+    list.appendChild(li);
+  });
+  document.getElementById("friends-count").innerText=data.length;
 }
-async function loadFriendRequests(){
+
+async function loadRequests(){
   const { data } = await supabaseClient.from("friend_requests").select("*").eq("receiver_id",currentUser.id);
-  const list=document.getElementById("friend-requests-list");list.innerHTML="";
-  if(!data||data.length===0){list.innerHTML="<li>No requests</li>";}
-  else{data.forEach(req=>{let li=document.createElement("li");li.innerHTML=req.sender_username+` <button onclick="acceptRequest('${req.id}')">Accept</button> <button onclick="declineRequest('${req.id}')">Decline</button>`;list.appendChild(li);});}
+  const list=document.getElementById("requests-list");
+  list.innerHTML="";
+  if(!data||data.length===0){ list.innerHTML="<li>No requests</li>"; return; }
+  data.forEach(r=>{
+    const li=document.createElement("li");
+    li.innerHTML=`${r.sender_username} <button onclick="acceptRequest('${r.id}','${r.sender_id}','${r.sender_username}')">Accept</button> <button onclick="declineRequest('${r.id}')">Decline</button>`;
+    list.appendChild(li);
+  });
 }
-async function acceptRequest(id){await supabaseClient.from("friend_requests").delete().eq("id",id);await supabaseClient.from("friends").insert([{user_id:currentUser.id,friend_username:""}]);loadFriends();loadFriendRequests();}
-async function declineRequest(id){await supabaseClient.from("friend_requests").delete().eq("id",id);loadFriendRequests();}
-async function sendMessage(){const input=document.getElementById("chat-input");const message=input.value.trim();if(!message)return;await supabaseClient.from("messages").insert([{sender:currentUser.email,content:message}]);input.value="";loadChat();}
-async function loadChat(){const { data } = await supabaseClient.from("messages").select("sender,content,created_at").order("created_at",{ascending:true}).limit(50);const box=document.getElementById("chat-box");box.innerHTML="";if(data){data.forEach(msg=>{let div=document.createElement("div");div.innerHTML=`<b>${msg.sender}:</b> ${msg.content}`;box.appendChild(div);});box.scrollTop=box.scrollHeight;}}
-function logout(){supabaseClient.auth.signOut().then(()=>window.location.href="login.html");}
-async function deleteAccount(){if(confirm("Are you sure you want to delete your account? This cannot be undone.")){await supabaseClient.from("profiles").delete().eq("id",currentUser.id);await supabaseClient.auth.signOut();window.location.href="login.html";}}
-function goToGames(){window.location.href="games.html";}
-loadUser();
+
+async function acceptRequest(id,senderId,senderUsername){
+  await supabaseClient.from("friends").insert([{user_id:currentUser.id,friend_id:senderId,friend_username:senderUsername}]);
+  await supabaseClient.from("friends").insert([{user_id:senderId,friend_id:currentUser.id,friend_username:document.getElementById("username").innerText}]);
+  await supabaseClient.from("friend_requests").delete().eq("id",id);
+  loadRequests();
+  loadFriends();
+}
+
+async function declineRequest(id){
+  await supabaseClient.from("friend_requests").delete().eq("id",id);
+  loadRequests();
+}
+
+async function sendMessage(){
+  const input=document.getElementById("chat-input");
+  const message=input.value.trim();
+  if(!message) return;
+  await supabaseClient.from("messages").insert([{sender:currentUser.email,content:message}]);
+  input.value="";
+  loadChat();
+}
+
+async function loadChat(){
+  const { data } = await supabaseClient.from("messages").select("*").order("created_at",{ascending:true}).limit(50);
+  const box=document.getElementById("chat-box");
+  box.innerHTML="";
+  if(data) data.forEach(m=>{ const div=document.createElement("div"); div.innerHTML=`<b>${m.sender}:</b> ${m.content}`; box.appendChild(div); });
+  box.scrollTop=box.scrollHeight;
+}
+
+function logout(){ supabaseClient.auth.signOut(); window.location.href='login.html'; }
+
+loadProfile();
+setInterval(loadChat,5000);
 </script>
 </body>
 </html>
