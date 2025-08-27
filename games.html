@@ -8,7 +8,7 @@
 <style>
 body{margin:0;font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#0f0f1a,#1a1a2e);color:#fff;overflow-x:hidden}
 header{padding:15px;background:#111;display:flex;justify-content:space-between;align-items:center;box-shadow:0 0 10px #000}
-header h1{margin:0;font-size:22px;color:#06b6d4}
+header h1{margin:0;font-size:22px;color:#06b6d4;display:flex;align-items:center;gap:10px}
 header button{padding:8px 16px;border:none;border-radius:6px;cursor:pointer;background:#06b6d4;color:#fff;font-weight:bold}
 header button:hover{background:#0891b2}
 #userInfo{margin-right:10px;font-size:14px;color:#ddd}
@@ -16,10 +16,11 @@ header button:hover{background:#0891b2}
 .card{background:#1a1a2e;padding:15px;border-radius:12px;text-align:center;cursor:pointer;transition:.2s;box-shadow:0 0 10px #000}
 .card:hover{transform:scale(1.05);box-shadow:0 0 15px #06b6d4}
 .card img{width:100%;border-radius:10px}
-#gameModal{position:fixed;inset:0;background:rgba(0,0,0,0.95);display:none;justify-content:center;align-items:center;flex-direction:column;z-index:1000}
-#gameBox{display:flex;gap:20px;width:90%;max-width:1400px;align-items:flex-start}
-#gameFrame{width:75%;height:80vh;border:none;border-radius:12px;box-shadow:0 0 20px #000}
-#gameSide{width:25%;background:#111;padding:15px;border-radius:12px;overflow-y:auto;max-height:80vh}
+#gameModal{position:fixed;inset:0;background:rgba(0,0,0,0.95);display:none;justify-content:center;align-items:flex-start;flex-direction:column;z-index:1000;padding:20px;overflow-y:auto}
+#gameTitle{font-size:28px;color:#ffcc00;margin-bottom:10px;text-align:center}
+#gameBox{display:flex;gap:20px;width:100%;max-width:1400px;align-items:flex-start;flex-wrap:wrap}
+#gameFrame{flex:1 1 70%;height:70vh;border:none;border-radius:12px;box-shadow:0 0 20px #000}
+#gameSide{flex:1 1 25%;background:#111;padding:15px;border-radius:12px;overflow-y:auto;max-height:70vh}
 #gameActions button{width:100%;margin:5px 0;padding:10px;background:#06b6d4;border:none;border-radius:8px;color:#fff;font-weight:bold;cursor:pointer}
 #gameActions button:hover{background:#0891b2}
 .likeCount{margin:10px 0;font-size:14px;color:#ffcc00;text-align:center}
@@ -33,17 +34,16 @@ header button:hover{background:#0891b2}
 .topCard{background:#1a1a2e;padding:15px;border-radius:12px;text-align:center;width:200px;position:relative;box-shadow:0 0 10px #000}
 .topCard img{width:100%;border-radius:10px}
 .crown{position:absolute;top:-15px;left:50%;transform:translateX(-50%);font-size:28px;color:#ffcc00}
+#gameLogo{width:80px;margin-right:10px}
 </style>
 <script>
 document.addEventListener("contextmenu",e=>e.preventDefault());
-document.addEventListener("keydown",e=>{
-  if(e.ctrlKey&&(e.key==="u"||e.key==="U"||e.key==="s"||e.key==="S"||e.key==="i"||e.key==="I"||e.key==="j"||e.key==="J"||e.key==="c"||e.key==="C")){e.preventDefault()}
-});
+document.addEventListener("keydown",e=>{if(e.ctrlKey&&(e.key==="u"||e.key==="U"||e.key==="s"||e.key==="S"||e.key==="i"||e.key==="I"||e.key==="j"||e.key==="J"||e.key==="c"||e.key==="C")){e.preventDefault()}});
 </script>
 </head>
 <body>
 <header>
-  <h1>🎮 TyVila Games</h1>
+  <h1><img id="gameLogo" src="https://www.tyvila.online/cdn/ty-gameslogo.webp">TyVila Games</h1>
   <div style="display:flex;align-items:center;gap:10px">
     <div id="userInfo"></div>
     <button onclick="window.location.href='account.html'">Account</button>
@@ -58,6 +58,7 @@ document.addEventListener("keydown",e=>{
 </div>
 
 <div id="gameModal">
+  <div id="gameTitle"></div>
   <div id="gameBox">
     <iframe id="gameFrame"></iframe>
     <div id="gameSide">
@@ -101,13 +102,12 @@ async function loadGames(){
   data.forEach(g=>{
     const div=document.createElement("div")
     div.className="card"
-    div.innerHTML=`<img src="${g.image}"><h3>${g.title}</h3>`
+    div.innerHTML=`<img src="${g.image}"><h3>${g.title}</h3><p>${g.description||''}</p>`
     div.onclick=()=>playGame(g)
     container.appendChild(div)
   })
   loadTopGames()
 }
-loadGames()
 
 async function loadTopGames(){
   const {data}=await supabase.from("games").select("*").order("likes",{ascending:false}).limit(3)
@@ -116,7 +116,7 @@ async function loadTopGames(){
   data.forEach((g,i)=>{
     const card=document.createElement("div")
     card.className="topCard"
-    card.innerHTML=`${i===0?'<div class="crown">👑</div>':""}<img src="${g.image}"><h4>${g.title}</h4><p>👍 ${g.likes} | ▶️ ${g.played}</p>`
+    card.innerHTML=`${i===0?'<div class="crown">👑</div>':""}<img src="${g.image}"><h4>${g.title}</h4><p>👍 ${g.likes||0} | ▶️ ${g.played||0}</p>`
     top.appendChild(card)
   })
 }
@@ -124,9 +124,11 @@ async function loadTopGames(){
 function playGame(g){
   currentGame=g
   const modal=document.getElementById("gameModal")
+  document.getElementById("gameTitle").innerText=g.title
   const frame=document.getElementById("gameFrame")
   frame.src=g.embed
   modal.style.display="flex"
+  document.body.style.background=`linear-gradient(135deg,#0f0f1a,#1a1a2e), url('${g.image}') no-repeat center center / cover`
   loadComments()
   updateLikes()
   let seconds=0
@@ -136,7 +138,13 @@ function playGame(g){
   },1000)
   modal.onclick=e=>{if(e.target.id==="gameModal"){closeModal()}}
 }
-function closeModal(){document.getElementById("gameModal").style.display="none";document.getElementById("gameFrame").src="";clearInterval(timer)}
+
+function closeModal(){
+  document.getElementById("gameModal").style.display="none"
+  document.getElementById("gameFrame").src=""
+  clearInterval(timer)
+  document.body.style.background="linear-gradient(135deg,#0f0f1a,#1a1a2e)"
+}
 
 async function likeGame(){
   await supabase.from("games").update({likes:(currentGame.likes||0)+1}).eq("id",currentGame.id)
@@ -151,7 +159,7 @@ async function shareGame(){await navigator.clipboard.writeText(window.location.h
 function fullscreenGame(){document.getElementById("gameFrame").requestFullscreen()}
 
 async function loadComments(){
-  const {data}=await supabase.from("comments").select("id,author,content,email").eq("game_id",currentGame.id).order("created_at")
+  const {data}=await supabase.from("comments").select("*").eq("game_id",currentGame.id).order("created_at")
   const list=document.getElementById("commentsList")
   list.innerHTML=""
   data.forEach(c=>{
@@ -172,6 +180,8 @@ async function postComment(){
 }
 
 async function deleteComment(id){await supabase.from("comments").delete().eq("id",id);loadComments()}
+
+loadGames()
 </script>
 </body>
 </html>
