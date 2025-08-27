@@ -1,130 +1,180 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Games - TyVila</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Games — TyVila</title>
 <link rel="icon" href="https://www.tyvila.online/cdn/favicon.ico">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Play games, earn points, and chat with friends on TyVila.">
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<meta name="description" content="Play games on TyVila — earn points every minute you play.">
 <style>
-body { margin:0; font-family:'Segoe UI',sans-serif; background:linear-gradient(135deg,#000,#1a1a1a); color:white; display:flex; flex-direction:column; height:100vh; }
-header { display:flex; justify-content:space-between; align-items:center; padding:10px 20px; background:#111; border-bottom:2px solid #ff6600; flex-wrap:wrap; }
-header button { background:#ff6600; border:none; padding:10px 15px; border-radius:8px; cursor:pointer; color:white; margin:5px; font-size:14px; }
-header button:hover { background:#e65c00; }
-.main-container { display:flex; flex:1; overflow:hidden; }
-.sidebar { width:300px; background:#1e1e1e; overflow-y:auto; border-right:2px solid #ff6600; padding:15px; }
-.sidebar h2 { text-align:center; margin:10px 0; }
-.sidebar ul { list-style:none; padding:0; margin:0; }
-.sidebar li { padding:10px; background:#2a2a2a; margin:5px 0; border-radius:8px; cursor:pointer; }
-.sidebar li:hover { background:#ff6600; }
-.game-area { flex:1; display:flex; flex-direction:column; padding:15px; }
-.game-window { flex:1; border:2px solid #ff6600; border-radius:12px; background:#000; display:flex; align-items:center; justify-content:center; }
-.game-window iframe { width:100%; height:100%; border:none; border-radius:12px; }
-.comment-section { background:#1e1e1e; border-radius:12px; padding:15px; margin-top:10px; flex-shrink:0; }
-.comment-section h3 { margin-top:0; }
-.comment-list { max-height:150px; overflow-y:auto; margin-bottom:10px; }
-.comment-list div { padding:8px; border-bottom:1px solid #333; }
-.comment-list div b { color:#ff6600; }
-input, textarea, button { padding:8px; border:none; border-radius:6px; margin:4px 0; }
-input, textarea { width:100%; background:#2a2a2a; color:white; }
-button { background:#ff6600; color:white; cursor:pointer; }
-button:hover { background:#e65c00; }
-@media(max-width:900px){ .main-container{flex-direction:column;} .sidebar{width:100%; border-right:none; border-bottom:2px solid #ff6600;} }
+:root{--bg:#0b0b0f;--panel:#111;--accent1:#ff416c;--accent2:#ff4b2b;--muted:#9fb3c8}
+html,body{height:100%;margin:0;font-family:Inter,system-ui,Arial;background:linear-gradient(180deg,#05060a,var(--bg));color:#eaf6ff}
+.header{display:flex;justify-content:space-between;align-items:center;padding:18px 22px;background:linear-gradient(90deg,var(--panel),#0e0e12);border-bottom:1px solid rgba(255,255,255,0.03)}
+.brand{display:flex;align-items:center;gap:12px}
+.brand img{height:44px;border-radius:8px}
+.top-info{display:flex;gap:12px;align-items:center}
+.btn{background:linear-gradient(90deg,var(--accent1),var(--accent2));padding:10px 14px;border-radius:12px;border:0;color:white;cursor:pointer;font-weight:700}
+.container{display:grid;grid-template-columns:320px 1fr;gap:18px;padding:18px;height:calc(100vh - 86px)}
+.sidebar{background:rgba(255,255,255,0.02);padding:14px;border-radius:12px;overflow:auto}
+.games-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;padding:14px;overflow:auto}
+.card{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));padding:12px;border-radius:12px;display:flex;flex-direction:column;gap:8px;min-height:220px}
+.card img{width:100%;height:120px;object-fit:cover;border-radius:8px}
+.card h3{margin:0;font-size:16px}
+.card p{margin:0;color:var(--muted);font-size:13px;white-space:pre-line}
+.card .gactions{display:flex;gap:8px;margin-top:auto}
+.game-window{position:fixed;inset:0;background:rgba(2,6,23,0.9);display:none;align-items:center;justify-content:center;z-index:9999;padding:20px}
+.game-frame{width:100%;max-width:1200px;height:78vh;border-radius:12px;border:0;background:#000;overflow:hidden}
+.topbar-small{display:flex;gap:12px;align-items:center}
+.search{padding:10px;border-radius:10px;border:0;background:rgba(255,255,255,0.03);color:inherit;width:100%}
+@media(max-width:980px){.container{grid-template-columns:1fr;grid-auto-rows:min-content;height:auto}.game-frame{height:60vh}}
 </style>
-<script>
-document.addEventListener("contextmenu", e=>e.preventDefault());
-document.onkeydown=function(e){if(e.ctrlKey&&(e.key==="u"||e.key==="s"||e.key==="S")) e.preventDefault();}
-</script>
 </head>
-<body>
-<header>
-  <button onclick="window.location.href='account.html'">Account</button>
-  <div id="username-display">Username</div>
-  <div id="points-display">Points: 0</div>
-  <button onclick="logout()">Logout</button>
+<body oncontextmenu="return false" onkeydown="if(event.keyCode===123|| (event.ctrlKey&&event.shiftKey&&event.keyCode===73)){event.preventDefault();}">
+<header class="header">
+  <div class="brand">
+    <img src="https://www.tyvila.online/cdn/ty.webp" alt="logo">
+    <div>
+      <div style="font-weight:800">TyVila</div>
+      <div style="font-size:13px;color:var(--muted)">Play • Earn • Social</div>
+    </div>
+  </div>
+  <div class="top-info">
+    <div id="userInfo" class="topbar-small">Loading...</div>
+    <button class="btn" onclick="goAccount()">Account</button>
+  </div>
 </header>
 
-<div class="main-container">
-  <div class="sidebar">
-    <h2>Games</h2>
-    <ul id="games-list"><li>Loading...</li></ul>
-  </div>
-  <div class="game-area">
-    <div class="game-window" id="game-window"><p>Select a game to play</p></div>
-    <div class="comment-section">
-      <h3>Comments</h3>
-      <div id="comment-list" class="comment-list"><p>No comments</p></div>
-      <textarea id="comment-input" placeholder="Write a comment..."></textarea>
-      <button onclick="postComment()">Post Comment</button>
+<div class="container">
+  <aside class="sidebar">
+    <input id="searchBox" class="search" placeholder="Search games or tags" oninput="renderGames()" />
+    <h3 style="margin-top:12px">All Games</h3>
+    <div id="gamesList" style="display:flex;flex-direction:column;gap:10px"></div>
+  </aside>
+
+  <main style="display:flex;flex-direction:column;">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 6px 0 6px">
+      <h2 style="margin:0">Featured</h2>
+      <div style="color:var(--muted);font-size:13px">Points increase while playing: 1 point / minute</div>
+    </div>
+    <div class="games-grid" id="gamesGrid"></div>
+  </main>
+</div>
+
+<div class="game-window" id="gameWindow">
+  <div style="width:100%;max-width:1200px;display:flex;flex-direction:column;align-items:stretch;gap:10px">
+    <iframe id="gameFrame" class="game-frame" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div style="color:#cfeffd">Playing: <span id="playingTitle"></span></div>
+      <div style="display:flex;gap:10px">
+        <div style="background:rgba(255,255,255,0.03);padding:8px;border-radius:8px">Time: <span id="playTime">0m</span></div>
+        <button class="btn" onclick="closeGame()">Close</button>
+      </div>
     </div>
   </div>
 </div>
 
-<script>
-const { createClient } = supabase;
-const supabaseClient = createClient(
-  "https://wwcedhbbdoyrmquokyjj.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4"
-);
-let currentUser=null;
-let currentGameId=null;
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+const SUPABASE_URL = 'https://wwcedhbbdoyrmquokyjj.supabase.co'
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4'
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 
-async function loadUser(){
-  const { data:{user} } = await supabaseClient.auth.getUser();
-  if(!user) return window.location.href='login.html';
-  currentUser=user;
-  const { data } = await supabaseClient.from("profiles").select("*").eq("id",user.id).single();
-  document.getElementById("username-display").innerText=data.username||user.email;
-  document.getElementById("points-display").innerText="Points: "+(data.points||0);
+let games = []
+let currentUser = null
+let playInterval = null
+let playSeconds = 0
+let currentGame = null
+
+async function init(){
+  const { data:{ user } } = await supabase.auth.getUser()
+  if(user){
+    const { data:profile } = await supabase.from('profiles').select('username,email,points').eq('id',user.id).maybeSingle()
+    currentUser = { id: user.id, email: user.email, username: profile?.username || user.email, points: profile?.points || 0 }
+  } else {
+    currentUser = { id: null, email: 'guest', username: 'Guest', points: 0 }
+  }
+  document.getElementById('userInfo').innerText = `${currentUser.username} • ${currentUser.email} • ${currentUser.points} pts`
+  await loadGames()
 }
 
 async function loadGames(){
-  const { data } = await supabaseClient.from("games").select("*");
-  const list=document.getElementById("games-list");
-  list.innerHTML="";
-  if(!data||data.length===0){ list.innerHTML="<li>No games available</li>"; return;}
-  data.forEach(game=>{
-    const li=document.createElement("li");
-    li.innerText=game.name;
-    li.onclick=()=>playGame(game);
-    list.appendChild(li);
-  });
+  const { data } = await supabase.from('games').select('*').order('plays',{ascending:false})
+  games = data || []
+  renderGames()
+  renderList()
 }
 
-function playGame(game){
-  currentGameId=game.id;
-  document.getElementById("game-window").innerHTML=`<iframe src="${game.embed_link}" title="${game.name}"></iframe>`;
-  loadComments();
+function renderList(){
+  const list = document.getElementById('gamesList')
+  list.innerHTML = ''
+  games.forEach(g=>{
+    const el = document.createElement('div')
+    el.style.padding='8px'; el.style.borderRadius='8px'; el.style.background='rgba(255,255,255,0.01)'; el.style.cursor='pointer'
+    el.textContent = g.title
+    el.onclick = ()=>openGame(g)
+    list.appendChild(el)
+  })
 }
 
-async function loadComments(){
-  if(!currentGameId) return;
-  const { data } = await supabaseClient.from("comments").select("*").eq("game_id",currentGameId).order("created_at",{ascending:true});
-  const list=document.getElementById("comment-list");
-  list.innerHTML="";
-  if(!data||data.length===0){ list.innerHTML="<p>No comments</p>"; return;}
-  data.forEach(c=>{
-    const div=document.createElement("div");
-    div.innerHTML=`<b>${c.username||c.user_email}:</b> ${c.content}`;
-    list.appendChild(div);
-  });
+function renderGames(){
+  const q = document.getElementById('searchBox').value.trim().toLowerCase()
+  const grid = document.getElementById('gamesGrid')
+  grid.innerHTML = ''
+  const filtered = games.filter(g=>{
+    if(!q) return true
+    return (g.title||'').toLowerCase().includes(q) || (g.tags||'').toLowerCase().includes(q)
+  })
+  if(filtered.length===0){ grid.innerHTML = '<div style="color:var(--muted)">No games found</div>'; return }
+  filtered.forEach(g=>{
+    const card = document.createElement('div'); card.className='card'
+    card.innerHTML = `<img src="${g.image_link||''}" alt=""><h3>${g.title}</h3><p>${g.description||''}</p><div class="gactions"><button class="btn" onclick='openGameById("${g.id}")'>Play</button><button style="background:rgba(255,255,255,0.04);color:#fff" onclick='goComments("${g.id}")'>Comments</button></div>`
+    grid.appendChild(card)
+  })
 }
 
-async function postComment(){
-  if(!currentGameId) return;
-  const input=document.getElementById("comment-input");
-  const content=input.value.trim();
-  if(!content) return;
-  await supabaseClient.from("comments").insert([{game_id:currentGameId,user_id:currentUser.id,user_email:currentUser.email,username:document.getElementById("username-display").innerText,content}]);
-  input.value="";
-  loadComments();
+function openGameById(id){
+  const g = games.find(x=>x.id===id)
+  if(g) openGame(g)
 }
 
-function logout(){ supabaseClient.auth.signOut(); window.location.href='login.html'; }
+async function openGame(g){
+  currentGame = g
+  document.getElementById('playingTitle').innerText = g.title
+  document.getElementById('gameFrame').src = g.embed_link
+  document.getElementById('gameWindow').style.display = 'flex'
+  playSeconds = 0
+  document.getElementById('playTime').innerText = '0m'
+  if(playInterval) clearInterval(playInterval)
+  playInterval = setInterval(async ()=>{
+    playSeconds += 1
+    document.getElementById('playTime').innerText = Math.floor(playSeconds/60) + 'm ' + (playSeconds%60) + 's'
+    if(playSeconds % 60 === 0){
+      await awardPoint()
+    }
+  },1000)
+  await supabase.from('games').update({ plays: (g.plays||0)+1 }).eq('id', g.id)
+}
 
-loadUser();
-loadGames();
+async function awardPoint(){
+  if(!currentUser?.id) return
+  await supabase.rpc('increment_user_points', { uid: currentUser.id, amount: 1 })
+  const { data:profile } = await supabase.from('profiles').select('points').eq('id', currentUser.id).maybeSingle()
+  currentUser.points = profile?.points || currentUser.points + 1
+  document.getElementById('userInfo').innerText = `${currentUser.username} • ${currentUser.email} • ${currentUser.points} pts`
+}
+
+function closeGame(){
+  document.getElementById('gameFrame').src = ''
+  document.getElementById('gameWindow').style.display = 'none'
+  if(playInterval) clearInterval(playInterval)
+  playInterval = null
+  currentGame = null
+}
+
+function goAccount(){ window.location.href = 'account.html' }
+function goComments(gid){ window.location.href = `comments.html?game=${gid}` }
+
+init()
 </script>
 </body>
 </html>
