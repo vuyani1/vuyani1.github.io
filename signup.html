@@ -7,112 +7,108 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <style>
-body{
-  margin:0;
-  font-family:'Segoe UI',sans-serif;
-  background:linear-gradient(135deg,#000000,#1a1a1a);
-  color:white;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  min-height:100vh
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg,#0a0a0f,#1a1a2e);
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
 }
-.container{
+.container {
   background:#111;
   padding:30px;
   border-radius:15px;
   box-shadow:0 0 20px #ff6600;
-  width:90%;
-  max-width:400px;
-  text-align:center
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
 }
-h1{color:#ff6600;margin-bottom:20px}
-input{
-  width:100%;
-  padding:12px;
-  margin:10px 0;
-  border:none;
-  border-radius:8px;
-  background:#222;
-  color:white
+.container img {
+  width: 100px;
+  margin-bottom: 20px;
 }
-button{
-  width:100%;
-  padding:12px;
-  background:#ff6600;
-  border:none;
-  border-radius:8px;
-  color:white;
-  font-size:16px;
-  cursor:pointer;
-  margin-top:10px
+h1 {color:#ff6600;margin-bottom:20px;}
+input {
+  width:100%;padding:12px;margin:10px 0;border:none;border-radius:8px;background:#222;color:white;
 }
-button:hover{background:#e65c00}
-a{color:#ff6600;text-decoration:none}
-a:hover{text-decoration:underline}
+button {
+  width:100%;padding:12px;margin-top:10px;border:none;border-radius:8px;background:#ff6600;color:white;font-size:16px;cursor:pointer;
+}
+button:hover {background:#e65c00}
+p {margin-top:15px;}
+a {color:#ff6600;text-decoration:none;}
+a:hover{text-decoration:underline;}
 </style>
 <script>
-document.addEventListener("contextmenu",e=>e.preventDefault());
+document.addEventListener("contextmenu", e => e.preventDefault());
 </script>
 </head>
 <body>
 <div class="container">
+  <img src="https://www.tyvila.online/cdn/ty-gameslogo.webp" alt="TyVila Logo">
   <h1>Create Account</h1>
   <input id="username" placeholder="Username">
   <input id="email" type="email" placeholder="Email">
   <input id="password" type="password" placeholder="Password">
-  <button onclick="signup()">Sign Up</button>
+  <input id="otp" type="text" placeholder="Enter OTP" style="display:none;">
+  <button id="signupBtn">Sign Up</button>
   <p>Already have an account? <a href="login.html">Login</a></p>
+  <div id="status" style="margin-top:10px;color:#ffcc00;"></div>
 </div>
-<script>
-const { createClient } = supabase;
-const supabaseClient = createClient(
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+const supabase = createClient(
   "https://wwcedhbbdoyrmquokyjj.supabase.co",
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4"
-);
+)
 
-async function signup(){
-  const username=document.getElementById("username").value.trim();
-  const email=document.getElementById("email").value.trim();
-  const password=document.getElementById("password").value.trim();
+let generatedOTP = null
+let otpExpires = null
 
-  if(!username||!email||!password){
-    alert("All fields are required");
-    return;
-  }
-
-  const { data: existing, error: checkError } = await supabaseClient
-    .from("profiles")
-    .select("id")
-    .eq("username", username)
-    .maybeSingle();
-
-  if(checkError){
-    alert("Error checking username: "+checkError.message);
-    return;
-  }
-  if(existing){
-    alert("Username is already taken. Please choose another one.");
-    return;
-  }
-
-  const { data, error } = await supabaseClient.auth.signUp({email,password});
-  if(error){
-    alert(error.message);
-    return;
-  }
-
-  await supabaseClient.from("profiles").insert([{
-    id:data.user.id,
-    username,
-    email,
-    points:0,
-    avatar_url:`https://api.dicebear.com/9.x/adventurer/svg?seed=${encodeURIComponent(username)}`
-  }]);
-
-  alert("Signup successful! You can now login.");
-  window.location.href="login.html";
+async function sendOTP(email) {
+  generatedOTP = Math.floor(100000 + Math.random() * 900000)
+  otpExpires = Date.now() + 10*60*1000 
+  await supabase.functions.invoke('send-email-otp', {
+    body: { email, otp: generatedOTP }
+  })
+  document.getElementById('otp').style.display='block'
+  document.getElementById('status').innerText='OTP sent to your email. Expires in 10 minutes.'
 }
+
+async function signupFlow() {
+  const username = document.getElementById('username').value.trim()
+  const email = document.getElementById('email').value.trim()
+  const password = document.getElementById('password').value.trim()
+  const otpInput = document.getElementById('otp').value.trim()
+  const status = document.getElementById('status')
+
+  if (!username || !email || !password) {status.innerText='All fields are required.'; return;}
+
+  const { data: existing } = await supabase.from('profiles').select('id').eq('username', username).maybeSingle()
+  if (existing) {status.innerText='Username already taken.'; return;}
+
+  if (document.getElementById('otp').style.display==='none') {
+    await sendOTP(email)
+    return
+  }
+
+  if (parseInt(otpInput)!==generatedOTP) {status.innerText='Invalid OTP.'; return;}
+  if (Date.now()>otpExpires) {status.innerText='OTP expired. Please request again.'; return;}
+
+  const { data, error } = await supabase.auth.signUp({ email, password })
+  if (error) {status.innerText=error.message; return;}
+
+  await supabase.from('profiles').insert([{id: data.user.id, username, email, points:0, rank:'Newbie'}])
+  status.innerText='Signup successful! Redirecting to login…'
+  setTimeout(()=>window.location.href='login.html',1500)
+}
+
+document.getElementById('signupBtn').addEventListener('click', signupFlow)
 </script>
 </body>
 </html>
