@@ -7,30 +7,44 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <style>
-body{margin:0;font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#000,#1a1a1a);color:white;display:flex;align-items:center;justify-content:center;min-height:100vh}
-.container{background:#111;padding:30px;border-radius:15px;box-shadow:0 0 25px #ff6600;width:90%;max-width:450px;text-align:center}
-h1{color:#ff6600;margin-bottom:15px}
-.info{margin:10px 0;font-size:16px}
-.rank{margin-top:10px;font-weight:bold;font-size:18px;color:#00e6ff;text-shadow:0 0 10px #00e6ff}
-input{width:100%;padding:12px;margin:10px 0;border:none;border-radius:8px;background:#222;color:white}
-button{width:100%;padding:12px;background:#ff6600;border:none;border-radius:8px;color:white;font-size:16px;cursor:pointer;margin-top:10px}
-button:hover{background:#e65c00}
+  body{margin:0;font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#000,#1a1a1a);color:white;display:flex;align-items:center;justify-content:center;min-height:100vh}
+  .container{background:#111;padding:30px;border-radius:20px;box-shadow:0 0 25px #ff6600;width:95%;max-width:500px;text-align:center}
+  h1{color:#ff6600;margin-bottom:20px}
+  img.profile{width:120px;height:120px;border-radius:50%;border:3px solid #ff6600;margin-bottom:15px;object-fit:cover}
+  .info{margin:10px 0;font-size:16px}
+  .highlight{color:#ff6600;font-weight:bold}
+  input{width:100%;padding:12px;margin:10px 0;border:none;border-radius:8px;background:#222;color:white}
+  button{width:100%;padding:12px;background:#ff6600;border:none;border-radius:8px;color:white;font-size:16px;cursor:pointer;margin-top:10px;transition:0.3s}
+  button:hover{background:#e65c00}
+  a{color:#ff6600;text-decoration:none}
+  a:hover{text-decoration:underline}
 </style>
 <script>
 document.addEventListener("contextmenu",e=>e.preventDefault());
+document.addEventListener("keydown",e=>{
+  if(e.ctrlKey && (e.key==="u"||e.key==="U"||e.key==="i")) e.preventDefault();
+});
 </script>
 </head>
 <body>
 <div class="container">
   <h1>My Account</h1>
-  <div id="account-info">
-    <p class="info">Loading account...</p>
-  </div>
-  <h3>Update Profile</h3>
-  <input id="new-username" placeholder="New Username">
-  <button onclick="updateProfile()">Update</button>
-  <button onclick="logout()">Logout</button>
+  <img id="profile-pic" class="profile" src="https://www.tyvila.online/cdn/default-avatar.webp" alt="Profile Picture">
+  <div class="info">👤 <span id="username" class="highlight">Loading...</span></div>
+  <div class="info">📧 <span id="email" class="highlight">Loading...</span></div>
+  <div class="info">⭐ Points: <span id="points" class="highlight">0</span></div>
+  <div class="info">🏆 Rank: <span id="rank" class="highlight">Rookie</span></div>
+
+  <hr style="border:1px solid #333;margin:20px 0">
+
+  <h3>Add Friend</h3>
+  <input id="friend-input" placeholder="Enter username or email">
+  <button onclick="addFriend()">Add Friend</button>
+
+  <button onclick="playGames()">🎮 Play Games</button>
+  <p><a href="logout.html">Logout</a></p>
 </div>
+
 <script>
 const { createClient } = supabase;
 const supabaseClient = createClient(
@@ -38,45 +52,53 @@ const supabaseClient = createClient(
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4"
 );
 
-let currentUser;
+async function loadProfile(){
+  const { data: { user } } = await supabaseClient.auth.getUser();
+  if(!user){ window.location.href="login.html"; return; }
 
-function getRank(points){
-  if(points>=1000) return "🏆 Master";
-  if(points>=500) return "💎 Diamond";
-  if(points>=250) return "🥇 Gold";
-  if(points>=100) return "🥈 Silver";
-  if(points>=1) return "🥉 Bronze";
-  return "Unranked";
+  const { data: profile, error } = await supabaseClient
+    .from("profiles")
+    .select("*")
+    .eq("email", user.email)
+    .single();
+
+  if(error || !profile){ alert("Profile not found"); return; }
+
+  document.getElementById("username").textContent = profile.username;
+  document.getElementById("email").textContent = profile.email;
+  document.getElementById("points").textContent = profile.points;
+  document.getElementById("rank").textContent = profile.rank;
+  document.getElementById("profile-pic").src = profile.profile_pic || "https://www.tyvila.online/cdn/default-avatar.webp";
 }
 
-async function loadAccount(){
-  const { data:{user} } = await supabaseClient.auth.getUser();
-  if(!user){window.location.href="login.html";return;}
-  currentUser=user;
+async function addFriend(){
+  const friendInput=document.getElementById("friend-input").value.trim();
+  if(!friendInput){alert("Enter a username or email");return;}
 
-  const { data } = await supabaseClient.from("profiles").select("username,email,created_at,points").eq("id",user.id).single();
-  if(!data) return;
+  const { data: { user } } = await supabaseClient.auth.getUser();
+  if(!user){ alert("Login required"); return; }
 
-  const rank=getRank(data.points||0);
+  const { data: friend, error } = await supabaseClient
+    .from("profiles")
+    .select("id")
+    .or(`username.eq.${friendInput},email.eq.${friendInput}`)
+    .single();
 
-  document.getElementById("account-info").innerHTML=
-    `<p class="info"><b>Username:</b> ${data.username||"Not set"}</p>
-     <p class="info"><b>Email:</b> ${data.email}</p>
-     <p class="info"><b>Joined:</b> ${new Date(data.created_at).toLocaleDateString()}</p>
-     <p class="info"><b>Points:</b> ${data.points||0}</p>
-     <p class="rank"><b>Rank:</b> ${rank}</p>`;
+  if(error || !friend){ alert("User not found"); return; }
+
+  const { data: self } = await supabaseClient.from("profiles").select("id").eq("email", user.email).single();
+
+  if(self.id === friend.id){ alert("You cannot add yourself!"); return; }
+
+  await supabaseClient.from("friends").insert([{ requester:self.id, receiver:friend.id }]);
+  alert("Friend request sent!");
 }
 
-async function updateProfile(){
-  const newUsername=document.getElementById("new-username").value.trim();
-  if(!newUsername) return alert("Enter a username");
-  await supabaseClient.from("profiles").update({username:newUsername}).eq("id",currentUser.id);
-  alert("Profile updated");
-  loadAccount();
+function playGames(){
+  window.location.href="games.html";
 }
 
-function logout(){supabaseClient.auth.signOut();window.location.href="login.html";}
-loadAccount();
+loadProfile();
 </script>
 </body>
 </html>
