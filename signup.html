@@ -7,11 +7,46 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <style>
-body{margin:0;font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#000000,#1a1a1a);color:white;display:flex;align-items:center;justify-content:center;min-height:100vh}
-.container{background:#111;padding:30px;border-radius:15px;box-shadow:0 0 20px #ff6600;width:90%;max-width:400px;text-align:center}
+body{
+  margin:0;
+  font-family:'Segoe UI',sans-serif;
+  background:linear-gradient(135deg,#000000,#1a1a1a);
+  color:white;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:100vh
+}
+.container{
+  background:#111;
+  padding:30px;
+  border-radius:15px;
+  box-shadow:0 0 20px #ff6600;
+  width:90%;
+  max-width:400px;
+  text-align:center
+}
 h1{color:#ff6600;margin-bottom:20px}
-input{width:100%;padding:12px;margin:10px 0;border:none;border-radius:8px;background:#222;color:white}
-button{width:100%;padding:12px;background:#ff6600;border:none;border-radius:8px;color:white;font-size:16px;cursor:pointer;margin-top:10px}
+input{
+  width:100%;
+  padding:12px;
+  margin:10px 0;
+  border:none;
+  border-radius:8px;
+  background:#222;
+  color:white
+}
+button{
+  width:100%;
+  padding:12px;
+  background:#ff6600;
+  border:none;
+  border-radius:8px;
+  color:white;
+  font-size:16px;
+  cursor:pointer;
+  margin-top:10px
+}
 button:hover{background:#e65c00}
 a{color:#ff6600;text-decoration:none}
 a:hover{text-decoration:underline}
@@ -40,12 +75,41 @@ async function signup(){
   const username=document.getElementById("username").value.trim();
   const email=document.getElementById("email").value.trim();
   const password=document.getElementById("password").value.trim();
-  if(!username||!email||!password){alert("All fields required");return;}
 
-  const { data,error } = await supabaseClient.auth.signUp({email,password});
-  if(error){alert(error.message);return;}
+  if(!username||!email||!password){
+    alert("All fields are required");
+    return;
+  }
 
-  await supabaseClient.from("profiles").insert([{id:data.user.id,username,email}]);
+  const { data: existing, error: checkError } = await supabaseClient
+    .from("profiles")
+    .select("id")
+    .eq("username", username)
+    .maybeSingle();
+
+  if(checkError){
+    alert("Error checking username: "+checkError.message);
+    return;
+  }
+  if(existing){
+    alert("Username is already taken. Please choose another one.");
+    return;
+  }
+
+  const { data, error } = await supabaseClient.auth.signUp({email,password});
+  if(error){
+    alert(error.message);
+    return;
+  }
+
+  await supabaseClient.from("profiles").insert([{
+    id:data.user.id,
+    username,
+    email,
+    points:0,
+    avatar_url:`https://api.dicebear.com/9.x/adventurer/svg?seed=${encodeURIComponent(username)}`
+  }]);
+
   alert("Signup successful! You can now login.");
   window.location.href="login.html";
 }
