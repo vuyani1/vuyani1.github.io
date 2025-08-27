@@ -2,103 +2,102 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>My Account - TyVila</title>
-<link rel="icon" href="https://www.tyvila.online/cdn/favicon.ico">
+<title>My Account — TyVila</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<link rel="icon" href="https://www.tyvila.online/cdn/favicon.ico">
 <style>
-  body{margin:0;font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#000,#1a1a1a);color:white;display:flex;align-items:center;justify-content:center;min-height:100vh}
-  .container{background:#111;padding:30px;border-radius:20px;box-shadow:0 0 25px #ff6600;width:95%;max-width:500px;text-align:center}
-  h1{color:#ff6600;margin-bottom:20px}
-  img.profile{width:120px;height:120px;border-radius:50%;border:3px solid #ff6600;margin-bottom:15px;object-fit:cover}
-  .info{margin:10px 0;font-size:16px}
-  .highlight{color:#ff6600;font-weight:bold}
-  input{width:100%;padding:12px;margin:10px 0;border:none;border-radius:8px;background:#222;color:white}
-  button{width:100%;padding:12px;background:#ff6600;border:none;border-radius:8px;color:white;font-size:16px;cursor:pointer;margin-top:10px;transition:0.3s}
-  button:hover{background:#e65c00}
-  a{color:#ff6600;text-decoration:none}
-  a:hover{text-decoration:underline}
+body{margin:0;font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#0f0f1a,#1a1a2e);color:#fff;display:flex;flex-direction:column;align-items:center}
+header{width:100%;background:#111;padding:15px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 0 10px #000}
+header h1{color:#06b6d4;margin:0}
+header button{padding:8px 16px;border:none;border-radius:6px;cursor:pointer;background:#06b6d4;color:#fff;font-weight:bold}
+header button:hover{background:#0891b2}
+.main-container{display:flex;flex-wrap:wrap;gap:20px;padding:20px;justify-content:center;width:100%}
+.card{background:#1a1a2e;padding:20px;border-radius:12px;box-shadow:0 0 15px #000;text-align:center;min-width:250px}
+.card img{width:100px;height:100px;border-radius:50%;border:3px solid #06b6d4;object-fit:cover;margin-bottom:10px}
+.stats{display:flex;justify-content:space-around;margin-top:10px}
+.stat-box{background:#222;padding:10px;border-radius:10px;width:30%;text-align:center}
+input,button{padding:10px;border-radius:8px;border:none;margin-top:10px;width:100%}
+input{background:#222;color:#fff}
+button{background:#06b6d4;color:#fff;font-weight:bold;cursor:pointer}
+button:hover{background:#0891b2}
+ul{list-style:none;padding:0;max-height:200px;overflow-y:auto}
+li{padding:8px;border-bottom:1px solid #333;display:flex;justify-content:space-between;align-items:center}
+h2{margin-top:0;text-align:center;color:#ffcc00}
 </style>
 <script>
-document.addEventListener("contextmenu",e=>e.preventDefault());
-document.addEventListener("keydown",e=>{
-  if(e.ctrlKey && (e.key==="u"||e.key==="U"||e.key==="i")) e.preventDefault();
-});
+document.addEventListener("contextmenu", e=>e.preventDefault())
+document.onkeydown=function(e){if(e.ctrlKey&&(e.key==="u"||e.key==="U"||e.key==="s"||e.key==="S")) e.preventDefault();}
 </script>
 </head>
 <body>
-<div class="container">
-  <h1>My Account</h1>
-  <img id="profile-pic" class="profile" src="https://www.tyvila.online/cdn/default-avatar.webp" alt="Profile Picture">
-  <div class="info">👤 <span id="username" class="highlight">Loading...</span></div>
-  <div class="info">📧 <span id="email" class="highlight">Loading...</span></div>
-  <div class="info">⭐ Points: <span id="points" class="highlight">0</span></div>
-  <div class="info">🏆 Rank: <span id="rank" class="highlight">Rookie</span></div>
+<header>
+  <h1>TyVila Account</h1>
+  <button onclick="window.location.href='games.html'">Play Games</button>
+</header>
 
-  <hr style="border:1px solid #333;margin:20px 0">
+<div class="main-container">
+  <div class="card" id="profileCard">
+    <img id="profilePic" src="https://api.dicebear.com/9.x/thumbs/svg" alt="Profile">
+    <h2 id="username">Loading...</h2>
+    <p id="email">Loading...</p>
+    <div class="stats">
+      <div class="stat-box"><h3 id="points">0</h3><p>Points</p></div>
+      <div class="stat-box"><h3 id="rank">-</h3><p>Rank</p></div>
+    </div>
+    <input type="text" id="addFriendInput" placeholder="Add friend by username/email">
+    <button onclick="addFriend()">Add Friend</button>
+  </div>
 
-  <h3>Add Friend</h3>
-  <input id="friend-input" placeholder="Enter username or email">
-  <button onclick="addFriend()">Add Friend</button>
-
-  <button onclick="playGames()">🎮 Play Games</button>
-  <p><a href="logout.html">Logout</a></p>
+  <div class="card">
+    <h2>Friends</h2>
+    <ul id="friendsList"><li>No friends yet</li></ul>
+  </div>
 </div>
 
-<script>
-const { createClient } = supabase;
-const supabaseClient = createClient(
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+const supabase = createClient(
   "https://wwcedhbbdoyrmquokyjj.supabase.co",
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4"
-);
+)
+let currentUser
 
-async function loadProfile(){
-  const { data: { user } } = await supabaseClient.auth.getUser();
-  if(!user){ window.location.href="login.html"; return; }
+async function loadAccount(){
+  const {data:{user}} = await supabase.auth.getUser()
+  if(!user) return window.location.href='login.html'
+  currentUser=user
+  const {data:profile} = await supabase.from("profiles").select("*").eq("id",user.id).single()
+  document.getElementById("username").innerText = profile.username || user.email
+  document.getElementById("email").innerText = user.email
+  document.getElementById("points").innerText = profile.points || 0
+  document.getElementById("rank").innerText = profile.rank || "-"
+  document.getElementById("profilePic").src = profile.avatar_url || "https://api.dicebear.com/9.x/thumbs/svg"
+  loadFriends()
+}
 
-  const { data: profile, error } = await supabaseClient
-    .from("profiles")
-    .select("*")
-    .eq("email", user.email)
-    .single();
-
-  if(error || !profile){ alert("Profile not found"); return; }
-
-  document.getElementById("username").textContent = profile.username;
-  document.getElementById("email").textContent = profile.email;
-  document.getElementById("points").textContent = profile.points;
-  document.getElementById("rank").textContent = profile.rank;
-  document.getElementById("profile-pic").src = profile.profile_pic || "https://www.tyvila.online/cdn/default-avatar.webp";
+async function loadFriends(){
+  const {data} = await supabase.from("friends").select("*").eq("user_id",currentUser.id)
+  const list = document.getElementById("friendsList")
+  list.innerHTML=""
+  if(!data||data.length===0){ list.innerHTML="<li>No friends yet</li>"; return }
+  data.forEach(f=>{
+    const li=document.createElement("li")
+    li.textContent=f.friend_username
+    list.appendChild(li)
+  })
 }
 
 async function addFriend(){
-  const friendInput=document.getElementById("friend-input").value.trim();
-  if(!friendInput){alert("Enter a username or email");return;}
-
-  const { data: { user } } = await supabaseClient.auth.getUser();
-  if(!user){ alert("Login required"); return; }
-
-  const { data: friend, error } = await supabaseClient
-    .from("profiles")
-    .select("id")
-    .or(`username.eq.${friendInput},email.eq.${friendInput}`)
-    .single();
-
-  if(error || !friend){ alert("User not found"); return; }
-
-  const { data: self } = await supabaseClient.from("profiles").select("id").eq("email", user.email).single();
-
-  if(self.id === friend.id){ alert("You cannot add yourself!"); return; }
-
-  await supabaseClient.from("friends").insert([{ requester:self.id, receiver:friend.id }]);
-  alert("Friend request sent!");
+  const val = document.getElementById("addFriendInput").value.trim()
+  if(!val) return alert("Enter a username/email")
+  const {data:user} = await supabase.from("profiles").select("id,username,email").or(`username.eq.${val},email.eq.${val}`).maybeSingle()
+  if(!user) return alert("User not found")
+  await supabase.from("friends").insert([{user_id:currentUser.id,friend_id:user.id,friend_username:user.username}])
+  loadFriends()
+  document.getElementById("addFriendInput").value=""
 }
 
-function playGames(){
-  window.location.href="games.html";
-}
-
-loadProfile();
+loadAccount()
 </script>
 </body>
 </html>
