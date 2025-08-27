@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Comments — TyVila</title>
+<link rel="icon" href="https://www.tyvila.online/cdn/favicon.ico">
+<style>
+html,body{height:100%;margin:0;font-family:Inter,system-ui,Arial;background:linear-gradient(180deg,#04142a,#071028);color:#eaf6ff}
+.container{max-width:960px;margin:20px auto;padding:18px}
+.header{display:flex;justify-content:space-between;align-items:center}
+.input,textarea{width:100%;padding:10px;border-radius:10px;border:0;background:rgba(255,255,255,0.02);color:inherit;margin:8px 0}
+.button{padding:10px 14px;border-radius:10px;border:0;background:linear-gradient(90deg,#7c3aed,#06b6d4);color:white;cursor:pointer}
+.list{margin-top:12px}
+.comment{background:rgba(255,255,255,0.02);padding:12px;border-radius:10px;margin-bottom:10px}
+</style>
+</head>
+<body oncontextmenu="return false" onkeydown="if(event.keyCode===123|| (event.ctrlKey&&event.shiftKey&&event.keyCode===73)){event.preventDefault();}">
+<div class="container">
+  <div class="header"><h2>Comments</h2><div><button class="button" onclick="goGames()">Back</button></div></div>
+  <div id="postArea">
+    <textarea id="commentText" rows="4" placeholder="Write a comment"></textarea>
+    <div style="display:flex;gap:8px"><input id="commentGameId" class="input" placeholder="Game id (optional)"><button class="button" onclick="postComment()">Post</button></div>
+  </div>
+  <div class="list" id="commentsList">Loading comments...</div>
+</div>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+const SUPABASE_URL = 'https://wwcedhbbdoyrmquokyjj.supabase.co'
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4'
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
+
+let currentUser = null
+
+async function init(){
+  const { data:{ user } } = await supabase.auth.getUser()
+  if(!user){ window.location.href='login.html'; return }
+  currentUser = user
+  await loadComments()
+  const url = new URL(location.href)
+  const g = url.searchParams.get('game')
+  if(g) document.getElementById('commentGameId').value = g
+}
+
+async function postComment(){
+  const txt = document.getElementById('commentText').value.trim()
+  const gid = document.getElementById('commentGameId').value.trim() || null
+  if(!txt) return
+  const username = (await supabase.from('profiles').select('username').eq('id', currentUser.id).maybeSingle()).data?.username || currentUser.email
+  await supabase.from('comments').insert([{ game_id: gid, user_id: currentUser.id, username, user_email: currentUser.email, content: txt }])
+  document.getElementById('commentText').value = ''
+  await loadComments()
+}
+
+async function loadComments(){
+  const { data } = await supabase.from('comments').select('*').order('created_at',{ascending:false}).limit(200)
+  const out = document.getElementById('commentsList'); out.innerHTML=''
+  if(!data||data.length===0){ out.innerHTML = '<div>No comments yet</div>'; return }
+  data.forEach(c=>{
+    const d = document.createElement('div'); d.className='comment'
+    d.innerHTML = `<strong>${c.username||c.user_email}</strong> <small style="color:#9fb3c8">• ${new Date(c.created_at).toLocaleString()}</small><div style="margin-top:6px">${c.content}</div>`
+    out.appendChild(d)
+  })
+}
+
+function goGames(){ window.location.href='games.html' }
+init()
+</script>
+</body>
+</html>
