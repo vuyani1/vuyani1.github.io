@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>TyLive Admin</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<link rel="icon" href="https://www.tyvila.online/cdn/favicon.ico">
+<style>
+body{margin:0;font-family:'Segoe UI',sans-serif;background:#0a0a0f;color:#fff;padding:20px;}
+h2{color:#06b6d4;}
+input,select,textarea{width:100%;padding:8px;margin:5px 0;background:#111;color:#fff;border:1px solid #333;border-radius:6px;}
+button{padding:10px 16px;border:none;border-radius:8px;background:#06b6d4;color:#fff;cursor:pointer;margin-top:5px;}
+button:hover{background:#0891b2;}
+#commentsList{margin-top:20px;max-height:300px;overflow-y:auto;background:#111;padding:10px;border-radius:10px;}
+.comment{border-bottom:1px solid #333;padding:8px;}
+.comment .author{color:#ff6600;font-weight:bold;}
+#preview{margin-top:20px;}
+video,img{max-width:100%;border-radius:10px;}
+</style>
+</head>
+<body>
+<h2>🎥 TyLive Admin Panel</h2>
+
+<section>
+  <label><input type="checkbox" id="isLive"> Go Live</label><br>
+  <label><input type="checkbox" id="useCamera"> Use Camera</label><br>
+  <input type="text" id="videoLink" placeholder="Video Link (mp4)">
+  <input type="text" id="standbyMedia" placeholder="Standby Media (image or mp4)">
+  <label>Schedule Start:</label><input type="datetime-local" id="scheduleStart">
+  <label>Schedule End:</label><input type="datetime-local" id="scheduleEnd">
+  <button onclick="saveConfig()">💾 Save Settings</button>
+</section>
+
+<div id="preview">
+  <h3>Preview</h3>
+  <video id="previewVideo" controls autoplay></video>
+  <img id="previewImage" style="display:none;">
+</div>
+
+<section>
+  <h3>💬 Manage Comments</h3>
+  <div id="commentsList"></div>
+</section>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+const supabase = createClient(
+  "https://wwcedhbbdoyrmquokyjj.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4"
+)
+
+async function loadConfig(){
+  const {data} = await supabase.from('ty_live_config').select('*').limit(1).single()
+  if(!data) return
+  document.getElementById('isLive').checked=data.is_live
+  document.getElementById('useCamera').checked=data.use_camera
+  document.getElementById('videoLink').value=data.current_video||''
+  document.getElementById('standbyMedia').value=data.standby_media||''
+  if(data.schedule_start) document.getElementById('scheduleStart').value=data.schedule_start.split('.')[0]
+  if(data.schedule_end) document.getElementById('scheduleEnd').value=data.schedule_end.split('.')[0]
+}
+
+async function saveConfig(){
+  const payload={
+    is_live: document.getElementById('isLive').checked,
+    use_camera: document.getElementById('useCamera').checked,
+    current_video: document.getElementById('videoLink').value,
+    standby_media: document.getElementById('standbyMedia').value,
+    schedule_start: document.getElementById('scheduleStart').value||null,
+    schedule_end: document.getElementById('scheduleEnd').value||null
+  }
+  await supabase.from('ty_live_config').delete().neq('id',null) -- keep one config only
+  await supabase.from('ty_live_config').insert([payload])
+  alert('✅ Config Saved!')
+  loadConfig()
+}
+
+async function loadComments(){
+  const {data} = await supabase.from('ty_live_comments').select('*').order('created_at',{ascending:false})
+  const list=document.getElementById('commentsList')
+  list.innerHTML=''
+  data.forEach(c=>{
+    const div=document.createElement('div')
+    div.className='comment'
+    div.innerHTML=`<span class="author">${c.username}</span>: ${c.content} <button onclick="delComment('${c.id}')">🗑</button>`
+    list.appendChild(div)
+  })
+}
+
+async function delComment(id){
+  await supabase.from('ty_live_comments').delete().eq('id',id)
+  loadComments()
+}
+
+loadConfig()
+loadComments()
+setInterval(loadComments,5000)
+</script>
+</body>
+</html>
