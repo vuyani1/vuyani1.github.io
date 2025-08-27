@@ -5,66 +5,141 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Login — TyVila</title>
 <link rel="icon" href="https://www.tyvila.online/cdn/favicon.ico">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg1:#0a0a0f;--bg2:#0d0d1a;--accent:linear-gradient(90deg,#7c3aed,#06b6d4);
---muted:#9fb3c8;--card-bg:rgba(255,255,255,0.03);}
-*{box-sizing:border-box;}
-body{margin:0;font-family:'Inter',sans-serif;color:white;
-background:radial-gradient(1200px 600px at 10% 10%, rgba(124,58,237,0.12), transparent),
-radial-gradient(900px 500px at 90% 90%, rgba(6,182,212,0.07), transparent),
-linear-gradient(180deg,var(--bg1),var(--bg2));
-display:flex;justify-content:center;align-items:center;height:100vh;padding:12px;}
-.container{display:flex;width:100%;max-width:1100px;background:var(--card-bg);
-border-radius:20px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.6);}
-.left-panel{flex:1;background:linear-gradient(135deg,#7c3aed,#06b6d4);
-padding:40px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:20px;}
-.left-panel h1{font-size:48px;font-weight:700;}
-.left-panel p{font-size:18px;color:rgba(255,255,255,0.9);text-align:center;}
-.left-panel img{width:120px;border-radius:16px;}
-.right-panel{flex:1;padding:50px 40px;display:flex;flex-direction:column;justify-content:center;gap:20px;}
-.right-panel h2{margin:0;font-size:32px;font-weight:700;text-align:center;}
-.input-group{display:flex;flex-direction:column;gap:8px;margin-top:12px;}
-input{padding:14px;border-radius:12px;border:none;background:rgba(255,255,255,0.05);
-color:white;font-size:16px;}
-button.primary{margin-top:18px;padding:14px;border-radius:12px;border:none;font-size:16px;
-font-weight:700;color:white;background-image:var(--accent);cursor:pointer;transition:all .3s;}
-button.primary:hover{transform:scale(1.05);}
-.links{display:flex;justify-content:space-between;font-size:14px;margin-top:12px;}
-.links a{color:#cfeffd;text-decoration:none;}
-.error-msg{color:#ff7777;text-align:center;margin-top:6px;min-height:18px;}
-.success-msg{color:#7cf59b;text-align:center;margin-top:6px;min-height:18px;}
-@media(max-width:900px){.container{flex-direction:column;}.left-panel,.right-panel{padding:30px;}}
+:root {
+  --bg1: #050510;
+  --bg2: #0c0c1a;
+  --neon1: #7c3aed;
+  --neon2: #06b6d4;
+  --error: #ff4d6d;
+  --success: #32ff91;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  color: white;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(180deg, var(--bg1), var(--bg2));
+  overflow: hidden;
+}
+body::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url("https://www.tyvila.online/cdn/LOGIN.webp") center/cover no-repeat;
+  opacity: 0.15;
+  animation: floatBg 20s infinite alternate ease-in-out;
+}
+@keyframes floatBg {
+  0% { transform: scale(1) translateY(0); }
+  100% { transform: scale(1.1) translateY(-20px); }
+}
+.container {
+  position: relative;
+  width: 95%;
+  max-width: 1000px;
+  background: rgba(10,10,25,0.85);
+  border: 3px solid transparent;
+  border-image: linear-gradient(90deg, var(--neon1), var(--neon2)) 1;
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 0 30px rgba(124,58,237,0.4), 0 0 50px rgba(6,182,212,0.3);
+  animation: glowPulse 3s infinite alternate;
+}
+@keyframes glowPulse {
+  0% { box-shadow: 0 0 20px rgba(124,58,237,0.5); }
+  100% { box-shadow: 0 0 40px rgba(6,182,212,0.7); }
+}
+h1 {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 28px;
+  text-align: center;
+  margin: 0 0 20px;
+  background: linear-gradient(90deg, var(--neon1), var(--neon2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+label { font-size: 14px; }
+input {
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  background: rgba(255,255,255,0.08);
+  color: white;
+  font-size: 16px;
+  outline: none;
+  transition: all 0.2s;
+}
+input:focus {
+  background: rgba(255,255,255,0.15);
+  box-shadow: 0 0 10px var(--neon2);
+}
+button.primary {
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  font-size: 18px;
+  font-weight: bold;
+  color: white;
+  background: linear-gradient(90deg, var(--neon1), var(--neon2));
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+button.primary:hover {
+  transform: scale(1.08) rotate(-1deg);
+  box-shadow: 0 0 20px var(--neon2);
+}
+.links {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+}
+.links a {
+  color: #cfeffd;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.links a:hover { color: var(--neon2); }
+.error-msg {
+  color: var(--error);
+  text-align: center;
+  min-height: 20px;
+}
+.success-msg {
+  color: var(--success);
+  text-align: center;
+  min-height: 20px;
+}
 </style>
 </head>
 <body>
 <div class="container">
-  <div class="left-panel">
-    <img src="https://www.tyvila.online/cdn/ty.webp" alt="TyVila">
-    <h1>TyVila</h1>
-    <p>Play games, earn points, climb the leaderboard.</p>
-  </div>
-
-  <form class="right-panel" id="loginForm">
-    <h2>Sign In</h2>
+  <h1>🎮 TyVila Login 🎮</h1>
+  <form id="loginForm">
     <div class="error-msg" id="loginError"></div>
     <div class="success-msg" id="loginSuccess"></div>
 
-    <div class="input-group">
-      <label for="identifier">Email or Username</label>
-      <input id="identifier" type="text" placeholder="you@example.com or username" required>
-    </div>
+    <label for="identifier">Email or Username</label>
+    <input id="identifier" type="text" placeholder="you@example.com or username" required>
 
-    <div class="input-group">
-      <label for="password">Password</label>
-      <input id="password" type="password" placeholder="Enter password" required>
-    </div>
+    <label for="password">Password</label>
+    <input id="password" type="password" placeholder="Enter password" required>
 
-    <button class="primary" type="submit">Login</button>
+    <button class="primary" type="submit">▶ Enter Game</button>
 
     <div class="links">
-      <a href="signup.html">Create account</a>
-      <a href="#" id="forgotLink">Forgot password?</a>
+      <a href="signup.html">🆕 Create account</a>
+      <a href="#" id="forgotLink">❓ Forgot password?</a>
     </div>
   </form>
 </div>
