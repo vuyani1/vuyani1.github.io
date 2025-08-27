@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>TyLive Admin — TyVila</title>
+<link rel="icon" href="https://www.tyvila.online/cdn/favicon.ico">
+<style>
+:root{--bg:#070718;--card:#0f1620;--accent:#06b6d4;--accent2:#ff6600}
+html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:linear-gradient(180deg,var(--bg),#000);color:#e6f0f8}
+.header{display:flex;justify-content:space-between;align-items:center;padding:18px 24px;background:rgba(255,255,255,.02);backdrop-filter:blur(6px)}
+.brand{display:flex;gap:12px;align-items:center}
+.brand img{height:44px;border-radius:8px}
+.controls{display:flex;gap:12px;align-items:center}
+.grid{display:grid;grid-template-columns:400px 1fr;gap:20px;padding:20px}
+.card{background:var(--card);padding:16px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.6)}
+.form-row{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+input,textarea,select,button{border-radius:8px;padding:10px;border:1px solid rgba(255,255,255,.08);background:transparent;color:inherit}
+label{font-size:13px;color:#9fb3c8}
+button.primary{background:linear-gradient(90deg,var(--accent2),var(--accent));color:#000;font-weight:800;border:none;cursor:pointer}
+.small{font-size:13px;color:#9fb3c8}
+.viewer-list{max-height:260px;overflow:auto;margin-top:10px}
+.viewer-item{padding:8px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;justify-content:space-between;align-items:center}
+.table{width:100%;border-collapse:collapse;margin-top:12px}
+.table th,.table td{padding:8px;border-bottom:1px solid rgba(255,255,255,.06);text-align:left}
+.badge{padding:4px 8px;border-radius:999px;background:#123b48;color:#9fefff;font-size:12px}
+.upload-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+@media(max-width:1000px){.grid{grid-template-columns:1fr;padding:14px}}
+</style>
+<script>
+document.addEventListener("contextmenu",e=>e.preventDefault())
+document.addEventListener("keydown",e=>{if(e.ctrlKey&&(e.key==='u'||e.key==='U'||e.key==='i'||e.key==='I'||e.key==='s'||e.key==='S'))e.preventDefault()})
+</script>
+</head>
+<body>
+<div class="header">
+  <div class="brand">
+    <img src="https://www.tyvila.online/cdn/ty-gameslogo.webp" alt="TyVila">
+    <div>
+      <div style="font-weight:800">TyLive Admin</div>
+      <div class="small">Live control • uploads • pushes • analytics</div>
+    </div>
+  </div>
+  <div class="controls">
+    <div id="adminEmail" class="small"></div>
+    <button class="primary" id="logoutBtn">Logout</button>
+  </div>
+</div>
+
+<div class="grid">
+  <div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div style="font-weight:800">Live Controls</div>
+        <div class="badge" id="liveState">offline</div>
+      </div>
+
+      <div class="form-row">
+        <label>Go Live</label>
+        <select id="isLive"><option value="false">No</option><option value="true">Yes</option></select>
+
+        <label>Use Camera</label>
+        <select id="useCamera"><option value="false">No</option><option value="true">Yes</option></select>
+
+        <label>Live Video URL (mp4)</label>
+        <input id="currentVideo" placeholder="https://.../stream.mp4">
+
+        <label>Standby Media (image or mp4)</label>
+        <input id="standbyMedia" placeholder="https://.../standby.jpg">
+
+        <div class="upload-row">
+          <input type="file" id="fileInput" accept="video/*,image/*">
+          <button id="uploadFile" class="primary">Upload to Storage</button>
+          <div id="uploadHint" class="small">Bucket: <b>tylive</b> • public read</div>
+        </div>
+
+        <label>Title</label>
+        <input id="streamTitle" placeholder="Stream title">
+        <label>Description</label>
+        <textarea id="streamDesc" rows="3" placeholder="Short description"></textarea>
+
+        <label>Schedule start</label>
+        <input id="scheduleStart" type="datetime-local">
+        <label>Schedule end</label>
+        <input id="scheduleEnd" type="datetime-local">
+
+        <label>Webhook URL for pushes (optional)</label>
+        <input id="webhookUrl" placeholder="https://hooks.your-service.tld/xyz">
+
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button class="primary" id="saveBtn">Save & Publish</button>
+          <button id="previewBtn">Preview</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <div style="font-weight:800">Push Messages</div>
+      <div class="form-row">
+        <input id="pushTitle" placeholder="Title">
+        <textarea id="pushMessage" rows="3" placeholder="Message to viewers"></textarea>
+        <button id="sendPush" class="primary">Send Push</button>
+        <div id="pushStatus" class="small"></div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div style="font-weight:800">Monitoring</div>
+        <div class="small">realtime</div>
+      </div>
+
+      <div style="margin-top:12px">
+        <div style="display:flex;gap:12px">
+          <div style="flex:1">
+            <div class="small">Current Viewers</div>
+            <div id="viewerCount" style="font-size:22px;font-weight:800">0</div>
+          </div>
+          <div style="flex:1">
+            <div class="small">Unique Today</div>
+            <div id="uniqueCount" style="font-size:22px;font-weight:800">0</div>
+          </div>
+          <div style="flex:1">
+            <div class="small">Last Live</div>
+            <div id="lastLive" class="small">-</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:12px">
+        <div style="font-weight:700">Viewers</div>
+        <div id="viewerList" class="viewer-list"></div>
+      </div>
+
+      <div style="margin-top:12px">
+        <div style="font-weight:700">Comments</div>
+        <div id="adminComments" style="max-height:300px;overflow:auto;margin-top:8px"></div>
+      </div>
+
+      <div style="margin-top:12px">
+        <div style="font-weight:700">Daily Unique Stats</div>
+        <table class="table" id="statsTable">
+          <thead><tr><th>Date</th><th>Unique viewers</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+const supabase = createClient('https://wwcedhbbdoyrmquokyjj.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4')
+
+let adminUser=null
+
+async function guard(){
+  const { data:{ user } } = await supabase.auth.getUser()
+  if(!user || user.email!=='admin@tyvila.online'){ window.location.href='login.html'; return }
+  adminUser=user
+  document.getElementById('adminEmail').innerText=user.email
+  boot()
+}
+
+document.getElementById('logoutBtn').addEventListener('click', async()=>{ await supabase.auth.signOut(); window.location.href='login.html' })
+
+async function boot(){
+  await loadConfig()
+  await refreshPanels()
+
+  supabase
+    .channel('rt-comments-admin')
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'ty_live_comments'},()=>loadComments())
+    .on('postgres_changes',{event:'DELETE',schema:'public',table:'ty_live_comments'},()=>loadComments())
+    .subscribe()
+
+  supabase
+    .channel('rt-viewers-admin')
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'ty_live_viewers'},()=>loadViewers())
+    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'ty_live_viewers'},()=>loadViewers())
+    .subscribe()
+
+  setInterval(refreshPanels, 10000)
+
+  document.getElementById('saveBtn').addEventListener('click', saveConfig)
+  document.getElementById('previewBtn').addEventListener('click', ()=>{
+    const cfg = gatherConfig(); localStorage.setItem('__tylive_preview', JSON.stringify(cfg)); window.open('tylive.html','_blank')
+  })
+
+  document.getElementById('sendPush').addEventListener('click', sendPush)
+  document.getElementById('uploadFile').addEventListener('click', uploadToStorage)
+}
+
+function gatherConfig(){
+  return {
+    is_live: document.getElementById('isLive').value==='true',
+    use_camera: document.getElementById('useCamera').value==='true',
+    current_video: document.getElementById('currentVideo').value || null,
+    standby_media: document.getElementById('standbyMedia').value || null,
+    title: document.getElementById('streamTitle').value || null,
+    description: document.getElementById('streamDesc').value || null,
+    schedule_start: document.getElementById('scheduleStart').value || null,
+    schedule_end: document.getElementById('scheduleEnd').value || null,
+    live_started_at: (document.getElementById('isLive').value==='true') ? new Date().toISOString() : null,
+    updated_at: new Date().toISOString(),
+    metadata: { webhook_url: document.getElementById('webhookUrl').value || '' }
+  }
+}
+
+async function saveConfig(){
+  const payload=gatherConfig()
+  await supabase.from('ty_live_config').delete().neq('id',null)
+  await supabase.from('ty_live_config').insert([payload])
+  await loadConfig()
+  alert('Saved')
+}
+
+async function loadConfig(){
+  const { data } = await supabase.from('ty_live_config').select('*').order('updated_at',{ascending:false}).limit(1).maybeSingle()
+  const c = data || {}
+  document.getElementById('isLive').value = c.is_live ? 'true' : 'false'
+  document.getElementById('useCamera').value = c.use_camera ? 'true' : 'false'
+  document.getElementById('currentVideo').value = c.current_video || ''
+  document.getElementById('standbyMedia').value = c.standby_media || ''
+  document.getElementById('streamTitle').value = c.title || ''
+  document.getElementById('streamDesc').value = c.description || ''
+  if(c.schedule_start) document.getElementById('scheduleStart').value = c.schedule_start.split('.')[0]
+  if(c.schedule_end) document.getElementById('scheduleEnd').value = c.schedule_end.split('.')[0]
+  document.getElementById('webhookUrl').value = (c.metadata && c.metadata.webhook_url) ? c.metadata.webhook_url : ''
+  document.getElementById('liveState').innerText = c.is_live ? 'LIVE' : 'offline'
+  if(c.live_started_at) document.getElementById('lastLive').innerText = new Date(c.live_started_at).toLocaleString()
+}
+
+async function refreshPanels(){
+  await Promise.all([loadViewers(), loadComments(), loadStats()])
+}
+
+async function loadViewers(){
+  const { data } = await supabase.from('ty_live_viewers').select('*').order('last_seen',{ascending:false})
+  document.getElementById('viewerCount').innerText = (data||[]).length
+  const box=document.getElementById('viewerList'); box.innerHTML=''
+  ;(data||[]).forEach(v=>{
+    const d=document.createElement('div'); d.className='viewer-item'
+    d.innerHTML='<div>'+(v.username||v.user_id)+'</div><div class="small">'+new Date(v.last_seen).toLocaleTimeString()+'</div>'
+    box.appendChild(d)
+  })
+  const { data: uniq } = await supabase.from('ty_live_daily_unique').select('user_id').eq('viewer_date', new Date().toISOString().slice(0,10))
+  document.getElementById('uniqueCount').innerText = (uniq||[]).length
+}
+
+async function loadComments(){
+  const { data } = await supabase.from('ty_live_comments').select('*').order('created_at',{ascending:false}).limit(300)
+  const cdiv=document.getElementById('adminComments'); cdiv.innerHTML=''
+  ;(data||[]).forEach(c=>{
+    const el=document.createElement('div'); el.style.padding='8px'; el.style.borderBottom='1px solid rgba(255,255,255,.06)'
+    el.innerHTML='<div style="font-weight:700">'+(c.username||c.email)+'</div><div class="small">'+new Date(c.created_at).toLocaleString()+'</div><div style="margin-top:6px">'+c.content+'</div><div style="margin-top:6px"><button onclick="window.deleteComment(\\''+c.id+'\\')">Delete</button></div>'
+    cdiv.appendChild(el)
+  })
+}
+window.deleteComment = async(id)=>{ await supabase.from('ty_live_comments').delete().eq('id',id); loadComments() }
+
+async function loadStats(){
+  const { data } = await supabase.from('ty_live_daily_unique').select('viewer_date,user_id')
+  const grouped = {}
+  ;(data||[]).forEach(r=>{ grouped[r.viewer_date]=(grouped[r.viewer_date]||0)+1 })
+  const tbody=document.querySelector('#statsTable tbody'); tbody.innerHTML=''
+  Object.keys(grouped).sort((a,b)=>b.localeCompare(a)).forEach(d=>{
+    const tr=document.createElement('tr')
+    tr.innerHTML='<td>'+d+'</td><td>'+grouped[d]+'</td>'
+    tbody.appendChild(tr)
+  })
+}
+
+async function uploadToStorage(){
+  const file=document.getElementById('fileInput').files[0]
+  if(!file){ alert('Choose a file'); return }
+  const ext=file.name.split('.').pop()
+  const path=`admin/${crypto.randomUUID()}.${ext}`
+  const { error } = await supabase.storage.from('tylive').upload(path, file, { upsert:false })
+  if(error){ alert(error.message); return }
+  const { data } = supabase.storage.from('tylive').getPublicUrl(path)
+  const url=data.publicUrl
+  if(file.type.startsWith('video/')) document.getElementById('currentVideo').value=url
+  else document.getElementById('standbyMedia').value=url
+  alert('Uploaded: '+url)
+}
+
+async function sendPush(){
+  const title=document.getElementById('pushTitle').value.trim()
+  const message=document.getElementById('pushMessage').value.trim()
+  if(!title||!message){ document.getElementById('pushStatus').innerText='Title and message required'; return }
+  await supabase.from('ty_live_pushes').insert([{ title, message }])
+  document.getElementById('pushStatus').innerText='Push sent (realtime + webhook)'
+  document.getElementById('pushTitle').value=''
+  document.getElementById('pushMessage').value=''
+}
+guard()
+</script>
+</body>
+</html>
