@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>TyLive - TyVila</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<link rel="icon" href="https://www.tyvila.online/cdn/favicon.ico">
+<style>
+body {margin:0;font-family:'Segoe UI',sans-serif;background:#0a0a0f;color:#fff;overflow-x:hidden;}
+header{background:#111;padding:15px;text-align:center;font-size:22px;color:#06b6d4;position:relative;}
+#liveTicker{position:absolute;top:10px;right:20px;background:#ff0000;padding:5px 10px;border-radius:8px;font-weight:bold;animation:blink 1s infinite;}
+@keyframes blink{0%,50%,100%{opacity:1}25%,75%{opacity:0}}
+#liveContainer{display:flex;gap:20px;flex-wrap:wrap;padding:20px;justify-content:center;transition:background 1s;}
+#videoBox{flex:2;min-width:400px;background:#111;padding:15px;border-radius:12px;box-shadow:0 0 15px #06b6d4;position:relative;}
+#videoBox video, #videoBox img{width:100%;border-radius:12px;}
+#overlay{position:absolute;top:10px;left:10px;background:#06b6d4;color:#fff;padding:5px 10px;border-radius:8px;font-weight:bold;animation:fadeIn 2s;}
+@keyframes fadeIn{0%{opacity:0}100%{opacity:1}}
+#commentsBox{flex:1;min-width:250px;background:#111;padding:15px;border-radius:12px;max-height:80vh;overflow-y:auto;box-shadow:0 0 15px #ff6600;}
+.comment{padding:8px;border-bottom:1px solid #333;}
+.comment .author{color:#06b6d4;font-weight:bold;}
+#commentInput{width:100%;padding:8px;border-radius:8px;background:#222;border:none;color:#fff;margin-top:10px;}
+button{padding:8px 16px;border:none;border-radius:8px;background:#06b6d4;color:#fff;cursor:pointer;margin-top:5px;}
+button:hover{background:#0891b2;}
+</style>
+</head>
+<body>
+<header>
+  🎥 TyLive - Watch & Chat
+  <div id="liveTicker" style="display:none;">LIVE</div>
+</header>
+
+<div id="liveContainer">
+  <div id="videoBox">
+    <video id="liveVideo" autoplay controls></video>
+    <img id="standbyImage" style="display:none;">
+    <div id="overlay">Welcome to TyLive!</div>
+  </div>
+  <div id="commentsBox">
+    <h3>💬 Comments</h3>
+    <div id="commentsList"></div>
+    <textarea id="commentInput" placeholder="Write a comment..."></textarea>
+    <button onclick="postComment()">Send</button>
+  </div>
+</div>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+const supabase = createClient(
+  "https://wwcedhbbdoyrmquokyjj.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4"
+)
+
+let currentUser, liveConfig
+
+async function checkAuth(){
+  const {data:{user}} = await supabase.auth.getUser()
+  if(!user){window.location.href='login.html';return}
+  currentUser = user
+}
+
+async function loadLive(){
+  const {data} = await supabase.from('ty_live_config').select('*').limit(1).single()
+  liveConfig = data
+  const video = document.getElementById('liveVideo')
+  const img = document.getElementById('standbyImage')
+  const ticker = document.getElementById('liveTicker')
+  const overlay = document.getElementById('overlay')
+  
+  const now = new Date()
+  let isActive = data.is_live
+  if(data.schedule_start && data.schedule_end){
+    const start = new Date(data.schedule_start)
+    const end = new Date(data.schedule_end)
+    isActive = now >= start && now <= end
+  }
+
+  if(isActive){
+    ticker.style.display='block'
+    overlay.innerText='LIVE NOW!'
+    document.body.style.background='linear-gradient(135deg,#1a0f3f,#0a0f1a)'
+    if(data.use_camera){
+      video.srcObject = await navigator.mediaDevices.getUserMedia({video:true,audio:true})
+      video.play(); img.style.display='none'
+    } else {
+      video.src = data.current_video; video.play(); img.style.display='none'
+    }
+  } else {
+    ticker.style.display='none'
+    overlay.innerText='Standby Mode'
+    document.body.style.background='linear-gradient(135deg,#0a0f1a,#1a1a2e)'
+    if(data.standby_media.endsWith('.mp4')){
+      video.src = data.standby_media; video.play(); img.style.display='none'
+    } else {
+      video.style.display='none'; img.src=data.standby_media; img.style.display='block'
+    }
+  }
+}
+
+async function loadComments(){
+  const {data} = await supabase.from('ty_live_comments').select('*').order('created_at',{ascending:true})
+  const list = document.getElementById('commentsList')
+  list.innerHTML = ''
+  data.forEach(c=>{
+    const div = document.createElement('div')
+    div.className='comment'
+    div.innerHTML=`<span class="author">${c.username}</span>: ${c.content}`
+    list.appendChild(div)
+  })
+}
+
+async function postComment(){
+  const content = document.getElementById('commentInput').value.trim()
+  if(!content) return
+  await supabase.from('ty_live_comments').insert([{
+    user_id: currentUser.id,
+    username: currentUser.email,
+    email: currentUser.email,
+    content
+  }])
+  document.getElementById('commentInput').value=''
+  loadComments()
+}
+
+checkAuth().then(()=>loadLive())
+setInterval(loadComments,3000)
+setInterval(loadLive,10000) 
+</script>
+</body>
+</html>
