@@ -1,174 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Admin — TyVila</title>
 <link rel="icon" href="https://www.tyvila.online/cdn/favicon.ico">
-<meta name="description" content="TyVila admin dashboard">
 <style>
-:root{--bg:#06060a;--panel:#0f0f12;--accent1:#00d4ff;--accent2:#7c3aed}
-html,body{height:100%;margin:0;font-family:Inter,system-ui,Arial;background:linear-gradient(180deg,var(--bg),#0b0b0f);color:#eaf6ff}
-.header{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;background:linear-gradient(90deg,var(--panel),#111);border-bottom:1px solid rgba(255,255,255,0.03)}
-.header h1{margin:0}
-.container{padding:18px;display:grid;grid-template-columns:1fr 1fr;gap:18px}
-.card{background:rgba(255,255,255,0.02);padding:14px;border-radius:12px;min-height:180px}
-.input,textarea,select{width:100%;padding:10px;border-radius:10px;border:0;background:rgba(255,255,255,0.03);color:inherit;margin:6px 0}
-.button{padding:10px 14px;border-radius:10px;border:0;color:white;background:linear-gradient(90deg,var(--accent1),var(--accent2));cursor:pointer}
-.list{max-height:350px;overflow:auto;margin-top:10px}
-.row{display:flex;gap:8px;align-items:center}
-.notice{color:#ffb86b;margin-bottom:8px}
-@media(max-width:900px){.container{grid-template-columns:1fr}}
+body{margin:0;font-family:sans-serif;background:#0d0d1a;color:#fff;}
+header{padding:15px;background:#111;display:flex;justify-content:space-between;align-items:center;}
+header h1{margin:0;font-size:22px;}
+button{padding:8px 16px;border:none;border-radius:6px;cursor:pointer;background:#7c3aed;color:#fff;}
+.container{padding:20px;}
+.card{background:#1a1a2e;padding:15px;margin:12px 0;border-radius:10px;}
+input,textarea{width:100%;padding:10px;margin-top:6px;margin-bottom:12px;border-radius:6px;border:none;}
 </style>
 </head>
-<body oncontextmenu="return false" onkeydown="if(event.keyCode===123|| (event.ctrlKey&&event.shiftKey&&event.keyCode===73)){event.preventDefault();}">
-<header class="header">
-  <h1>Admin Dashboard</h1>
-  <div><button class="button" onclick="logout()">Logout</button></div>
+<body>
+<header>
+  <h1>🎮 Admin Dashboard</h1>
+  <button onclick="logout()">Logout</button>
 </header>
 
-<div id="main" style="display:none">
-  <div style="padding:12px;color:#cfeffd">Only admin@tyvila.online can access this panel</div>
-  <div class="container">
-    <div class="card">
-      <div class="notice">Games manager (paste JSON array to add multiple)</div>
-      <textarea id="gamesJson" rows="6" class="input" placeholder='[ { "title":"X", "embed":"..", "image":"..", "tags":"a,b", "description":"..." } ]'></textarea>
-      <div class="row">
-        <button class="button" onclick="addGamesFromJson()">Add Games JSON</button>
-        <button class="button" onclick="refreshGames()">Refresh</button>
-      </div>
-      <div style="margin-top:12px">
-        <select id="removeSelect" class="input"></select>
-        <div class="row"><button class="button" onclick="removeSelectedGame()">Remove Selected Game</button></div>
-      </div>
-    </div>
+<div class="container">
+  <h2>Add New Game</h2>
+  <form id="gameForm">
+    <input id="title" placeholder="Game Title" required>
+    <input id="embed" placeholder="Embed URL" required>
+    <input id="image" placeholder="Image URL" required>
+    <input id="tags" placeholder="Tags (comma separated)">
+    <textarea id="description" placeholder="Description"></textarea>
+    <button type="submit">Add Game</button>
+  </form>
 
-    <div class="card">
-      <div class="notice">Comments moderation</div>
-      <div class="list" id="commentsList"></div>
-    </div>
-
-    <div class="card">
-      <div class="notice">Users</div>
-      <div class="list" id="usersList"></div>
-    </div>
-
-    <div class="card">
-      <div class="notice">Push widget</div>
-      <textarea id="widgetContent" rows="4" class="input" placeholder="Widget message to push to games page"></textarea>
-      <div class="row"><button class="button" onclick="sendWidget()">Send Widget</button></div>
-      <div style="margin-top:12px"><button class="button" onclick="refreshAll()">Refresh All</button></div>
-    </div>
-  </div>
+  <h2>Games List</h2>
+  <div id="gamesList"></div>
 </div>
-
-<div id="denied" style="padding:24px;text-align:center">Access denied. Please sign in as admin@tyvila.online</div>
 
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
-const SUPABASE_URL = 'https://wwcedhbbdoyrmquokyjj.supabase.co'
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4'
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
+const supabase=createClient("https://wwcedhbbdoyrmquokyjj.supabase.co",
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4")
 
-async function checkAdmin(){
-  const { data:{ user } } = await supabase.auth.getUser()
-  if(!user){document.getElementById('denied').style.display='block';return}
-  if(user.email !== 'admin@tyvila.online'){document.getElementById('denied').style.display='block';return}
-  document.getElementById('main').style.display='block'
-  document.getElementById('denied').style.display='none'
-  await refreshAll()
+async function checkAuth(){
+  const {data:{user}}=await supabase.auth.getUser()
+  if(!user){window.location.href="login.html";return}
+  if(user.email!=="admin@tyvila.online"){window.location.href="games.html";return}
 }
+checkAuth()
 
-async function addGamesFromJson(){
-  const raw = document.getElementById('gamesJson').value.trim()
-  if(!raw) return
-  let arr
-  try{ arr = JSON.parse(raw) } catch(e){ alert('Invalid JSON'); return }
-  const payload = arr.map(g=>({
-    title: g.title,
-    embed_link: g.embed,
-    image_link: g.image,
-    description: g.description,
-    tags: g.tags,
-    metadata: g
-  }))
-  await supabase.from('games').insert(payload)
-  document.getElementById('gamesJson').value=''
-  await refreshGames()
-}
-
-async function refreshGames(){
-  const { data } = await supabase.from('games').select('id,title').order('created_at',{ascending:false})
-  const sel = document.getElementById('removeSelect')
-  sel.innerHTML = ''
-  if(!data || data.length===0){ sel.innerHTML = '<option value="">No games</option>'; return }
+async function loadGames(){
+  const {data}=await supabase.from("games").select("*")
+  const container=document.getElementById("gamesList")
+  container.innerHTML=""
   data.forEach(g=>{
-    const opt = document.createElement('option'); opt.value = g.id; opt.text = g.title; sel.appendChild(opt)
+    const div=document.createElement("div")
+    div.className="card"
+    div.innerHTML=`
+      <h3>${g.title}</h3>
+      <img src="${g.image}" width="120"><br>
+      <small>${g.tags}</small>
+      <p>${g.description}</p>
+      <button onclick="deleteGame('${g.id}')">Delete</button>
+    `
+    container.appendChild(div)
   })
 }
+loadGames()
 
-async function removeSelectedGame(){
-  const id = document.getElementById('removeSelect').value
-  if(!id) return alert('Choose a game')
-  if(!confirm('Delete selected game?')) return
-  await supabase.from('games').delete().eq('id', id)
-  await refreshGames()
-  await loadComments()
-  await loadUsers()
+document.getElementById("gameForm").addEventListener("submit",async e=>{
+  e.preventDefault()
+  const game={
+    title:document.getElementById("title").value,
+    embed:document.getElementById("embed").value,
+    image:document.getElementById("image").value,
+    tags:document.getElementById("tags").value,
+    description:document.getElementById("description").value
+  }
+  await supabase.from("games").insert(game)
+  loadGames()
+  e.target.reset()
+})
+
+window.deleteGame=async(id)=>{
+  await supabase.from("games").delete().eq("id",id)
+  loadGames()
 }
 
-async function loadComments(){
-  const { data } = await supabase.from('comments').select('*').order('created_at',{ascending:false})
-  const list = document.getElementById('commentsList'); list.innerHTML=''
-  if(!data || data.length===0) { list.innerHTML = '<div style="color:var(--muted)">No comments</div>'; return }
-  data.forEach(c=>{
-    const div = document.createElement('div')
-    div.style.padding='8px'; div.style.borderBottom='1px solid rgba(255,255,255,0.03)'
-    div.innerHTML = `<strong>${c.username||c.user_email}</strong> <div style="color:var(--muted)">${new Date(c.created_at).toLocaleString()}</div><div>${(c.content||c.comment||c.text)||''}</div><div style="margin-top:6px"><button class="button" onclick="deleteComment('${c.id}')">Delete</button></div>`
-    list.appendChild(div)
-  })
-}
-
-async function deleteComment(id){
-  if(!confirm('Delete comment?')) return
-  await supabase.from('comments').delete().eq('id',id)
-  await loadComments()
-}
-
-async function loadUsers(){
-  const { data } = await supabase.from('profiles').select('id,username,email,points,created_at').order('points',{ascending:false})
-  const list = document.getElementById('usersList'); list.innerHTML=''
-  if(!data || data.length===0){ list.innerHTML = '<div style="color:var(--muted)">No users</div>'; return }
-  data.forEach(u=>{
-    const div = document.createElement('div'); div.style.padding='8px'; div.style.borderBottom='1px solid rgba(255,255,255,0.03)'
-    div.innerHTML = `<strong>${u.username||'Unnamed'}</strong> • ${u.email} • ${u.points||0} pts <div style="margin-top:6px"><button class="button" onclick="banUser('${u.id}')">Ban</button></div>`
-    list.appendChild(div)
-  })
-}
-
-async function banUser(id){
-  if(!confirm('Ban user?')) return
-  await supabase.from('profiles').update({banned:true}).eq('id',id)
-  await loadUsers()
-}
-
-async function sendWidget(){
-  const content = document.getElementById('widgetContent').value.trim()
-  if(!content) return
-  await supabase.from('widgets').insert([{ content }])
-  document.getElementById('widgetContent').value=''
-  alert('Widget pushed')
-}
-
-async function refreshAll(){
-  await refreshGames()
-  await loadComments()
-  await loadUsers()
-}
-
-function logout(){ supabase.auth.signOut(); window.location.href='login.html' }
-
-checkAdmin()
+window.logout=async()=>{await supabase.auth.signOut();window.location.href="login.html"}
 </script>
 </body>
 </html>
