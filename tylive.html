@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>TyLive — TyVila</title>
+<link rel="icon" href="https://www.tyvila.online/cdn/favicon.ico">
+<style>
+:root{--bg1:#071029;--accent:#06b6d4;--accent2:#7c3aed}
+html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:linear-gradient(180deg,var(--bg1),#050812);color:#e6f0f8}
+.header{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;background:rgba(0,0,0,.25);backdrop-filter:blur(6px)}
+.brand{display:flex;gap:12px;align-items:center}
+.brand img{height:44px;border-radius:8px}
+.title{font-size:20px;font-weight:800}
+.container{display:flex;flex-wrap:wrap;gap:20px;padding:20px;justify-content:center}
+.video-panel{flex:1;min-width:360px;max-width:1000px;background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.01));padding:14px;border-radius:14px;box-shadow:0 10px 40px rgba(2,6,23,.6)}
+.video-topbar{display:flex;justify-content:space-between;align-items:center;padding:10px;background:rgba(0,0,0,.4);border-radius:10px}
+.live-badge{background:linear-gradient(90deg,var(--accent2),var(--accent));padding:6px 10px;border-radius:8px;font-weight:800;animation:blink 1s infinite}
+@keyframes blink{0%,60%{opacity:1}30%{opacity:.25}}
+.video-wrap{position:relative;border-radius:12px;overflow:hidden;background:#000;margin-top:10px}
+#liveVideo{width:100%;height:60vh;background:#000;border-radius:8px;outline:none}
+#standbyImage{width:100%;display:none;border-radius:8px}
+.overlay{position:absolute;left:12px;top:12px;background:rgba(0,0,0,.5);padding:6px 10px;border-radius:8px}
+.custom-controls{position:absolute;right:12px;bottom:12px;display:flex;gap:8px}
+.btn{background:var(--accent);border:none;color:#fff;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:800}
+.side-panel{width:360px;min-width:300px;background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.01));padding:14px;border-radius:14px;box-shadow:0 10px 40px rgba(2,6,23,.6);height:calc(100vh - 140px);overflow:auto}
+.comment{padding:10px;border-radius:8px;background:rgba(255,255,255,.02);margin-bottom:8px}
+.comment .meta{font-size:12px;color:#9fb3c8;margin-bottom:6px}
+.input-row{display:flex;gap:8px;margin-top:10px}
+.input-row input{flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,.06);background:transparent;color:inherit}
+.footer{padding:20px;text-align:center;color:#9fb3c8;font-size:13px}
+@media(max-width:900px){.container{flex-direction:column}.side-panel{width:100%;height:auto}}
+</style>
+<script>
+document.addEventListener("contextmenu",e=>e.preventDefault())
+document.addEventListener("keydown",e=>{if(e.ctrlKey&&(e.key==='u'||e.key==='U'||e.key==='i'||e.key==='I'||e.key==='s'||e.key==='S'))e.preventDefault()})
+</script>
+</head>
+<body>
+<div class="header">
+  <div class="brand">
+    <img src="https://www.tyvila.online/cdn/ty-gameslogo.webp" alt="TyVila">
+    <div>
+      <div class="title">TyLive</div>
+      <div style="font-size:13px;color:#9fb3c8">Live events • 10s delay</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:12px;align-items:center">
+    <div id="viewer-count" style="font-weight:800;color:#ffcc00">Viewers: 0</div>
+    <button class="btn" onclick="window.location.href='account.html'">Account</button>
+    <button class="btn" onclick="logout()">Logout</button>
+  </div>
+</div>
+
+<div class="container">
+  <div class="video-panel">
+    <div class="video-topbar">
+      <div style="display:flex;gap:10px;align-items:center">
+        <div id="liveBadge" class="live-badge" style="display:none">LIVE</div>
+        <div id="stream-title" style="font-weight:800">Standby</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn" id="shareBtn">Share</button>
+        <button class="btn" id="fullBtn">Fullscreen</button>
+      </div>
+    </div>
+
+    <div class="video-wrap" id="videoWrap">
+      <div id="overlay" class="overlay">Standby</div>
+      <video id="liveVideo" playsinline muted></video>
+      <img id="standbyImage" />
+      <div class="custom-controls">
+        <button id="playBtn" class="btn">Play</button>
+        <button id="muteBtn" class="btn">Unmute</button>
+      </div>
+    </div>
+
+    <div style="margin-top:12px;display:flex;gap:14px;align-items:center">
+      <div id="uniqueCount" style="font-weight:800;color:#7cf59b">Unique today: 0</div>
+    </div>
+
+    <div style="margin-top:14px">
+      <div style="font-weight:800;margin-bottom:6px">Now playing</div>
+      <div id="desc" style="color:#9fb3c8">Standby mode</div>
+    </div>
+  </div>
+
+  <div class="side-panel">
+    <div style="font-weight:800;margin-bottom:10px">Live Chat</div>
+    <div id="commentsList"></div>
+
+    <div class="input-row">
+      <input id="commentInput" placeholder="Say something..."/>
+      <button class="btn" id="sendComment">Send</button>
+    </div>
+
+    <div style="margin-top:20px">
+      <div style="font-weight:800;margin-bottom:6px">Pushes</div>
+      <div id="pushList"></div>
+    </div>
+
+    <div style="margin-top:20px">
+      <div style="font-weight:800;margin-bottom:6px">Schedule</div>
+      <div id="scheduleView" style="color:#9fb3c8"></div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">TyVila • Always-on live with 10s delay</div>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+const supabase = createClient('https://wwcedhbbdoyrmquokyjj.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4')
+
+let currentUser=null,currentConfig=null
+
+function fmt(iso){ if(!iso) return ''; return new Date(iso).toLocaleString() }
+function escapeHtml(s){ return String(s).replace(/[&<>"'`]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;',"`":'&#96;'})[c]) }
+
+async function auth(){
+  const { data:{ user } } = await supabase.auth.getUser()
+  if(!user) { window.location.href='login.html'; return }
+  currentUser = user
+  init()
+}
+
+async function init(){
+  await loadConfig()
+  markViewer()
+  setInterval(markViewer, 15000)
+  loadStats()
+  setInterval(loadStats, 10000)
+
+  supabase
+    .channel('live-comments')
+    .on('postgres_changes', {event:'INSERT',schema:'public',table:'ty_live_comments'}, payload => {
+      addComment(payload.new)
+    })
+    .on('postgres_changes', {event:'DELETE',schema:'public',table:'ty_live_comments'}, () => reloadComments())
+    .subscribe()
+
+  supabase
+    .channel('live-pushes')
+    .on('postgres_changes', {event:'INSERT',schema:'public',table:'ty_live_pushes'}, payload => addPush(payload.new))
+    .subscribe()
+
+  reloadComments()
+  reloadPushes()
+
+  document.getElementById('sendComment').addEventListener('click', postComment)
+  document.getElementById('shareBtn').addEventListener('click', async ()=>{
+    await navigator.clipboard.writeText(location.href); alert('Link copied')
+  })
+  document.getElementById('fullBtn').addEventListener('click', ()=>{
+    const el=document.getElementById('videoWrap'); if(el.requestFullscreen) el.requestFullscreen()
+  })
+  document.getElementById('playBtn').addEventListener('click', ()=>{
+    const v=document.getElementById('liveVideo'); v.play().catch(()=>{})
+  })
+  document.getElementById('muteBtn').addEventListener('click', ()=>{
+    const v=document.getElementById('liveVideo'); v.muted=!v.muted; document.getElementById('muteBtn').innerText=v.muted?'Unmute':'Mute'
+  })
+}
+
+async function loadConfig(){
+  const { data } = await supabase.from('ty_live_config').select('*').limit(1).single()
+  currentConfig = data || {}
+  const live = !!currentConfig.is_live
+  document.getElementById('liveBadge').style.display = live ? 'inline-block':'none'
+  document.getElementById('stream-title').innerText = currentConfig.title || (live?'Live Stream':'Standby')
+  document.getElementById('desc').innerText = currentConfig.description || (live?'Live now':'Standby content')
+  document.getElementById('scheduleView').innerText =
+    (currentConfig.schedule_start?('Start: '+fmt(currentConfig.schedule_start)+' '):'')+
+    (currentConfig.schedule_end?('End: '+fmt(currentConfig.schedule_end)):'')
+  const overlay=document.getElementById('overlay')
+  const video=document.getElementById('liveVideo')
+  const standby=document.getElementById('standbyImage')
+
+  if(live){
+    overlay.innerText='LIVE • 10s delay'
+    if(currentConfig.use_camera){
+      navigator.mediaDevices.getUserMedia({video:true,audio:true}).then(stream=>{
+        video.srcObject=stream; standby.style.display='none'; setTimeout(()=>video.play().catch(()=>{}),10000)
+      }).catch(()=>showStandby())
+    }else if(currentConfig.current_video){
+      standby.style.display='none'; video.removeAttribute('controls'); video.src=''; setTimeout(()=>{
+        video.src=currentConfig.current_video; video.play().catch(()=>{})
+      },10000)
+    }else showStandby()
+  }else{
+    overlay.innerText='Standby'
+    showStandby()
+  }
+}
+
+function showStandby(){
+  const video=document.getElementById('liveVideo')
+  const standby=document.getElementById('standbyImage')
+  if(currentConfig?.standby_media?.endsWith('.mp4')){
+    standby.style.display='none'
+    video.src=currentConfig.standby_media
+    video.play().catch(()=>{})
+  }else{
+    video.pause(); video.removeAttribute('src'); video.load()
+    standby.src=currentConfig?.standby_media||'https://www.tyvila.online/cdn/LOGIN.webp'
+    standby.style.display='block'
+  }
+}
+
+async function reloadComments(){
+  const { data } = await supabase.from('ty_live_comments').select('*').order('created_at',{ascending:true}).limit(200)
+  const list=document.getElementById('commentsList'); list.innerHTML=''
+  ;(data||[]).forEach(addComment)
+  list.scrollTop=list.scrollHeight
+}
+function addComment(c){
+  const list=document.getElementById('commentsList')
+  const div=document.createElement('div'); div.className='comment'
+  div.innerHTML='<div class="meta">'+new Date(c.created_at).toLocaleTimeString()+' — '+(c.username||c.email)+'</div><div>'+escapeHtml(c.content)+'</div>'
+  list.appendChild(div)
+}
+
+async function postComment(){
+  const v=document.getElementById('commentInput').value.trim(); if(!v||!currentUser) return
+  await supabase.from('ty_live_comments').insert([{ user_id: currentUser.id, username: currentUser.email, email: currentUser.email, content: v }])
+  document.getElementById('commentInput').value=''
+}
+
+async function reloadPushes(){
+  const { data } = await supabase.from('ty_live_pushes').select('*').order('created_at',{ascending:false}).limit(20)
+  const box=document.getElementById('pushList'); box.innerHTML=''
+  ;(data||[]).forEach(addPush)
+}
+function addPush(p){
+  const box=document.getElementById('pushList')
+  const d=document.createElement('div'); d.style.padding='8px'; d.style.borderBottom='1px solid rgba(255,255,255,.06)'
+  d.innerHTML='<b>'+escapeHtml(p.title)+'</b><div style="color:#9fb3c8">'+escapeHtml(p.message)+'</div>'
+  box.prepend(d)
+}
+
+async function markViewer(){
+  if(!currentUser) return
+  await supabase.rpc('record_viewer', { _user_id: currentUser.id, _username: currentUser.email }).catch(()=>{})
+  await supabase.from('ty_live_viewers').upsert([{ user_id: currentUser.id, username: currentUser.email, last_seen: new Date().toISOString() }], { onConflict: ['user_id'] })
+}
+
+async function loadStats(){
+  const { data: v } = await supabase.from('ty_live_viewers').select('user_id')
+  document.getElementById('viewer-count').innerText='Viewers: '+((v&&v.length)||0)
+  const { data: u } = await supabase.from('ty_live_daily_unique').select('user_id').eq('viewer_date', new Date().toISOString().slice(0,10))
+  document.getElementById('uniqueCount').innerText='Unique today: '+((u&&u.length)||0)
+}
+
+async function logout(){ await supabase.auth.signOut(); window.location.href='login.html' }
+
+auth()
+</script>
+</body>
+</html>
