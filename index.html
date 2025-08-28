@@ -2,84 +2,76 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>TyVila Online Games</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- SEO -->
-  <meta name="description" content="Play fun online games, earn points, climb the ranks and enjoy a social gaming experience on TyVila Online.">
-  <meta name="keywords" content="TyVila, online games, multiplayer, leaderboard, play games, fun, social">
-  <meta name="author" content="tbsv Vilakazi">
-
-  <!-- Social Media Metadata -->
-  <meta property="og:title" content="TyVila Online Games">
-  <meta property="og:description" content="Play online games, earn points and climb the leaderboard. Join TyVila Online today!">
-  <meta property="og:image" content="https://www.tyvila.online/cdn/ty.webp">
-  <meta property="og:url" content="https://www.tyvila.online">
-  <meta name="twitter:card" content="summary_large_image">
-
-  <!-- Favicon -->
-  <link rel="icon" href="https://www.tyvila.online/cdn/favicon.ico" type="image/x-icon">
-
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>TyVila — Leaderboard</title>
+  <link rel="icon" href="https://www.tyvila.online/cdn/favicon.ico">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     body {
-      background: linear-gradient(135deg, #1a1a1d, #2d2d34, #121212);
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      text-align: center;
-      overflow: hidden;
+      margin:0; font-family:'Inter',sans-serif;
+      background:linear-gradient(180deg,#050510,#0c0c1a);
+      color:white; text-align:center;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      min-height:100vh;
     }
-    header {
-      padding: 20px;
-      font-size: 2.5rem;
-      font-weight: bold;
-      background: linear-gradient(90deg, #ff416c, #ff4b2b);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+    h1 {
+      font-family:'Press Start 2P',cursive;
+      font-size:26px;margin-bottom:20px;
+      background:linear-gradient(90deg,#7c3aed,#06b6d4);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
     }
-    p {
-      margin-top: 15px;
-      font-size: 1.2rem;
-      max-width: 600px;
-      line-height: 1.5;
+    .leaderboard {
+      width:95%; max-width:500px; background:rgba(15,15,35,.9);
+      border-radius:20px;padding:20px;
+      box-shadow:0 0 25px rgba(124,58,237,.4),0 0 40px rgba(6,182,212,.3);
     }
+    .player {
+      display:flex;align-items:center;justify-content:space-between;
+      padding:12px;border-bottom:1px solid rgba(255,255,255,.1);
+    }
+    .player img {width:45px;height:45px;border-radius:50%;margin-right:12px;}
+    .player .info {display:flex;align-items:center;gap:10px}
+    .rank {font-weight:bold;font-size:20px;}
+    .crown {color:gold;font-size:22px;}
     .play-btn {
-      margin-top: 40px;
-      padding: 18px 50px;
-      font-size: 1.4rem;
-      font-weight: bold;
-      border: none;
-      border-radius: 50px;
-      background: linear-gradient(90deg, #ff4b2b, #ff416c);
-      color: #fff;
-      cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
+      margin-top:20px;padding:15px 30px;border:none;border-radius:15px;
+      background:linear-gradient(90deg,#7c3aed,#06b6d4);color:white;
+      font-size:18px;cursor:pointer;font-weight:600;
+      transition:.2s;
     }
-    .play-btn:hover {
-      transform: scale(1.05);
-      box-shadow: 0px 4px 15px rgba(255, 65, 108, 0.6);
-    }
-    footer {
-      position: absolute;
-      bottom: 10px;
-      font-size: 0.9rem;
-      opacity: 0.8;
-    }
-    @media (max-width: 768px) {
-      header { font-size: 2rem; }
-      p { font-size: 1rem; padding: 0 10px; }
-      .play-btn { font-size: 1.2rem; padding: 15px 40px; }
-    }
+    .play-btn:hover {transform:scale(1.05);}
   </style>
 </head>
-<body oncontextmenu="return false;">
-  <header>TyVila Online</header>
-  <p>Welcome to <strong>TyVila Online</strong> — a fun and social gaming platform where you can play exciting games, earn points, climb the ranks, and challenge your friends.</p>
-  <button class="play-btn" onclick="window.location.href='games.html'">▶ Play Now</button>
-  <footer>&copy; 2025 TyVila Online. All Rights Reserved.</footer>
+<body>
+  <h1>🏆 TyVila Leaderboard 🏆</h1>
+  <div class="leaderboard" id="leaderboard">Loading...</div>
+  <button class="play-btn" onclick="location.href='games.html'">▶ Play Games</button>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+const supabase = createClient(
+ "https://wwcedhbbdoyrmquokyjj.supabase.co",
+ "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4"
+)
+
+async function loadLeaderboard(){
+  const {data,error}=await supabase.from("profiles").select("*").order("points",{ascending:false}).limit(3)
+  const lb=document.getElementById("leaderboard")
+  if(error){lb.textContent=error.message;return}
+  lb.innerHTML=""
+  data.forEach((p,i)=>{
+    lb.innerHTML+=`
+      <div class="player">
+        <div class="info">
+          <span class="rank">${i+1===1?"👑":i+1}</span>
+          <img src="${p.avatar_url||'https://www.tyvila.online/cdn/ty.webp'}">
+          <span>${p.username}</span>
+        </div>
+        <span>${p.points} pts</span>
+      </div>`
+  })
+}
+loadLeaderboard()
+</script>
 </body>
 </html>
