@@ -1,80 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>TyVila Signup</title>
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-  <link rel="icon" href="https://www.tyvila.online/cdn/favicon.ico">
-  <script src="https://cdn.tailwindcss.com"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Signup — TyVila</title>
+<link rel="icon" href="https://www.tyvila.online/cdn/favicon.ico">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;display:flex;align-items:center;justify-content:center;height:100vh;font-family:'Inter',sans-serif;background:linear-gradient(180deg,#050510,#0c0c1a);color:#fff}
+.container{width:95%;max-width:420px;background:rgba(15,15,35,.9);padding:30px;border-radius:20px;text-align:center}
+h1{font-family:'Press Start 2P',cursive;font-size:22px;margin-bottom:20px;background:linear-gradient(90deg,#7c3aed,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+input,button{width:100%;padding:12px;margin:8px 0;border-radius:10px;border:none;font-size:15px}
+input{background:rgba(255,255,255,.08);color:#fff}
+button{cursor:pointer;font-weight:600;color:#fff;background:linear-gradient(90deg,#7c3aed,#06b6d4)}
+button:hover{transform:scale(1.05)}
+.google-btn{background:#fff;color:#333;display:flex;align-items:center;justify-content:center;gap:10px;font-weight:600}
+.error-msg{color:#ff4d6d}
+</style>
 </head>
-<body class="bg-gradient-to-br from-gray-900 via-purple-900 to-indigo-900 flex items-center justify-center h-screen">
-  <div class="bg-white shadow-2xl rounded-2xl p-10 w-full max-w-md text-center">
-    <img src="https://www.tyvila.online/cdn/ty.webp" alt="TyVila" class="mx-auto w-24 mb-6">
-    <h1 class="text-3xl font-bold text-gray-800 mb-4">Welcome to TyVila</h1>
-    <p class="text-gray-600 mb-6">Sign up with Google to get started</p>
-    
-    <button id="googleLogin" class="w-full py-3 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-xl shadow-md transition">
-      Continue with Google
-    </button>
+<body>
+<div class="container">
+  <h1>🚀 Create Account</h1>
+  <form id="signupForm">
+    <input id="email" type="email" placeholder="Email" required>
+    <input id="password" type="password" placeholder="Password" required>
+    <input id="username" type="text" placeholder="Choose unique username" required>
+    <button type="submit">✅ Sign up</button>
+  </form>
+  <br>
+  <button class="google-btn" id="googleSignup">🔑 Sign up with Google</button>
+  <div class="error-msg" id="signupError"></div>
+  <p>Already have an account? <a href="login.html" style="color:#06b6d4">Login</a></p>
+</div>
 
-    <div id="usernameSection" class="hidden mt-6">
-      <p class="text-gray-700 mb-2">Choose a unique username:</p>
-      <input id="usernameInput" type="text" placeholder="Your username" class="w-full p-3 border rounded-xl mb-4">
-      <button id="saveUsername" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow-md transition">
-        Save Username
-      </button>
-    </div>
-  </div>
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+const supabase=createClient(
+ "https://wwcedhbbdoyrmquokyjj.supabase.co",
+ "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+)
 
-  <script>
-    const supabase = supabase.createClient("https://wwcedhbbbdoyrmquokyjj.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4");
+document.getElementById("signupForm").addEventListener("submit",async e=>{
+ e.preventDefault()
+ const email=document.getElementById("email").value
+ const pw=document.getElementById("password").value
+ const username=document.getElementById("username").value.trim()
+ const err=document.getElementById("signupError"); err.textContent=""
 
-    document.getElementById("googleLogin").onclick = async () => {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: { redirectTo: window.location.href }
-      });
-      if (error) alert(error.message);
-    };
+ const {data,error}=await supabase.auth.signUp({email,password:pw})
+ if(error){err.textContent=error.message;return}
+ if(data.user){
+   await supabase.from("profiles").insert({id:data.user.id,email,username,points:0})
+   alert("Check your email for confirmation!");window.location.href="login.html"
+ }
+})
 
-    async function checkUser() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data: existing } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", user.id)
-          .single();
+document.getElementById("googleSignup").addEventListener("click",async()=>{
+ const {error}=await supabase.auth.signInWithOAuth({
+   provider:"google",
+   options:{redirectTo:"https://www.tyvila.online/account.html"}
+ })
+ if(error) alert(error.message)
+})
 
-        if (!existing) {
-          document.getElementById("usernameSection").classList.remove("hidden");
-        } else {
-          window.location.href = "account.html";
-        }
-      }
-    }
-    checkUser();
-
-    document.getElementById("saveUsername").onclick = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      const username = document.getElementById("usernameInput").value.trim();
-      if (!username) return alert("Enter a username");
-
-      const { error } = await supabase.from("profiles").insert({
-        id: user.id,
-        email: user.email,
-        username: username,
-        avatar_url: user.user_metadata.avatar_url,
-        points: 0,
-        rank: 'Beginner'
-      });
-
-      if (error) {
-        alert("Error: " + error.message);
-      } else {
-        window.location.href = "account.html";
-      }
-    };
-  </script>
+document.addEventListener("contextmenu",e=>e.preventDefault())
+document.onkeydown=e=>{
+ if(e.keyCode==123|| (e.ctrlKey&&e.shiftKey&&['I','J','C'].includes(e.key.toUpperCase()))|| (e.ctrlKey&&e.key.toUpperCase()=='U')) return false
+}
+</script>
 </body>
 </html>
