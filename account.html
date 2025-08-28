@@ -1,50 +1,199 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>My Account - TyVila</title>
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-  <link rel="icon" href="https://www.tyvila.online/cdn/favicon.ico">
-  <script src="https://cdn.tailwindcss.com"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>My Account — TyVila</title>
+<link rel="icon" href="https://www.tyvila.online/cdn/favicon.ico">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f9fafb;
+  --card: #fff;
+  --border: #e5e7eb;
+  --text: #111827;
+  --subtext: #6b7280;
+  --primary: #7c3aed;
+  --accent: #06b6d4;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}
+body {
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+header {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:15px 30px;
+  background:white;
+  border-bottom:1px solid var(--border);
+}
+header img {height:40px;}
+header h1 {font-size:20px;color:var(--primary);}
+main {
+  flex:1;
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  padding:40px 20px;
+}
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 30px;
+  max-width: 700px;
+  width: 100%;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+.profile {
+  display:flex;
+  gap:20px;
+  align-items:center;
+  margin-bottom:30px;
+}
+.profile img {
+  width:90px;
+  height:90px;
+  border-radius:50%;
+  object-fit:cover;
+  border:3px solid var(--accent);
+}
+.profile h2 {margin:0;font-size:22px;color:var(--text);}
+.profile p {margin:4px 0;color:var(--subtext);}
+.stats {
+  margin-top:20px;
+  display:grid;
+  grid-template-columns: repeat(auto-fit,minmax(160px,1fr));
+  gap:20px;
+}
+.stat {
+  background:#f3f4f6;
+  border-radius:12px;
+  padding:15px;
+  text-align:center;
+}
+.stat h3 {margin:0;font-size:18px;color:var(--primary);}
+.stat p {margin:5px 0 0;font-size:14px;color:var(--subtext);}
+.actions {
+  margin-top:30px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:15px;
+}
+.actions a, .actions button {
+  flex:1;
+  padding:12px;
+  border:none;
+  border-radius:12px;
+  font-weight:600;
+  cursor:pointer;
+  text-align:center;
+  text-decoration:none;
+}
+.actions a {
+  background:linear-gradient(90deg,var(--primary),var(--accent));
+  color:white;
+}
+.actions button {
+  background:#ef4444;
+  color:white;
+}
+footer {
+  background:#fff;
+  border-top:1px solid var(--border);
+  padding:15px;
+  text-align:center;
+  font-size:13px;
+  color:var(--subtext);
+}
+footer a{color:var(--primary);text-decoration:none;margin:0 5px;}
+@media(max-width:600px){
+  .profile{flex-direction:column;align-items:center;text-align:center}
+}
+</style>
 </head>
-<body class="bg-gradient-to-r from-indigo-900 via-purple-800 to-pink-700 flex items-center justify-center h-screen">
-  <div class="bg-white shadow-xl rounded-2xl p-10 w-full max-w-md text-center">
-    <img id="profilePic" class="mx-auto w-24 h-24 rounded-full border-4 border-indigo-500 mb-4" src="" alt="Profile">
-    <h1 id="username" class="text-2xl font-bold text-gray-800"></h1>
-    <p id="email" class="text-gray-600 mb-4"></p>
-    <p id="points" class="text-lg font-semibold text-indigo-600"></p>
-    <p id="rank" class="text-sm text-gray-500 mb-6"></p>
-
-    <button onclick="window.location.href='games.html'" class="w-full py-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-xl shadow-md transition">
-      🎮 Play Games
-    </button>
+<body oncontextmenu="return false">
+<header>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <img src="https://www.tyvila.online/cdn/ty.webp" alt="TyVila Logo">
+    <h1>My Account</h1>
   </div>
+</header>
+<main>
+  <div class="card" id="accountCard">
+    <div class="profile">
+      <img id="avatar" src="https://www.tyvila.online/cdn/default-avatar.png" alt="Profile Picture">
+      <div>
+        <h2 id="username">Loading...</h2>
+        <p id="email"></p>
+      </div>
+    </div>
 
-  <script>
-    const supabase = supabase.createClient("https://wwcedhbbbdoyrmquokyjj.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4");
+    <div class="stats">
+      <div class="stat">
+        <h3 id="points">0</h3>
+        <p>Points</p>
+      </div>
+      <div class="stat">
+        <h3>🎮</h3>
+        <p>Play Games</p>
+      </div>
+    </div>
 
-    async function loadProfile() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return window.location.href = "signup.html";
+    <div class="actions">
+      <a href="games.html">Play Games</a>
+      <button id="logoutBtn">Logout</button>
+    </div>
+  </div>
+</main>
+<footer>
+  <p>
+    <a href="terms.html">Terms of Service</a> • 
+    <a href="privacy.html">Privacy Policy</a> • 
+    <a href="cookies.html">Cookies</a>
+  </p>
+</footer>
 
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .single();
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+const supabase = createClient(
+  "https://wwcedhbbdoyrmquokyjj.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4"
+)
 
-      if (error || !data) {
-        return window.location.href = "signup.html";
-      }
+async function loadProfile(){
+  const { data: { user } } = await supabase.auth.getUser()
+  if(!user){ window.location.href="login.html"; return }
 
-      document.getElementById("username").innerText = data.username;
-      document.getElementById("email").innerText = data.email;
-      document.getElementById("profilePic").src = data.avatar_url || "https://api.dicebear.com/9.x/adventurer/svg";
-      document.getElementById("points").innerText = "Points: " + (data.points || 0);
-      document.getElementById("rank").innerText = "Rank: " + (data.rank || "Beginner");
-    }
+  let { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).maybeSingle()
 
-    loadProfile();
-  </script>
+  if(!profile){
+    await supabase.from("profiles").insert({
+      id:user.id,
+      email:user.email,
+      username:user.user_metadata?.preferred_username || user.email.split("@")[0],
+      avatar_url:user.user_metadata?.avatar_url || user.user_metadata?.picture
+    })
+    profile = { username:user.user_metadata?.preferred_username||user.email.split("@")[0], email:user.email, avatar_url:user.user_metadata?.picture, points:0 }
+  }
+
+  document.getElementById("username").textContent = profile.username || "No Username"
+  document.getElementById("email").textContent = profile.email || user.email
+  document.getElementById("avatar").src = profile.avatar_url || user.user_metadata?.picture || "https://www.tyvila.online/cdn/default-avatar.png"
+  document.getElementById("points").textContent = profile.points ?? 0
+}
+
+document.getElementById("logoutBtn").addEventListener("click",async()=>{
+  await supabase.auth.signOut()
+  window.location.href="login.html"
+})
+
+loadProfile()
+</script>
 </body>
 </html>
