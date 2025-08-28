@@ -1,103 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>My Account — TyVila</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" href="https://www.tyvila.online/cdn/favicon.ico">
-<style>
-body{margin:0;font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#0f0f1a,#1a1a2e);color:#fff;display:flex;flex-direction:column;align-items:center}
-header{width:100%;background:#111;padding:15px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 0 10px #000}
-header h1{color:#06b6d4;margin:0}
-header button{padding:8px 16px;border:none;border-radius:6px;cursor:pointer;background:#06b6d4;color:#fff;font-weight:bold}
-header button:hover{background:#0891b2}
-.main-container{display:flex;flex-wrap:wrap;gap:20px;padding:20px;justify-content:center;width:100%}
-.card{background:#1a1a2e;padding:20px;border-radius:12px;box-shadow:0 0 15px #000;text-align:center;min-width:250px}
-.card img{width:100px;height:100px;border-radius:50%;border:3px solid #06b6d4;object-fit:cover;margin-bottom:10px}
-.stats{display:flex;justify-content:space-around;margin-top:10px}
-.stat-box{background:#222;padding:10px;border-radius:10px;width:30%;text-align:center}
-input,button{padding:10px;border-radius:8px;border:none;margin-top:10px;width:100%}
-input{background:#222;color:#fff}
-button{background:#06b6d4;color:#fff;font-weight:bold;cursor:pointer}
-button:hover{background:#0891b2}
-ul{list-style:none;padding:0;max-height:200px;overflow-y:auto}
-li{padding:8px;border-bottom:1px solid #333;display:flex;justify-content:space-between;align-items:center}
-h2{margin-top:0;text-align:center;color:#ffcc00}
-</style>
-<script>
-document.addEventListener("contextmenu", e=>e.preventDefault())
-document.onkeydown=function(e){if(e.ctrlKey&&(e.key==="u"||e.key==="U"||e.key==="s"||e.key==="S")) e.preventDefault();}
-</script>
+  <meta charset="UTF-8">
+  <title>My Account - TyVila</title>
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <link rel="icon" href="https://www.tyvila.online/cdn/favicon.ico">
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-<header>
-  <h1>TyVila Account</h1>
-  <button onclick="window.location.href='games.html'">Play Games</button>
-</header>
+<body class="bg-gradient-to-r from-indigo-900 via-purple-800 to-pink-700 flex items-center justify-center h-screen">
+  <div class="bg-white shadow-xl rounded-2xl p-10 w-full max-w-md text-center">
+    <img id="profilePic" class="mx-auto w-24 h-24 rounded-full border-4 border-indigo-500 mb-4" src="" alt="Profile">
+    <h1 id="username" class="text-2xl font-bold text-gray-800"></h1>
+    <p id="email" class="text-gray-600 mb-4"></p>
+    <p id="points" class="text-lg font-semibold text-indigo-600"></p>
+    <p id="rank" class="text-sm text-gray-500 mb-6"></p>
 
-<div class="main-container">
-  <div class="card" id="profileCard">
-    <img id="profilePic" src="https://api.dicebear.com/9.x/thumbs/svg" alt="Profile">
-    <h2 id="username">Loading...</h2>
-    <p id="email">Loading...</p>
-    <div class="stats">
-      <div class="stat-box"><h3 id="points">0</h3><p>Points</p></div>
-      <div class="stat-box"><h3 id="rank">-</h3><p>Rank</p></div>
-    </div>
-    <input type="text" id="addFriendInput" placeholder="Add friend by username/email">
-    <button onclick="addFriend()">Add Friend</button>
+    <button onclick="window.location.href='games.html'" class="w-full py-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-xl shadow-md transition">
+      🎮 Play Games
+    </button>
   </div>
 
-  <div class="card">
-    <h2>Friends</h2>
-    <ul id="friendsList"><li>No friends yet</li></ul>
-  </div>
-</div>
+  <script>
+    const supabase = supabase.createClient("https://wwcedhbbbdoyrmquokyjj.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4");
 
-<script type="module">
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
-const supabase = createClient(
-  "https://wwcedhbbdoyrmquokyjj.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4"
-)
-let currentUser
+    async function loadProfile() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return window.location.href = "signup.html";
 
-async function loadAccount(){
-  const {data:{user}} = await supabase.auth.getUser()
-  if(!user) return window.location.href='login.html'
-  currentUser=user
-  const {data:profile} = await supabase.from("profiles").select("*").eq("id",user.id).single()
-  document.getElementById("username").innerText = profile.username || user.email
-  document.getElementById("email").innerText = user.email
-  document.getElementById("points").innerText = profile.points || 0
-  document.getElementById("rank").innerText = profile.rank || "-"
-  document.getElementById("profilePic").src = profile.avatar_url || "https://api.dicebear.com/9.x/thumbs/svg"
-  loadFriends()
-}
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single();
 
-async function loadFriends(){
-  const {data} = await supabase.from("friends").select("*").eq("user_id",currentUser.id)
-  const list = document.getElementById("friendsList")
-  list.innerHTML=""
-  if(!data||data.length===0){ list.innerHTML="<li>No friends yet</li>"; return }
-  data.forEach(f=>{
-    const li=document.createElement("li")
-    li.textContent=f.friend_username
-    list.appendChild(li)
-  })
-}
+      if (error || !data) {
+        return window.location.href = "signup.html";
+      }
 
-async function addFriend(){
-  const val = document.getElementById("addFriendInput").value.trim()
-  if(!val) return alert("Enter a username/email")
-  const {data:user} = await supabase.from("profiles").select("id,username,email").or(`username.eq.${val},email.eq.${val}`).maybeSingle()
-  if(!user) return alert("User not found")
-  await supabase.from("friends").insert([{user_id:currentUser.id,friend_id:user.id,friend_username:user.username}])
-  loadFriends()
-  document.getElementById("addFriendInput").value=""
-}
+      document.getElementById("username").innerText = data.username;
+      document.getElementById("email").innerText = data.email;
+      document.getElementById("profilePic").src = data.avatar_url || "https://api.dicebear.com/9.x/adventurer/svg";
+      document.getElementById("points").innerText = "Points: " + (data.points || 0);
+      document.getElementById("rank").innerText = "Rank: " + (data.rank || "Beginner");
+    }
 
-loadAccount()
-</script>
+    loadProfile();
+  </script>
 </body>
 </html>
