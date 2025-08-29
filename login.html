@@ -14,8 +14,6 @@
   --neon2: #06b6d4;
   --error: #ff4d6d;
   --success: #32ff91;
-  --google-blue: #4285F4;
-  --google-dark-blue: #3367D6;
 }
 * { box-sizing: border-box; }
 body {
@@ -95,10 +93,6 @@ button.primary, button.google {
   color: white;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
 }
 button.primary {
   background: linear-gradient(90deg, var(--neon1), var(--neon2));
@@ -108,42 +102,12 @@ button.primary:hover {
   box-shadow: 0 0 20px var(--neon2);
 }
 button.google {
-  background: var(--google-blue);
-  position: relative;
-  overflow: hidden;
+  background: #DB4437;
+  margin-top: 10px;
 }
 button.google:hover {
   transform: scale(1.05);
-  box-shadow: 0 0 15px var(--google-blue);
-  background: var(--google-dark-blue);
-}
-button.google::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-  transition: 0.5s;
-}
-button.google:hover::before {
-  left: 100%;
-}
-.google-icon {
-  width: 20px;
-  height: 20px;
-  background: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2px;
-}
-.google-icon img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+  box-shadow: 0 0 15px #DB4437;
 }
 .links {
   display: flex;
@@ -166,49 +130,11 @@ button.google:hover::before {
   text-align: center;
   min-height: 20px;
 }
-.account-badge {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  margin-bottom: 15px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  animation: fadeIn 0.5s ease;
-}
-.account-badge img {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-.account-badge div {
-  flex: 1;
-}
-.account-badge .account-name {
-  font-weight: 600;
-  font-size: 14px;
-}
-.account-badge .account-email {
-  font-size: 12px;
-  opacity: 0.8;
-}
-.account-badge .not-you {
-  font-size: 12px;
-  color: var(--neon2);
-  cursor: pointer;
-  text-decoration: underline;
-}
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
 </style>
 </head>
 <body>
 <div class="container">
-  <h1>TyVila Login</h1>
+  <h1>🎮 TyVila Login 🎮</h1>
   <form id="loginForm">
     <div class="error-msg" id="loginError"></div>
     <div class="success-msg" id="loginSuccess"></div>
@@ -219,14 +145,12 @@ button.google:hover::before {
     <label for="password">Password</label>
     <input id="password" type="password" placeholder="Enter password" required>
 
-    <button class="primary" type="submit">Enter Game</button>
-    
-    <div id="googleAuthContainer">
-    </div>
+    <button class="primary" type="submit">▶ Enter Game</button>
+    <button type="button" class="google" id="googleLogin">🔑 Sign in with Google</button>
 
     <div class="links">
-      <a href="signup.html">Create account</a>
-      <a href="#" id="forgotLink">Forgot password?</a>
+      <a href="signup.html">🆕 Create account</a>
+      <a href="#" id="forgotLink">❓ Forgot password?</a>
     </div>
   </form>
 </div>
@@ -244,81 +168,6 @@ async function sendResetLink(email){
   await supabase.auth.resetPasswordForEmail(email,{
     redirectTo:"https://www.tyvila.online/reset.html"
   })
-}
-
-async function renderGoogleAuthButton() {
-  const container = document.getElementById('googleAuthContainer');
-  const { data: { session } } = await supabase.auth.getSession();
-  
-  if (session && session.provider_token) {
-    const user = session.user;
-    const profile = await getProfile(user.id);
-    
-    container.innerHTML = `
-      <div class="account-badge">
-        <img src="${user.user_metadata.avatar_url || user.user_metadata.picture || 'https://www.tyvila.online/cdn/default-avatar.png'}" 
-             alt="Profile picture">
-        <div>
-          <div class="account-name">Continue as ${profile?.username || user.user_metadata.name || user.email}</div>
-          <div class="account-email">${user.email}</div>
-        </div>
-        <span class="not-you" id="switchAccount">Not you?</span>
-      </div>
-      <button class="google" id="continueWithGoogle">
-        <span class="google-icon">
-          <img src="https://www.tyvila.online/cdn/gsign.png" alt="Google logo">
-        </span>
-        Continue with Google
-      </button>
-    `;
-    
-    document.getElementById('continueWithGoogle').addEventListener('click', () => {
-      window.location.href = "account.html";
-    });
-    
-    document.getElementById('switchAccount').addEventListener('click', async () => {
-      await supabase.auth.signOut();
-      renderGoogleAuthButton(); 
-    });
-  } else {
-    container.innerHTML = `
-      <button class="google" id="googleLogin">
-        <span class="google-icon">
-          <img src="https://www.tyvila.online/cdn/gsign.png" alt="Google logo">
-        </span>
-        Sign in with Google
-      </button>
-    `;
-    
-    document.getElementById('googleLogin').addEventListener('click', googleSignIn);
-  }
-}
-
-async function getProfile(userId) {
-  const { data: profile, error } = await supabase
-    .from('profiles')
-    .select('username, avatar_url')
-    .eq('id', userId)
-    .single();
-    
-  return profile;
-}
-
-async function googleSignIn() {
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: "google",
-    options: {
-      redirectTo: "https://www.tyvila.online/account.html",
-      queryParams: {
-        access_type: 'offline',
-        prompt: 'consent'
-      }
-    }
-  });
-  
-  if (error) {
-    document.getElementById('loginError').textContent = error.message;
-  }
 }
 
 document.getElementById("loginForm").addEventListener("submit",async e=>{
@@ -352,14 +201,22 @@ document.getElementById("loginForm").addEventListener("submit",async e=>{
   }
 })
 
+document.getElementById("googleLogin").addEventListener("click",async()=>{
+  const {data,error}=await supabase.auth.signInWithOAuth({
+    provider:"google",
+    options:{
+      redirectTo:"https://www.tyvila.online/account.html"
+    }
+  })
+  if(error) alert(error.message)
+})
+
 document.getElementById("forgotLink").addEventListener("click",async e=>{
   e.preventDefault()
   const email=prompt("Enter your email to reset password")
   if(email&&!isValidInput(email)){alert("Invalid input");return}
   if(email){await sendResetLink(email);alert("Reset link sent. Check inbox.")}
 })
-
-renderGoogleAuthButton();
 </script>
 </body>
 </html>
