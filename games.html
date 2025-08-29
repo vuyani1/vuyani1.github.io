@@ -7,224 +7,130 @@
 <link rel="icon" href="https://www.tyvila.online/cdn/favicon.ico">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-:root {
-  --primary:#7c3aed;
-  --secondary:#06b6d4;
-  --dark:#111;
-  --light:#f9f9f9;
-}
-body {
-  margin:0;
-  font-family:Inter,sans-serif;
-  background:linear-gradient(135deg,var(--primary),var(--secondary));
-  color:#fff;
-}
-header {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:15px 25px;
-  background:rgba(0,0,0,0.25);
-  backdrop-filter:blur(10px);
-  position:sticky;
-  top:0;
-  z-index:10;
-}
-header h1 {
-  font-size:20px;
-  font-weight:700;
-}
-.profile {
-  position:relative;
-}
-.profile img {
-  width:45px;
-  height:45px;
-  border-radius:50%;
-  cursor:pointer;
-  border:2px solid #ffeb3b;
-}
-.dropdown {
-  display:none;
-  position:absolute;
-  right:0;
-  top:55px;
-  background:#fff;
-  color:#000;
-  border-radius:12px;
-  box-shadow:0 8px 30px rgba(0,0,0,0.2);
-  overflow:hidden;
-}
-.dropdown button {
-  display:block;
-  width:100%;
-  padding:12px;
-  border:none;
-  background:none;
-  text-align:left;
-  cursor:pointer;
-  font-weight:600;
-}
-.dropdown button:hover {background:#f0f0f0}
-.stats {
-  text-align:center;
-  padding:20px;
-}
-.stats h2 {
-  margin:5px 0;
-}
-.gamesGrid {
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-  gap:20px;
-  padding:20px;
-}
-.gameCard {
-  background:#fff;
-  color:#000;
-  border-radius:16px;
-  box-shadow:0 8px 25px rgba(0,0,0,0.15);
-  overflow:hidden;
-  display:flex;
-  flex-direction:column;
-}
-.gameCard img {
-  width:100%;
-  height:160px;
-  object-fit:cover;
-}
-.gameCard .content {
-  padding:15px;
-  flex:1;
-  display:flex;
-  flex-direction:column;
-  justify-content:space-between;
-}
-.gameCard h3 {
-  margin:0 0 10px;
-  font-size:18px;
-  font-weight:700;
-}
-.gameCard p {
-  font-size:14px;
-  color:#555;
-  flex:1;
-}
-.gameCard button {
-  margin-top:10px;
-  padding:10px;
-  border:none;
-  border-radius:8px;
-  background:linear-gradient(90deg,var(--primary),var(--secondary));
-  color:#fff;
-  font-weight:600;
-  cursor:pointer;
-}
-.toast {
-  position:fixed;
-  bottom:20px;
-  right:20px;
-  background:#111;
-  color:#fff;
-  padding:12px 20px;
-  border-radius:12px;
-  display:none;
-}
-.rank {
-  font-size:14px;
-  color:#ffeb3b;
-  font-weight:700;
-}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,sans-serif;background:#0f172a;color:#fff;user-select:none}
+header{display:flex;align-items:center;justify-content:space-between;padding:15px 25px;background:#1e293b;position:sticky;top:0;z-index:50}
+header h1{margin:0;font-size:22px;color:#38bdf8}
+.profile{display:flex;align-items:center;gap:12px;cursor:pointer;position:relative}
+.profile img{width:40px;height:40px;border-radius:50%;border:2px solid #38bdf8}
+.profile span{font-weight:600}
+.dropdown{display:none;position:absolute;top:55px;right:0;background:#1e293b;border:1px solid #334155;border-radius:12px;overflow:hidden}
+.dropdown button{background:none;color:#fff;padding:10px 20px;text-align:left;width:100%;border:none;cursor:pointer}
+.dropdown button:hover{background:#334155}
+.games-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:20px;padding:20px}
+.card{background:#1e293b;border-radius:16px;overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,0.4);cursor:pointer;transition:transform .2s}
+.card:hover{transform:scale(1.03)}
+.card img{width:100%;height:140px;object-fit:cover}
+.card .info{padding:15px}
+.card h3{margin:0 0 8px;font-size:17px}
+.card p{margin:0;font-size:13px;color:#cbd5e1;max-height:40px;overflow:hidden}
+#playerModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#0f172a;z-index:1000;flex-direction:column}
+#playerHeader{display:flex;justify-content:space-between;align-items:center;padding:10px 15px;background:#1e293b}
+#playerHeader button{background:#334155;color:#fff;border:none;padding:8px 14px;border-radius:8px;cursor:pointer}
+#gameFrame{flex:1;width:100%;border:none}
+.actions{display:flex;gap:10px;align-items:center}
+.actions button{background:#38bdf8;color:#000;font-weight:600;border:none;border-radius:8px;padding:8px 14px;cursor:pointer}
+.like{background:#f43f5e;color:#fff}
 </style>
 </head>
-<body>
+<body oncontextmenu="return false">
+
 <header>
   <h1>🎮 TyVila Games</h1>
-  <div class="profile">
-    <img id="profilePic" src="https://www.tyvila.online/cdn/default-avatar.png" alt="profile">
-    <div class="dropdown" id="dropdownMenu">
+  <div class="profile" id="profileBtn">
+    <img id="avatar" src="https://www.tyvila.online/cdn/default-avatar.png">
+    <span id="username">Guest</span>
+    <div class="dropdown" id="dropdown">
       <button onclick="window.location.href='accounts.html'">Account Info</button>
       <button onclick="logout()">Logout</button>
+      <button onclick="window.location.href='ranks.html'">View Ranks</button>
     </div>
   </div>
 </header>
 
-<div class="stats">
-  <h2 id="username">Loading...</h2>
-  <p id="points">Points: -</p>
-  <p class="rank" id="rank">Rank: -</p>
-  <p id="gameCount">Games Available: 0</p>
+<main class="games-grid" id="gamesGrid">
+  <p>Loading games...</p>
+</main>
+
+<!-- Game Player Modal -->
+<div id="playerModal">
+  <div id="playerHeader">
+    <span id="gameTitle"></span>
+    <div class="actions">
+      <button class="like" id="likeBtn">❤️ Like</button>
+      <button onclick="toggleFullscreen()">⛶ Fullscreen</button>
+      <button onclick="closeGame()">✖ Exit</button>
+    </div>
+  </div>
+  <iframe id="gameFrame"></iframe>
 </div>
-
-<div class="gamesGrid" id="gamesGrid"></div>
-
-<div class="toast" id="toast"></div>
 
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
-const supabase = createClient("https://wwcedhbbdoyrmquokyjj.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4")
+const supabase = createClient(
+ "https://wwcedhbbdoyrmquokyjj.supabase.co",
+ "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4"
+)
 
-function showToast(msg){
-  const t=document.getElementById("toast")
-  t.textContent=msg
-  t.style.display="block"
-  setTimeout(()=>t.style.display="none",3000)
-}
-
-const profilePic=document.getElementById("profilePic")
-const dropdown=document.getElementById("dropdownMenu")
-profilePic.onclick=()=>{dropdown.style.display=dropdown.style.display==="block"?"none":"block"}
-
-async function logout(){
-  await supabase.auth.signOut()
-  showToast("Logged out")
-  setTimeout(()=>window.location.href="login.html",1000)
-}
-window.logout=logout
+const profileBtn=document.getElementById("profileBtn")
+const dropdown=document.getElementById("dropdown")
+profileBtn.onclick=()=>dropdown.style.display=dropdown.style.display==="block"?"none":"block"
 
 async function loadUser(){
-  const { data:{ user } } = await supabase.auth.getUser()
-  if(!user){
-    window.location.href="login.html"
-    return
-  }
-  const {data}=await supabase.from("profiles").select("*").eq("id",user.id).single()
-  if(data){
-    document.getElementById("username").textContent=data.username||"Player"
-    document.getElementById("points").textContent="Points: "+data.points
-    profilePic.src=data.avatar_url||"https://www.tyvila.online/cdn/default-avatar.png"
-
-    let rank="Player"
-    if(data.points>=1000000) rank="🌌 God"
-    else if(data.points>=10000) rank="👑 Crown"
-    document.getElementById("rank").textContent="Rank: "+rank
+  const {data:{user}}=await supabase.auth.getUser()
+  if(user){
+    const {data}=await supabase.from("profiles").select("*").eq("id",user.id).single()
+    if(data){
+      document.getElementById("username").textContent=data.username||user.email
+      document.getElementById("avatar").src=data.avatar_url||"https://www.tyvila.online/cdn/default-avatar.png"
+    }
   }
 }
 loadUser()
 
 async function loadGames(){
-  try {
-    const res=await fetch("https://www.tyvila.online/games/game-app/game.json")
-    const games=await res.json()
-    document.getElementById("gameCount").textContent="Games Available: "+games.length
-    const grid=document.getElementById("gamesGrid")
-    games.forEach(g=>{
-      const card=document.createElement("div")
-      card.className="gameCard"
-      card.innerHTML=`
-        <img src="${g.image}" alt="${g.title}">
-        <div class="content">
-          <h3>${g.title}</h3>
-          <p>${g.description.substring(0,80)}...</p>
-          <button onclick="window.open('${g.embed}','_blank')">Play</button>
-        </div>`
-      grid.appendChild(card)
-    })
-  } catch(e){
-    showToast("Error loading games")
-  }
+  const res=await fetch("https://www.tyvila.online/games/game-app/game.json")
+  const games=await res.json()
+  const grid=document.getElementById("gamesGrid")
+  grid.innerHTML=""
+  games.forEach((g,i)=>{
+    const card=document.createElement("div")
+    card.className="card"
+    card.innerHTML=`<img src="${g.image}" alt=""><div class="info"><h3>${g.title}</h3><p>${g.description}</p></div>`
+    card.onclick=()=>openGame(g)
+    grid.appendChild(card)
+  })
 }
 loadGames()
+
+const player=document.getElementById("playerModal")
+const gameFrame=document.getElementById("gameFrame")
+function openGame(game){
+  player.style.display="flex"
+  document.getElementById("gameTitle").textContent=game.title
+  gameFrame.src=game.embed
+  addPoint()
+}
+function closeGame(){
+  player.style.display="none"
+  gameFrame.src=""
+}
+function toggleFullscreen(){
+  if(gameFrame.requestFullscreen){gameFrame.requestFullscreen()}
+  else if(gameFrame.webkitRequestFullscreen){gameFrame.webkitRequestFullscreen()}
+}
+document.getElementById("likeBtn").onclick=()=>alert("You liked this game ❤️")
+
+async function addPoint(){
+  const {data:{user}}=await supabase.auth.getUser()
+  if(!user) return
+  await supabase.rpc("increment_points",{userid:user.id})
+}
+
+async function logout(){
+  await supabase.auth.signOut()
+  window.location.href="login.html"
+}
 </script>
 </body>
 </html>
