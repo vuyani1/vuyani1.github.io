@@ -3,148 +3,132 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Games — TyVila</title>
+<title>TyVila Crown Games</title>
 <link rel="icon" href="https://www.tyvila.online/cdn/favicon.ico">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 body{margin:0;font-family:Inter,sans-serif;background:linear-gradient(135deg,#7c3aed,#06b6d4);color:#fff;min-height:100vh;display:flex;flex-direction:column}
 header{display:flex;justify-content:space-between;align-items:center;padding:15px 25px;background:rgba(0,0,0,0.5);backdrop-filter:blur(10px)}
 header img{height:40px}
-header .user{display:flex;align-items:center;gap:10px}
-header .user img{width:35px;height:35px;border-radius:50%;border:2px solid #ffeb3b}
-main{flex:1;padding:20px;display:flex;flex-direction:column;align-items:center}
-#topGame{width:90%;margin-bottom:20px;border-radius:16px;overflow:hidden;cursor:pointer;transition:0.3s;position:relative}
-#topGame img{width:100%;height:220px;object-fit:cover;border-radius:16px}
-#topGame .info{position:absolute;bottom:10px;left:10px;color:#fff;background:rgba(0,0,0,0.5);padding:10px;border-radius:10px}
-#gameContainer{display:flex;flex-wrap:wrap;gap:15px;width:100%;justify-content:center}
-.gameCard{background:rgba(255,255,255,0.1);border-radius:16px;overflow:hidden;cursor:pointer;transition:0.3s;flex:1 1 220px;max-width:250px}
+.user{display:flex;align-items:center;gap:10px}
+.user img{width:35px;height:35px;border-radius:50%;border:2px solid #ffeb3b}
+.pointsBox{background:rgba(255,255,255,0.15);padding:6px 12px;border-radius:10px;font-size:14px;font-weight:600}
+.rank{font-size:12px;color:#ffeb3b}
+main{flex:1;padding:20px}
+h2{text-align:center;margin:15px 0}
+.gamesGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:20px}
+.gameCard{background:rgba(255,255,255,0.1);border-radius:16px;overflow:hidden;transition:transform 0.2s}
+.gameCard:hover{transform:scale(1.05)}
 .gameCard img{width:100%;height:140px;object-fit:cover}
-.gameCard .info{padding:10px;text-align:center}
-.gameCard .info h3{margin:5px 0;font-size:16px}
-#playModal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px;z-index:999}
-#playModal iframe{width:90%;height:70%;border:none;border-radius:12px}
-#playModal .modalHeader{width:90%;display:flex;justify-content:space-between;align-items:center;color:#fff;margin-bottom:10px}
-#playModal button{padding:8px 12px;border:none;border-radius:8px;cursor:pointer;font-weight:600}
-#playModal .likeBtn{background:#ff5722;color:#fff}
-#playModal .fullscreenBtn{background:#06b6d4;color:#fff}
-#moreGames{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px;justify-content:center;width:100%}
-.moreCard{background:rgba(255,255,255,0.1);border-radius:12px;width:100px;cursor:pointer;transition:0.3s}
-.moreCard img{width:100%;height:60px;object-fit:cover;border-radius:12px}
-.moreCard p{text-align:center;font-size:12px;margin:5px;color:#fff}
+.gameCard .info{padding:10px}
+.playBtn{margin-top:8px;padding:6px 12px;background:#06b6d4;border:none;border-radius:8px;font-weight:600;color:#fff;cursor:pointer}
+#gameOverlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:9999}
+#gameOverlay iframe{width:90%;height:80%;border:none;border-radius:12px}
+.overlayControls{margin-top:15px;display:flex;gap:10px}
+.overlayControls button{padding:8px 15px;border:none;border-radius:8px;font-weight:600;cursor:pointer}
+.likeBtn{background:#ff4444;color:#fff}
+.exitBtn{background:#06b6d4;color:#fff}
+#customAlert{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#ff4444;color:#fff;padding:12px 22px;border-radius:10px;display:none;z-index:10000;font-weight:600}
 </style>
 </head>
 <body oncontextmenu="return false">
 <header>
   <img src="https://www.tyvila.online/cdn/ty.webp" alt="TyVila Logo">
   <div class="user">
-    <span id="username">Loading...</span>
+    <span id="username">Player</span>
+    <div class="pointsBox">⭐ <span id="points">0</span> <span class="rank" id="rank">Bronze</span></div>
     <img id="avatar" src="https://www.tyvila.online/cdn/default-avatar.png">
-    <span id="points">0 pts</span>
   </div>
 </header>
 <main>
-  <div id="topGame"></div>
-  <div id="gameContainer"></div>
-  <div id="moreGames"></div>
-
-  <div id="playModal">
-    <div class="modalHeader">
-      <h3 id="modalGameName">Game</h3>
-      <div>
-        <button class="likeBtn" id="likeBtn">Like ❤️</button>
-        <button class="fullscreenBtn" id="fullscreenBtn">Fullscreen ⛶</button>
-        <button onclick="closeModal()">Close ✖</button>
-      </div>
-    </div>
-    <iframe id="gameFrame"></iframe>
-    <div>Plays: <span id="playsCount">0</span></div>
-  </div>
+  <h2>TyVila Crown Games</h2>
+  <div class="gamesGrid" id="gamesGrid"></div>
 </main>
+
+<!-- Overlay -->
+<div id="gameOverlay">
+  <iframe id="gameFrame"></iframe>
+  <div class="overlayControls">
+    <button class="likeBtn" id="likeBtn">❤️ Like</button>
+    <button class="exitBtn" id="exitBtn">Exit</button>
+  </div>
+</div>
+<div id="customAlert"></div>
 
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
-const supabase = createClient(
-  "https://wwcedhbbdoyrmquokyjj.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4"
+const supabase=createClient(
+ "https://wwcedhbbdoyrmquokyjj.supabase.co",
+ "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4"
 )
-let currentUser
-let pointsInterval
-let gamesList=[]
 
-async function loadUser(){
-  const {data:{user}}=await supabase.auth.getUser()
-  if(!user){alert("Please login to play games");window.location.href="login.html";return}
-  currentUser=user
-  let {data:profile}=await supabase.from("profiles").select("*").eq("id",user.id).maybeSingle()
-  if(profile){
-    document.getElementById("username").textContent=profile.username
-    document.getElementById("points").textContent=(profile.points||0)+" pts"
-    document.getElementById("avatar").src=profile.avatar_url||"https://www.tyvila.online/cdn/default-avatar.png"
-  }
+function getRank(points){
+  if(points>=1000) return "Crown 👑"
+  if(points>=500) return "Diamond 💎"
+  if(points>=250) return "Gold 🥇"
+  if(points>=100) return "Silver 🥈"
+  return "Bronze 🥉"
 }
+
+async function loadProfile(){
+  const {data:{user}}=await supabase.auth.getUser()
+  if(!user) return
+  let {data}=await supabase.from("profiles").select("*").eq("id",user.id).single()
+  if(!data){await supabase.from("profiles").insert({id:user.id,username:user.email,points:0});data={username:user.email,points:0,avatar_url:""}}
+  document.getElementById("username").textContent=data.username
+  document.getElementById("avatar").src=data.avatar_url||"https://www.tyvila.online/cdn/default-avatar.png"
+  document.getElementById("points").textContent=data.points
+  document.getElementById("rank").textContent=getRank(data.points)
+}
+
+let currentGame=null,startTime=0
 
 async function loadGames(){
-  const res = await fetch("https://www.onlinegames.io/media/plugins/genGames/embed.json")
-  gamesList = await res.json()
-
-  const topGameDiv=document.getElementById("topGame")
-  const container=document.getElementById("gameContainer")
-  const moreGamesDiv=document.getElementById("moreGames")
-  container.innerHTML=""
-  moreGamesDiv.innerHTML=""
-  if(gamesList.length>0){
-    const top=gamesList[0]
-    topGameDiv.innerHTML=`<img src="${top.image}" alt="${top.title}"><div class="info"><h3>${top.title}</h3><p>${top.description||""}</p></div>`
-    topGameDiv.onclick=()=>openGame(top)
-  }
-  gamesList.slice(1).forEach(g=>{
-    const card=document.createElement("div")
-    card.className="moreCard"
-    card.innerHTML=`<img src="${g.image}"><p>${g.title}</p>`
-    card.onclick=()=>openGame(g)
-    moreGamesDiv.appendChild(card)
-  })
-  gamesList.slice(1).forEach(g=>{
+  const res=await fetch("https://www.onlinegames.io/media/plugins/genGames/embed.json")
+  const games=await res.json()
+  const grid=document.getElementById("gamesGrid");grid.innerHTML=""
+  games.forEach(g=>{
     const card=document.createElement("div")
     card.className="gameCard"
-    card.innerHTML=`<img src="${g.image}" alt="${g.title}"><div class="info"><h3>${g.title}</h3><p>${g.description||""}</p></div>`
-    card.onclick=()=>openGame(g)
-    container.appendChild(card)
+    card.innerHTML=`<img src="${g.image}" alt=""><div class="info"><h3>${g.title}</h3><p>${g.description.slice(0,70)}...</p><button class="playBtn">▶ Play</button></div>`
+    card.querySelector(".playBtn").onclick=()=>openGame(g)
+    grid.appendChild(card)
   })
 }
 
-async function openGame(game){
-  const modal=document.getElementById("playModal")
-  modal.style.display="flex"
-  document.getElementById("modalGameName").textContent=game.title
-  document.getElementById("gameFrame").src=game.embed
-  document.getElementById("playsCount").textContent=game.plays||0
-  history.pushState(null,"",`?game=${game.title.replace(/\s+/g,"-")}`)
-  pointsInterval=setInterval(async()=>{
-    await supabase.rpc("increment_points",{userid:currentUser.id})
-    let {data}=await supabase.from("profiles").select("points").eq("id",currentUser.id).maybeSingle()
-    if(data)document.getElementById("points").textContent=data.points+" pts"
-  },1000)
-  document.getElementById("likeBtn").onclick=async()=>{
-    if(game.likes==undefined) game.likes=0
-    game.likes++
-    alert("Liked! Total Likes: "+game.likes)
-  }
-  document.getElementById("fullscreenBtn").onclick=()=>{
-    const iframe=document.getElementById("gameFrame")
-    if(iframe.requestFullscreen)iframe.requestFullscreen()
-    else if(iframe.webkitRequestFullscreen)iframe.webkitRequestFullscreen()
-  }
+function openGame(g){
+  currentGame=g
+  document.getElementById("gameFrame").src=g.embed
+  document.getElementById("gameOverlay").style.display="flex"
+  startTime=Date.now()
 }
 
-function closeModal(){
-  document.getElementById("playModal").style.display="none"
+document.getElementById("exitBtn").onclick=async()=>{
+  document.getElementById("gameOverlay").style.display="none"
   document.getElementById("gameFrame").src=""
-  clearInterval(pointsInterval)
-  history.pushState(null,"","games.html")
+  if(currentGame){
+    const sec=Math.floor((Date.now()-startTime)/1000)
+    if(sec>0){
+      const {data:{user}}=await supabase.auth.getUser()
+      await supabase.rpc("add_points",{uid:user.id,p:sec})
+      showAlert(`+${sec} points from playing!`)
+      loadProfile()
+    }
+  }
 }
 
-loadUser()
+document.getElementById("likeBtn").onclick=async()=>{
+  if(!currentGame) return
+  await supabase.rpc("increment_like",{g:currentGame.title})
+  showAlert(`You liked ${currentGame.title}`)
+}
+
+function showAlert(msg){
+  const a=document.getElementById("customAlert");a.textContent=msg;a.style.display="block"
+  setTimeout(()=>a.style.display="none",3000)
+}
+
+loadProfile()
 loadGames()
 </script>
 </body>
