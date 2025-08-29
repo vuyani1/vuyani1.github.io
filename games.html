@@ -1,178 +1,209 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>TyVila Games</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <link rel="icon" href="https://www.tyvila.online/cdn/favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-  <style>
-    body{margin:0;font-family:Inter,sans-serif;background:linear-gradient(135deg,#0f172a,#1e293b);color:#fff;min-height:100vh;overflow-x:hidden}
-    header{display:flex;align-items:center;justify-content:space-between;padding:15px 30px;background:rgba(0,0,0,0.6);position:sticky;top:0;z-index:1000}
-    header img{height:40px}
-    header button{padding:8px 16px;border:none;border-radius:10px;background:#06b6d4;color:#fff;font-weight:600;cursor:pointer}
-    .profile{display:flex;align-items:center;gap:12px}
-    .profile img{width:40px;height:40px;border-radius:50%;border:2px solid #06b6d4}
-    .profile .info{display:flex;flex-direction:column;font-size:14px}
-    .profile .info span{font-weight:600}
-    .container{padding:30px;display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px}
-    .game-card{background:#1e293b;border-radius:16px;padding:20px;text-align:center;box-shadow:0 8px 20px rgba(0,0,0,0.4);transition:transform .2s}
-    .game-card:hover{transform:scale(1.05)}
-    .game-card img{width:100%;height:150px;object-fit:cover;border-radius:12px;pointer-events:none;user-select:none}
-    .game-card button{margin-top:12px;padding:10px 14px;width:100%;border:none;border-radius:10px;background:linear-gradient(90deg,#7c3aed,#06b6d4);color:#fff;font-weight:600;cursor:pointer}
-    #gamePlayer{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:2000;flex-direction:column}
-    #gamePlayer iframe{flex:1;width:100%;border:none}
-    #gameControls{display:flex;justify-content:space-between;align-items:center;padding:10px;background:#111}
-    #gameControls button{padding:8px 14px;border:none;border-radius:8px;font-weight:600;cursor:pointer}
-    .likeBtn{background:#ef4444;color:#fff}
-    .fullscreenBtn{background:#06b6d4;color:#fff}
-    .closeBtn{background:#7c3aed;color:#fff}
-    #ranks{padding:20px}
-    #ranks h2{text-align:center;margin-bottom:20px}
-    .rank-card{background:#111;border-radius:14px;padding:15px;display:flex;align-items:center;gap:12px;margin-bottom:10px}
-    .rank-card img{width:40px;height:40px;border-radius:50%}
-    .rank-card strong{flex:1}
-    .hidden{display:none!important}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Games — TyVila</title>
+<link rel="icon" href="https://www.tyvila.online/cdn/favicon.ico">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary:#7c3aed;
+  --secondary:#06b6d4;
+  --dark:#111;
+  --light:#f9f9f9;
+}
+body {
+  margin:0;
+  font-family:Inter,sans-serif;
+  background:linear-gradient(135deg,var(--primary),var(--secondary));
+  color:#fff;
+  overflow-x:hidden;
+}
+header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:15px 25px;
+  background:rgba(0,0,0,0.25);
+  backdrop-filter:blur(10px);
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+header h1 {font-size:20px;font-weight:700}
+.profile {position:relative}
+.profile img {
+  width:45px;height:45px;border-radius:50%;cursor:pointer;
+  border:2px solid #ffeb3b;
+}
+.dropdown {
+  display:none;position:absolute;right:0;top:55px;
+  background:#fff;color:#000;border-radius:12px;
+  box-shadow:0 8px 30px rgba(0,0,0,0.2);overflow:hidden;
+}
+.dropdown button {
+  display:block;width:100%;padding:12px;border:none;
+  background:none;text-align:left;cursor:pointer;font-weight:600;
+}
+.dropdown button:hover {background:#f0f0f0}
+.stats {text-align:center;padding:20px}
+.stats h2 {margin:5px 0}
+.gamesGrid {
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:20px;padding:20px;
+}
+.gameCard {
+  background:#fff;color:#000;border-radius:16px;
+  box-shadow:0 8px 25px rgba(0,0,0,0.15);
+  overflow:hidden;display:flex;flex-direction:column;
+}
+.gameCard img {width:100%;height:160px;object-fit:cover}
+.gameCard .content {
+  padding:15px;flex:1;display:flex;flex-direction:column;
+  justify-content:space-between;
+}
+.gameCard h3 {margin:0 0 10px;font-size:18px;font-weight:700}
+.gameCard p {font-size:14px;color:#555;flex:1}
+.gameCard button {
+  margin-top:10px;padding:10px;border:none;border-radius:8px;
+  background:linear-gradient(90deg,var(--primary),var(--secondary));
+  color:#fff;font-weight:600;cursor:pointer;
+}
+.toast {
+  position:fixed;bottom:20px;right:20px;background:#111;color:#fff;
+  padding:12px 20px;border-radius:12px;display:none;z-index:99;
+}
+.rank {font-size:14px;color:#ffeb3b;font-weight:700}
+
+/* In-game modal */
+#gameModal {
+  display:none;position:fixed;top:0;left:0;width:100%;height:100%;
+  background:#000;z-index:1000;flex-direction:column;
+}
+#gameHeader {
+  display:flex;justify-content:space-between;align-items:center;
+  padding:10px;background:#111;color:#fff;
+}
+#gameFrame {
+  flex:1;border:none;width:100%;
+}
+#gameHeader button {
+  margin-left:10px;padding:8px 12px;border:none;border-radius:6px;
+  background:var(--secondary);color:#fff;cursor:pointer;font-weight:600;
+}
+</style>
 </head>
 <body oncontextmenu="return false">
 
 <header>
-  <img src="https://www.tyvila.online/cdn/ty.webp" alt="TyVila Logo">
-  <div id="profileArea" class="profile hidden">
-    <img id="userAvatar" src="https://www.tyvila.online/cdn/default-avatar.png">
-    <div class="info">
-      <span id="userName">Guest</span>
-      <small id="userEmail"></small>
-      <small id="userPoints">0 pts</small>
+  <h1>🎮 TyVila Games</h1>
+  <div class="profile">
+    <img id="profilePic" src="https://www.tyvila.online/cdn/default-avatar.png" alt="profile">
+    <div class="dropdown" id="dropdownMenu">
+      <button onclick="window.location.href='accounts.html'">Account Info</button>
+      <button onclick="logout()">Logout</button>
     </div>
   </div>
-  <button id="loginBtn">Login</button>
 </header>
 
-<section class="container" id="gamesSection" class="hidden">
-  <div class="game-card">
-    <img src="https://picsum.photos/400/200?random=1" alt="Game1">
-    <h3>Jeep Driver</h3>
-    <button onclick="playGame('https://example.com/jeepdriver')">Play</button>
-  </div>
-  <div class="game-card">
-    <img src="https://picsum.photos/400/200?random=2" alt="Game2">
-    <h3>Xando</h3>
-    <button onclick="playGame('online-xando.html')">Play</button>
-  </div>
+<div class="stats">
+  <h2 id="username">Loading...</h2>
+  <p id="points">Points: -</p>
+  <p class="rank" id="rank">Rank: -</p>
+  <p id="gameCount">Games Available: 0</p>
+</div>
 
-</section>
+<div class="gamesGrid" id="gamesGrid"></div>
+<div class="toast" id="toast"></div>
 
-<section id="ranks">
-  <h2>🏆 Global Ranks</h2>
-  <div id="rankList"></div>
-</section>
-
-<div id="gamePlayer">
-  <div id="gameControls">
-    <button class="likeBtn" onclick="likeGame()">❤️ Like</button>
-    <button class="fullscreenBtn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
-    <button class="closeBtn" onclick="closeGame()">✖ Close</button>
+<!-- Game Modal -->
+<div id="gameModal">
+  <div id="gameHeader">
+    <span id="gameTitle"></span>
+    <div>
+      <button onclick="likeGame()">❤️ Like</button>
+      <button onclick="toggleFullscreen()">⛶ Fullscreen</button>
+      <button onclick="closeGame()">✖ Exit</button>
+    </div>
   </div>
   <iframe id="gameFrame"></iframe>
 </div>
 
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+const supabase = createClient("https://wwcedhbbdoyrmquokyjj.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4")
 
-const supabase = createClient(
-  "https://wwcedhbbdoyrmquokyjj.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4"
-)
+function showToast(msg){const t=document.getElementById("toast");t.textContent=msg;t.style.display="block";setTimeout(()=>t.style.display="none",3000)}
 
-const loginBtn=document.getElementById("loginBtn")
-const profileArea=document.getElementById("profileArea")
-const gamesSection=document.getElementById("gamesSection")
+const profilePic=document.getElementById("profilePic"),dropdown=document.getElementById("dropdownMenu")
+profilePic.onclick=()=>{dropdown.style.display=dropdown.style.display==="block"?"none":"block"}
 
-function maskEmail(email){
-  if(!email) return ""
-  let [user,domain]=email.split("@")
-  return user.slice(0,2)+"*****@"+domain[0]+"****."+domain.slice(-2)
-}
+async function logout(){await supabase.auth.signOut();showToast("Logged out");setTimeout(()=>window.location.href="login.html",1000)}
+window.logout=logout
 
+let currentUser=null
 async function loadUser(){
-  const { data:{ user } } = await supabase.auth.getUser()
-  if(user){
-    loginBtn.classList.add("hidden")
-    profileArea.classList.remove("hidden")
-    gamesSection.classList.remove("hidden")
-
-    let { data:profiles }=await supabase.from("profiles").select("*").eq("id",user.id).single()
-    if(!profiles){
-      const { data:inserted }=await supabase.from("profiles").insert({
-        id:user.id,
-        username:user.user_metadata.full_name || user.email.split("@")[0],
-        email:user.email,
-        avatar_url:user.user_metadata.avatar_url||"https://www.tyvila.online/cdn/default-avatar.png",
-        points:0
-      }).select().single()
-      profiles=inserted
-    }
-
-    document.getElementById("userAvatar").src=profiles.avatar_url
-    document.getElementById("userName").textContent=profiles.username
-    document.getElementById("userEmail").textContent=maskEmail(profiles.email)
-    document.getElementById("userPoints").textContent=profiles.points+" pts"
-  }else{
-    gamesSection.classList.add("hidden")
-    profileArea.classList.add("hidden")
-    loginBtn.classList.remove("hidden")
+  const { data:{ user } }=await supabase.auth.getUser()
+  if(!user){window.location.href="login.html";return}
+  currentUser=user
+  const {data}=await supabase.from("profiles").select("*").eq("id",user.id).single()
+  if(data){
+    document.getElementById("username").textContent=data.username||"Player"
+    document.getElementById("points").textContent="Points: "+data.points
+    profilePic.src=data.avatar_url||"https://www.tyvila.online/cdn/default-avatar.png"
+    let rank="Player"
+    if(data.points>=1000000) rank="🌌 God"
+    else if(data.points>=10000) rank="👑 Crown"
+    document.getElementById("rank").textContent="Rank: "+rank
   }
 }
 loadUser()
 
-loginBtn.onclick=()=>window.location.href="login.html"
-
-async function playGame(url){
-  const { data:{ user } } = await supabase.auth.getUser()
-  if(!user){alert("Please log in first");return}
-
-  await supabase.rpc("increment_points",{ userid:user.id })
-
-  loadUser()
-
-  document.getElementById("gamePlayer").style.display="flex"
-  document.getElementById("gameFrame").src=url
+let gamesData=[]
+async function loadGames(){
+  try {
+    const res=await fetch("https://www.tyvila.online/games/game-app/game.json")
+    gamesData=await res.json()
+    document.getElementById("gameCount").textContent="Games Available: "+gamesData.length
+    const grid=document.getElementById("gamesGrid")
+    gamesData.forEach((g,i)=>{
+      const card=document.createElement("div")
+      card.className="gameCard"
+      card.innerHTML=`
+        <img src="${g.image}" alt="${g.title}">
+        <div class="content">
+          <h3>${g.title}</h3>
+          <p>${g.description.substring(0,80)}...</p>
+          <button onclick="openGame(${i})">Play</button>
+        </div>`
+      grid.appendChild(card)
+    })
+  }catch(e){showToast("Error loading games")}
 }
+loadGames()
 
-function closeGame(){
-  document.getElementById("gamePlayer").style.display="none"
+window.openGame=async function(index){
+  const g=gamesData[index]
+  document.getElementById("gameTitle").textContent=g.title
+  document.getElementById("gameFrame").src=g.embed
+  document.getElementById("gameModal").style.display="flex"
+
+  if(currentUser){
+    await supabase.from("profiles").update({points:supabase.rpc('increment_points',{userid:currentUser.id,inc:1})}).eq("id",currentUser.id)
+    loadUser()
+  }
+}
+window.closeGame=function(){
+  document.getElementById("gameModal").style.display="none"
   document.getElementById("gameFrame").src=""
 }
-
-function likeGame(){ alert("You liked this game ❤️") }
-
-function toggleFullscreen(){
-  let elem=document.getElementById("gameFrame")
-  if(!document.fullscreenElement){ elem.requestFullscreen() }
-  else{ document.exitFullscreen() }
+window.likeGame=function(){showToast("You liked this game ❤️")}
+window.toggleFullscreen=function(){
+  const frame=document.getElementById("gameFrame")
+  if(frame.requestFullscreen) frame.requestFullscreen()
+  else if(frame.webkitRequestFullscreen) frame.webkitRequestFullscreen()
 }
-
-async function loadRanks(){
-  const { data }=await supabase.from("profiles").select("*").order("points",{ascending:false}).limit(20)
-  const rankList=document.getElementById("rankList")
-  rankList.innerHTML=""
-  data.forEach((p,i)=>{
-    let div=document.createElement("div")
-    div.className="rank-card"
-    div.innerHTML=`
-      <span>#${i+1}</span>
-      <img src="${p.avatar_url||"https://www.tyvila.online/cdn/default-avatar.png"}">
-      <strong>${p.username}</strong>
-      <small>${maskEmail(p.email)}</small>
-      <span>${p.points} pts</span>
-    `
-    rankList.appendChild(div)
-  })
-}
-loadRanks()
 </script>
-
 </body>
 </html>
