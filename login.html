@@ -7,55 +7,76 @@
 <link rel="icon" href="https://www.tyvila.online/cdn/favicon.ico">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-body{margin:0;background:linear-gradient(135deg,#7c3aed,#06b6d4);font-family:Inter,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;color:#fff}
-.card{background:#fff;padding:30px;border-radius:16px;box-shadow:0 8px 30px rgba(0,0,0,.1);max-width:400px;width:100%;text-align:center;color:#111;margin-bottom:30px}
+body{margin:0;font-family:Inter,sans-serif;background:linear-gradient(135deg,#7c3aed,#06b6d4);display:flex;justify-content:center;align-items:center;min-height:100vh;color:#fff}
+.container{display:flex;flex-direction:column;align-items:center;width:100%;max-width:450px;padding:20px}
+.card{background:#fff;width:100%;border-radius:16px;padding:30px;box-shadow:0 8px 30px rgba(0,0,0,0.1);text-align:center;color:#111;margin-bottom:20px;position:relative}
 .card img{width:60px;margin-bottom:20px}
 .card h1{margin-bottom:20px}
-input{width:100%;padding:12px;margin:10px 0;border:1px solid #ccc;border-radius:8px}
-button{width:100%;padding:12px;margin:10px 0;border:none;border-radius:8px;font-weight:600;cursor:pointer}
-.loginBtn{background:linear-gradient(90deg,#7c3aed,#06b6d4);color:white}
+input{width:100%;padding:12px;margin:10px 0;border:1px solid #ccc;border-radius:8px;font-size:14px}
+button{width:100%;padding:12px;margin:10px 0;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:15px}
+.loginBtn{background:linear-gradient(90deg,#7c3aed,#06b6d4);color:#fff}
 .googleBtn{background:#fff;color:#444;border:1px solid #ddd;display:flex;align-items:center;justify-content:center;gap:10px}
 .googleBtn img{width:20px;height:20px}
-.topPlayer{background:rgba(255,255,255,0.2);border-radius:12px;padding:15px;margin-top:20px;color:#fff;display:flex;align-items:center;gap:10px;flex-direction:column}
+.topPlayer{background:rgba(255,255,255,0.2);border-radius:12px;padding:15px;margin-top:20px;color:#fff;display:flex;flex-direction:column;align-items:center;gap:10px}
 .topPlayer img{width:60px;height:60px;border-radius:50%;border:2px solid #ffeb3b}
+#customAlert{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#ff4444;color:#fff;padding:15px 25px;border-radius:12px;display:none;z-index:1000;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,0.3)}
 </style>
 </head>
 <body>
-<div class="card">
-  <img src="https://www.tyvila.online/cdn/ty.webp">
-  <h1>Login to TyVila</h1>
-  <form id="emailForm">
-    <input type="email" name="email" placeholder="Email" required>
-    <input type="password" name="password" placeholder="Password" required>
-    <button type="submit" class="loginBtn">Login with Email</button>
-  </form>
-  <button id="googleBtn" class="googleBtn">
-    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg">
-    Sign in with Google
-  </button>
+<div class="container">
+  <div class="card">
+    <img src="https://www.tyvila.online/cdn/ty.webp" alt="TyVila Logo">
+    <h1>Login to TyVila</h1>
+    <form id="emailForm">
+      <input type="email" name="email" placeholder="Email" required>
+      <input type="password" name="password" placeholder="Password" required>
+      <button type="submit" class="loginBtn">Login with Email</button>
+    </form>
+    <button id="googleBtn" class="googleBtn">
+      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg">
+      Sign in with Google
+    </button>
+  </div>
+
+  <div class="topPlayer" id="topPlayer">
+    <strong>🏆 Top Player:</strong>
+    <img src="https://www.tyvila.online/cdn/default-avatar.png" alt="Top Player Avatar">
+    <span id="topUsername">Loading...</span>
+    <span id="topPoints">0 pts</span>
+    <em>Could be you!</em>
+  </div>
 </div>
-<div class="topPlayer" id="topPlayer">
-  <strong>🏆 Top Player:</strong>
-  <img src="https://www.tyvila.online/cdn/default-avatar.png">
-  <span id="topUsername">Loading...</span>
-  <span id="topPoints">0 pts</span>
-  <em>Could be you!</em>
-</div>
+
+<div id="customAlert"></div>
 
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
-const supabase = createClient("https://wwcedhbbdoyrmquokyjj.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4")
+const supabase = createClient(
+  "https://wwcedhbbdoyrmquokyjj.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4"
+)
+
+function showAlert(msg){
+  const alertDiv=document.getElementById("customAlert")
+  alertDiv.textContent=msg
+  alertDiv.style.display="block"
+  setTimeout(()=>alertDiv.style.display="none",3000)
+}
 
 document.getElementById("emailForm").onsubmit=async e=>{
   e.preventDefault()
   const form=new FormData(e.target)
-  const {error}=await supabase.auth.signInWithPassword({email:form.get("email"),password:form.get("password")})
-  if(error){alert(error.message)}else{window.location.href="accounts.html"}
+  const {error}=await supabase.auth.signInWithPassword({
+    email:form.get("email"),
+    password:form.get("password")
+  })
+  if(error){ showAlert(error.message) }
+  else{ window.location.href="accounts.html" }
 }
 
 document.getElementById("googleBtn").onclick=async()=>{
   const {error}=await supabase.auth.signInWithOAuth({provider:"google"})
-  if(error)alert(error.message)
+  if(error) showAlert(error.message)
 }
 
 async function loadTopPlayer(){
