@@ -13,13 +13,15 @@ header img{height:40px}
 header .user{display:flex;align-items:center;gap:10px}
 header .user img{width:35px;height:35px;border-radius:50%;border:2px solid #ffeb3b}
 main{flex:1;padding:20px;display:flex;flex-direction:column;align-items:center}
+#topGame{width:90%;margin-bottom:20px;border-radius:16px;overflow:hidden;cursor:pointer;transition:0.3s;position:relative}
+#topGame img{width:100%;height:220px;object-fit:cover;border-radius:16px}
+#topGame .info{position:absolute;bottom:10px;left:10px;color:#fff;background:rgba(0,0,0,0.5);padding:10px;border-radius:10px}
 #gameContainer{display:flex;flex-wrap:wrap;gap:15px;width:100%;justify-content:center}
 .gameCard{background:rgba(255,255,255,0.1);border-radius:16px;overflow:hidden;cursor:pointer;transition:0.3s;flex:1 1 220px;max-width:250px}
 .gameCard img{width:100%;height:140px;object-fit:cover}
 .gameCard .info{padding:10px;text-align:center}
 .gameCard .info h3{margin:5px 0;font-size:16px}
-.gameCard .info p{font-size:12px;color:#ddd;margin:0}
-#playModal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px;z-index:999}
+#playModal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px;z-index:999}
 #playModal iframe{width:90%;height:70%;border:none;border-radius:12px}
 #playModal .modalHeader{width:90%;display:flex;justify-content:space-between;align-items:center;color:#fff;margin-bottom:10px}
 #playModal button{padding:8px 12px;border:none;border-radius:8px;cursor:pointer;font-weight:600}
@@ -41,7 +43,9 @@ main{flex:1;padding:20px;display:flex;flex-direction:column;align-items:center}
   </div>
 </header>
 <main>
+  <div id="topGame"></div>
   <div id="gameContainer"></div>
+  <div id="moreGames"></div>
 
   <div id="playModal">
     <div class="modalHeader">
@@ -55,8 +59,6 @@ main{flex:1;padding:20px;display:flex;flex-direction:column;align-items:center}
     <iframe id="gameFrame"></iframe>
     <div>Plays: <span id="playsCount">0</span></div>
   </div>
-
-  <div id="moreGames"></div>
 </main>
 
 <script type="module">
@@ -67,6 +69,7 @@ const supabase = createClient(
 )
 let currentUser
 let pointsInterval
+let gamesList=[]
 
 async function loadUser(){
   const {data:{user}}=await supabase.auth.getUser()
@@ -81,14 +84,30 @@ async function loadUser(){
 }
 
 async function loadGames(){
-  const {data,error}=await supabase.from("games").select("*").order("plays",{ascending:false})
-  if(error)return console.error(error)
+  const res = await fetch("https://www.onlinegames.io/media/plugins/genGames/embed.json")
+  gamesList = await res.json()
+
+  const topGameDiv=document.getElementById("topGame")
   const container=document.getElementById("gameContainer")
+  const moreGamesDiv=document.getElementById("moreGames")
   container.innerHTML=""
-  data.forEach(g=>{
+  moreGamesDiv.innerHTML=""
+  if(gamesList.length>0){
+    const top=gamesList[0]
+    topGameDiv.innerHTML=`<img src="${top.image}" alt="${top.title}"><div class="info"><h3>${top.title}</h3><p>${top.description||""}</p></div>`
+    topGameDiv.onclick=()=>openGame(top)
+  }
+  gamesList.slice(1).forEach(g=>{
+    const card=document.createElement("div")
+    card.className="moreCard"
+    card.innerHTML=`<img src="${g.image}"><p>${g.title}</p>`
+    card.onclick=()=>openGame(g)
+    moreGamesDiv.appendChild(card)
+  })
+  gamesList.slice(1).forEach(g=>{
     const card=document.createElement("div")
     card.className="gameCard"
-    card.innerHTML=`<img src="${g.image_url}" alt="${g.name}"><div class="info"><h3>${g.name}</h3><p>${g.description||""}</p></div>`
+    card.innerHTML=`<img src="${g.image}" alt="${g.title}"><div class="info"><h3>${g.title}</h3><p>${g.description||""}</p></div>`
     card.onclick=()=>openGame(g)
     container.appendChild(card)
   })
@@ -97,19 +116,19 @@ async function loadGames(){
 async function openGame(game){
   const modal=document.getElementById("playModal")
   modal.style.display="flex"
-  document.getElementById("modalGameName").textContent=game.name
-  document.getElementById("gameFrame").src=game.embed_url
-  document.getElementById("playsCount").textContent=game.plays
-  history.pushState(null,"",`?game=${game.name.replace(/\s+/g,"-")}`)
+  document.getElementById("modalGameName").textContent=game.title
+  document.getElementById("gameFrame").src=game.embed
+  document.getElementById("playsCount").textContent=game.plays||0
+  history.pushState(null,"",`?game=${game.title.replace(/\s+/g,"-")}`)
   pointsInterval=setInterval(async()=>{
     await supabase.rpc("increment_points",{userid:currentUser.id})
     let {data}=await supabase.from("profiles").select("points").eq("id",currentUser.id).maybeSingle()
     if(data)document.getElementById("points").textContent=data.points+" pts"
   },1000)
   document.getElementById("likeBtn").onclick=async()=>{
-    await supabase.from("games").update({likes:game.likes+1}).eq("id",game.id)
+    if(game.likes==undefined) game.likes=0
     game.likes++
-    alert("Liked!")
+    alert("Liked! Total Likes: "+game.likes)
   }
   document.getElementById("fullscreenBtn").onclick=()=>{
     const iframe=document.getElementById("gameFrame")
