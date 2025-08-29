@@ -1,222 +1,82 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Login — TyVila</title>
 <link rel="icon" href="https://www.tyvila.online/cdn/favicon.ico">
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg1: #050510;
-  --bg2: #0c0c1a;
-  --neon1: #7c3aed;
-  --neon2: #06b6d4;
-  --error: #ff4d6d;
-  --success: #32ff91;
-}
-* { box-sizing: border-box; }
-body {
-  margin: 0;
-  font-family: 'Inter', sans-serif;
-  color: white;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: linear-gradient(180deg, var(--bg1), var(--bg2));
-  overflow: hidden;
-}
-body::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: url("https://www.tyvila.online/cdn/LOGIN.webp") center/cover no-repeat;
-  opacity: 0.15;
-  animation: floatBg 20s infinite alternate ease-in-out;
-}
-@keyframes floatBg {
-  0% { transform: scale(1) translateY(0); }
-  100% { transform: scale(1.1) translateY(-20px); }
-}
-.container {
-  position: relative;
-  width: 95%;
-  max-width: 1000px;
-  background: rgba(10,10,25,0.85);
-  border: 3px solid transparent;
-  border-image: linear-gradient(90deg, var(--neon1), var(--neon2)) 1;
-  border-radius: 20px;
-  padding: 40px;
-  box-shadow: 0 0 30px rgba(124,58,237,0.4), 0 0 50px rgba(6,182,212,0.3);
-  animation: glowPulse 3s infinite alternate;
-}
-@keyframes glowPulse {
-  0% { box-shadow: 0 0 20px rgba(124,58,237,0.5); }
-  100% { box-shadow: 0 0 40px rgba(6,182,212,0.7); }
-}
-h1 {
-  font-family: 'Press Start 2P', cursive;
-  font-size: 28px;
-  text-align: center;
-  margin: 0 0 20px;
-  background: linear-gradient(90deg, var(--neon1), var(--neon2));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-label { font-size: 14px; }
-input {
-  padding: 14px;
-  border-radius: 12px;
-  border: none;
-  background: rgba(255,255,255,0.08);
-  color: white;
-  font-size: 16px;
-  outline: none;
-  transition: all 0.2s;
-}
-input:focus {
-  background: rgba(255,255,255,0.15);
-  box-shadow: 0 0 10px var(--neon2);
-}
-button.primary, button.google {
-  padding: 14px;
-  border-radius: 12px;
-  border: none;
-  font-size: 18px;
-  font-weight: bold;
-  color: white;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-button.primary {
-  background: linear-gradient(90deg, var(--neon1), var(--neon2));
-}
-button.primary:hover {
-  transform: scale(1.08) rotate(-1deg);
-  box-shadow: 0 0 20px var(--neon2);
-}
-button.google {
-  background: #DB4437;
-  margin-top: 10px;
-}
-button.google:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 15px #DB4437;
-}
-.links {
-  display: flex;
-  justify-content: space-between;
-  font-size: 14px;
-}
-.links a {
-  color: #cfeffd;
-  text-decoration: none;
-  transition: color 0.2s;
-}
-.links a:hover { color: var(--neon2); }
-.error-msg {
-  color: var(--error);
-  text-align: center;
-  min-height: 20px;
-}
-.success-msg {
-  color: var(--success);
-  text-align: center;
-  min-height: 20px;
-}
+:root{--bg1:#7c3aed;--bg2:#06b6d4;--card:#ffffff;--muted:#6b7280}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}
+body{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--bg1),var(--bg2))}
+.card{width:96%;max-width:420px;background:var(--card);border-radius:16px;padding:22px;box-shadow:0 20px 60px rgba(2,6,23,0.35);text-align:center}
+.logo{width:72px;margin:0 auto 6px}
+h1{font-size:20px;margin-bottom:8px;color:#0f1724}
+p.small{color:var(--muted);margin-bottom:18px}
+input{width:100%;padding:12px;margin:8px 0;border-radius:10px;border:1px solid #e6eef8}
+.btn{width:100%;padding:12px;border-radius:10px;border:none;margin-top:8px;font-weight:800;cursor:pointer}
+.btn.primary{background:linear-gradient(90deg,var(--bg1),var(--bg2));color:white}
+.btn.google{background:#fff;color:#111;display:flex;align-items:center;justify-content:center;gap:10px;border:1px solid #eee}
+.top-player{display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;background:linear-gradient(90deg,rgba(124,58,237,0.08),rgba(6,182,212,0.04));margin-bottom:12px}
+.top-player img{width:56px;height:56px;border-radius:50%}
+.top-player .info{flex:1;text-align:left}
+.small-muted{color:#475569;font-size:13px}
 </style>
 </head>
-<body>
-<div class="container">
-  <h1>🎮 TyVila Login 🎮</h1>
-  <form id="loginForm">
-    <div class="error-msg" id="loginError"></div>
-    <div class="success-msg" id="loginSuccess"></div>
-
-    <label for="identifier">Email or Username</label>
-    <input id="identifier" type="text" placeholder="you@example.com or username" required>
-
-    <label for="password">Password</label>
-    <input id="password" type="password" placeholder="Enter password" required>
-
-    <button class="primary" type="submit">▶ Enter Game</button>
-    <button type="button" class="google" id="googleLogin">🔑 Sign in with Google</button>
-
-    <div class="links">
-      <a href="signup.html">🆕 Create account</a>
-      <a href="#" id="forgotLink">❓ Forgot password?</a>
+<body oncontextmenu="return false">
+<div class="card">
+  <img class="logo" src="https://www.tyvila.online/cdn/ty.webp" alt="logo">
+  <h1>Welcome to TyVila</h1>
+  <div id="topSpot" class="top-player">
+    <img id="topAvatar" src="https://www.tyvila.online/cdn/default-avatar.png" alt="top player">
+    <div class="info">
+      <div id="topName" style="font-weight:800">Top Player</div>
+      <div id="topPoints" class="small-muted">— pts</div>
     </div>
+    <div style="font-weight:700;color:#0f1724">That could be you</div>
+  </div>
+
+  <form id="emailForm">
+    <input type="email" name="email" placeholder="Email" required>
+    <input type="password" name="password" placeholder="Password" required>
+    <button class="btn primary" type="submit">Sign in with Email</button>
   </form>
+
+  <div style="margin:10px 0"><button id="googleBtn" class="btn google"><img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" style="width:20px;height:20px"> Sign in with Google</button></div>
+
+  <div style="margin-top:10px" class="small-muted">By signing in you agree to our <a href="terms.html">Terms</a>.</div>
 </div>
 
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
-const supabase = createClient(
-  "https://wwcedhbbdoyrmquokyjj.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4"
-)
+const supabase = createClient('https://wwcedhbbdoyrmquokyjj.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4')
 
-function isValidInput(str){return /^[A-Za-z0-9@.]+$/.test(str)}
-
-async function sendResetLink(email){
-  await supabase.auth.resetPasswordForEmail(email,{
-    redirectTo:"https://www.tyvila.online/reset.html"
-  })
-}
-
-document.getElementById("loginForm").addEventListener("submit",async e=>{
+document.getElementById('emailForm').addEventListener('submit', async (e)=>{
   e.preventDefault()
-  const id=document.getElementById("identifier").value.trim()
-  const pw=document.getElementById("password").value
-  const err=document.getElementById("loginError")
-  const ok=document.getElementById("loginSuccess")
-  err.textContent=""; ok.textContent=""
-
-  if(!isValidInput(id)||!pw){err.textContent="Invalid input";return}
-
-  let email=id
-  if(!id.includes("@")){
-    const {data:userRow}=await supabase.from("profiles").select("email").eq("username",id).maybeSingle()
-    if(!userRow){err.textContent="User not found";return}
-    email=userRow.email
-  }
-
-  const {data,error}=await supabase.auth.signInWithPassword({email,password:pw})
-  if(error){err.textContent=error.message;return}
-  const user=data.user
-  if(!user.confirmed_at){err.textContent="Verify your email first";return}
-
-  if(user.email==="admin@tyvila.online"){
-    const choice=confirm("Login as admin?\nOK = Dashboard, Cancel = Website")
-    window.location.href= choice? "admin.html":"account.html"
-  } else {
-    ok.textContent="Login successful! Redirecting…"
-    setTimeout(()=>window.location.href="account.html",800)
-  }
+  const fd = new FormData(e.target)
+  const email = fd.get('email')
+  const password = fd.get('password')
+  const { error } = await supabase.auth.signInWithPassword({ email, password })
+  if(error) return alert(error.message)
+  window.location.href = 'accounts.html'
 })
 
-document.getElementById("googleLogin").addEventListener("click",async()=>{
-  const {data,error}=await supabase.auth.signInWithOAuth({
-    provider:"google",
-    options:{
-      redirectTo:"https://www.tyvila.online/account.html"
-    }
-  })
+document.getElementById('googleBtn').addEventListener('click', async ()=>{
+  const { error } = await supabase.auth.signInWithOAuth({ provider: 'google' })
   if(error) alert(error.message)
 })
 
-document.getElementById("forgotLink").addEventListener("click",async e=>{
-  e.preventDefault()
-  const email=prompt("Enter your email to reset password")
-  if(email&&!isValidInput(email)){alert("Invalid input");return}
-  if(email){await sendResetLink(email);alert("Reset link sent. Check inbox.")}
-})
+async function loadTopPlayer(){
+  const { data } = await supabase.from('profiles').select('username,avatar_url,points').order('points',{ascending:false}).limit(1)
+  if(data && data[0]){
+    const p = data[0]
+    document.getElementById('topAvatar').src = p.avatar_url || 'https://www.tyvila.online/cdn/default-avatar.png'
+    document.getElementById('topName').textContent = p.username
+    document.getElementById('topPoints').textContent = (p.points ?? 0) + ' pts'
+  }
+}
+loadTopPlayer()
 </script>
 </body>
 </html>
