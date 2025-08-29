@@ -4,156 +4,206 @@
   <meta charset="UTF-8">
   <title>Ty's Studio | South African E-Business</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <!-- SEO Metadata -->
-  <meta name="description" content="Ty's Studio is a South African E-Business creating next-level online games, ranks, and digital experiences.">
-  <meta name="keywords" content="Ty's Studio, South African E-Business, Online Games, Ranks, TyVila, Multiplayer">
-  <meta name="author" content="Ty's Studio">
-  <link rel="canonical" href="https://www.tyvila.online/">
-
-  <!-- Social Media Metadata -->
-  <meta property="og:title" content="Ty's Studio | South African E-Business">
-  <meta property="og:description" content="Level up with Ty's Studio. Play games, climb the ranks, and join South Africa's online gaming movement.">
-  <meta property="og:image" content="https://www.tyvila.online/cdn/ty.webp">
-  <meta property="og:url" content="https://www.tyvila.online/">
-  <meta name="twitter:card" content="summary_large_image">
 
   <!-- Favicon -->
   <link rel="icon" href="https://www.tyvila.online/cdn/favicon.ico" type="image/x-icon">
 
-  <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <!-- SEO Metadata -->
+  <meta name="description" content="Ty's Studio is a South African E-Business for online gaming. Play games, view ranks, and join the TyVila community.">
+  <meta name="keywords" content="Ty's Studio, TyVila, South Africa, Games, Online Ranks, Login, Account, Play Games, E-Business">
+  <meta name="author" content="Ty's Studio">
 
-  <!-- Supabase -->
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <!-- Canonical & Categories for Search Engines -->
+  <link rel="canonical" href="https://www.tyvila.online/">
+  <link rel="alternate" href="https://www.tyvila.online/login" hreflang="en">
+  <link rel="alternate" href="https://www.tyvila.online/account" hreflang="en">
+  <link rel="alternate" href="https://www.tyvila.online/games" hreflang="en">
+
+  <!-- Open Graph / Social Media Metadata -->
+  <meta property="og:url" content="https://www.tyvila.online/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Ty's Studio | South African E-Business">
+  <meta property="og:description" content="Play games, climb the ranks, and join Ty's Studio — South Africa’s own online gaming E-business.">
+  <meta property="og:image" content="https://www.tyvila.online/cdn/favicon.ico">
+
+  <!-- Twitter Card Metadata -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Ty's Studio | South African E-Business">
+  <meta name="twitter:description" content="Play games, climb ranks, and join Ty's Studio — powered by South Africa.">
+  <meta name="twitter:image" content="https://www.tyvila.online/cdn/favicon.ico">
+
+  <!-- Structured Data JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Ty's Studio",
+    "url": "https://www.tyvila.online",
+    "logo": "https://www.tyvila.online/cdn/favicon.ico",
+    "sameAs": [
+      "https://www.tyvila.online/login",
+      "https://www.tyvila.online/account",
+      "https://www.tyvila.online/games"
+    ],
+    "address": {
+      "@type": "PostalAddress",
+      "addressCountry": "South Africa"
+    }
+  }
+  </script>
 
   <style>
     body {
       margin: 0;
-      font-family: 'Roboto', sans-serif;
-      background: radial-gradient(circle at top, #101820, #000000);
-      color: #fff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0f172a, #1e293b, #0f766e);
+      color: #f1f5f9;
       text-align: center;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
     }
     header {
-      padding: 20px;
-    }
-    header img {
-      width: 80px;
-      border-radius: 50%;
-    }
-    h1 {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 2.5rem;
-      margin-top: 10px;
-      color: #00ffcc;
-      text-shadow: 0 0 15px #00ffcc;
-    }
-    .flag {
-      margin-top: 10px;
-      width: 60px;
-    }
-    .tagline {
-      font-size: 1.2rem;
-      color: #ccc;
-      margin: 15px 0;
-    }
-    .buttons {
-      margin: 40px 0;
+      padding: 1.5rem;
+      background: rgba(0,0,0,0.5);
       display: flex;
       justify-content: center;
-      gap: 25px;
-    }
-    .buttons a {
-      padding: 15px 30px;
-      font-size: 1.2rem;
-      border-radius: 40px;
-      background: linear-gradient(135deg, #00ffcc, #0066ff);
-      text-decoration: none;
-      color: #fff;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.4rem;
       font-weight: bold;
-      transition: transform 0.3s, box-shadow 0.3s;
+      letter-spacing: 1px;
     }
-    .buttons a:hover {
-      transform: scale(1.1);
-      box-shadow: 0 0 20px #00ffcc;
+    header img {
+      height: 28px;
+      border-radius: 4px;
+    }
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 2rem;
+      padding: 2rem;
+    }
+    .title {
+      font-size: 3rem;
+      font-weight: bold;
+      background: linear-gradient(90deg, #22d3ee, #facc15, #f43f5e);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .subtitle {
+      font-size: 1.3rem;
+      color: #cbd5e1;
+      max-width: 600px;
+    }
+    .buttons {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .btn {
+      padding: 0.9rem 2rem;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s, background 0.3s;
+    }
+    .btn-play {
+      background: #22d3ee;
+      color: #0f172a;
+    }
+    .btn-play:hover {
+      background: #0ea5e9;
+      transform: scale(1.05);
+    }
+    .btn-ranks {
+      background: #facc15;
+      color: #0f172a;
+    }
+    .btn-ranks:hover {
+      background: #eab308;
+      transform: scale(1.05);
     }
     .top-player {
-      margin-top: 50px;
-      background: rgba(255,255,255,0.05);
-      padding: 20px;
-      border-radius: 15px;
-      display: inline-block;
-      box-shadow: 0 0 10px rgba(0,255,204,0.4);
+      margin-top: 2rem;
+      padding: 1.5rem;
+      background: rgba(255,255,255,0.08);
+      border-radius: 16px;
+      max-width: 400px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
     .top-player h2 {
-      margin: 0;
-      font-size: 1.8rem;
-      color: #ffd700;
-    }
-    .top-player p {
-      margin-top: 8px;
-      font-size: 1.1rem;
-      color: #ccc;
+      margin: 0 0 1rem;
+      font-size: 1.5rem;
+      color: #38bdf8;
     }
     footer {
-      margin-top: 60px;
-      padding: 20px;
+      padding: 1rem;
       font-size: 0.9rem;
-      color: #888;
-    }
-    footer a {
-      color: #00ffcc;
-      text-decoration: none;
+      background: rgba(0,0,0,0.5);
     }
   </style>
 </head>
 <body>
   <header>
-    <img src="https://www.tyvila.online/cdn/ty.webp" alt="Ty's Studio Logo">
-    <h1>Ty's Studio</h1>
-    <img src="https://upload.wikimedia.org/wikipedia/commons/a/af/Flag_of_South_Africa.svg" class="flag" alt="South Africa Flag">
-    <p class="tagline">A South African E-Business bringing you world-class online gaming & experiences.</p>
+    <img src="https://flagcdn.com/w20/za.png" alt="South African Flag">
+    Ty's Studio — A Proud South African E-Business
   </header>
 
-  <div class="buttons">
-    <a href="login.html">▶ Play</a>
-    <a href="ranks.html">🏆 Ranks</a>
-  </div>
+  <main>
+    <div class="title">Welcome to Ty's Studio</div>
+    <div class="subtitle">Play games, climb the ranks, and be part of South Africa’s future of online gaming.</div>
 
-  <div class="top-player">
-    <h2 id="topPlayerName">Loading Top Player...</h2>
-    <p>That could be YOU! Start playing now.</p>
-  </div>
+    <div class="buttons">
+      <button class="btn btn-play" onclick="window.location.href='games.html'">🎮 Play Now</button>
+      <button class="btn btn-ranks" onclick="window.location.href='ranks.html'">🏆 View Ranks</button>
+    </div>
+
+    <div class="top-player">
+      <h2>🌟 Top Player</h2>
+      <p id="top-player-info">Loading...</p>
+      <p><em>That could be you!</em></p>
+    </div>
+  </main>
 
   <footer>
-    <p>© 2025 Ty's Studio | Built with ❤️ in South Africa</p>
-    <p><a href="https://www.tyvila.online/">www.tyvila.online</a></p>
+    © 2025 Ty's Studio. Proudly made in South Africa 🇿🇦
   </footer>
 
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script>
-    const supabaseUrl = "https://wwcedhbbdboyrmquokyjj.supabase.co";
-    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4";
-    const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+    const supabase = window.supabase.createClient(
+      "https://wwcedhbbdboyrmquokyjj.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4"
+    );
 
-    async function fetchTopPlayer() {
-      let { data, error } = await supabaseClient
-        .from("profiles")
-        .select("username, points")
-        .order("points", { ascending: false })
+    async function loadTopPlayer() {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('username, points')
+        .order('points', { ascending: false })
         .limit(1);
 
       if (error) {
-        console.error("Error fetching top player:", error.message);
-        document.getElementById("topPlayerName").innerText = "No player data yet.";
-      } else if (data.length > 0) {
-        document.getElementById("topPlayerName").innerText = `Top Player: ${data[0].username} (${data[0].points} pts)`;
+        document.getElementById('top-player-info').textContent = "Error loading top player.";
+        return;
+      }
+
+      if (data.length > 0) {
+        const player = data[0];
+        document.getElementById('top-player-info').textContent =
+          `${player.username} — ${player.points} points`;
       } else {
-        document.getElementById("topPlayerName").innerText = "No top player yet.";
+        document.getElementById('top-player-info').textContent = "No players yet.";
       }
     }
 
-    fetchTopPlayer();
+    loadTopPlayer();
   </script>
 </body>
 </html>
