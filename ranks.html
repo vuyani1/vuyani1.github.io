@@ -1,55 +1,161 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>TyVila Rankings</title>
-<link rel="icon" href="https://www.tyvila.online/cdn/favicon.ico">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-<style>
-body{margin:0;font-family:Inter,sans-serif;background:linear-gradient(135deg,#06b6d4,#7c3aed);color:#fff;min-height:100vh;display:flex;flex-direction:column}
-header{padding:15px;text-align:center;background:rgba(0,0,0,0.5);backdrop-filter:blur(10px)}
-h2{margin:10px 0}
-table{width:90%;margin:20px auto;border-collapse:collapse;background:rgba(255,255,255,0.1);border-radius:12px;overflow:hidden}
-th,td{padding:12px;text-align:center}
-tr:nth-child(odd){background:rgba(255,255,255,0.05)}
-.rankBadge{font-weight:700}
-</style>
+  <meta charset="UTF-8">
+  <title>TyVila Ranks</title>
+  <link rel="icon" href="https://www.tyvila.online/cdn/favicon.ico" type="image/x-icon">
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <style>
+    * {
+      margin: 0; padding: 0; box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    header {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    header img {
+      height: 40px;
+    }
+    h1 {
+      font-size: 2rem;
+      margin: 10px 0;
+      text-align: center;
+      color: #00e6ff;
+    }
+    #leaderboard {
+      width: 100%;
+      max-width: 700px;
+      background: rgba(0,0,0,0.6);
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+      padding: 20px;
+      overflow: hidden;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 12px 10px;
+      text-align: left;
+    }
+    th {
+      background: rgba(255,255,255,0.1);
+      font-size: 1rem;
+      color: #00e6ff;
+    }
+    tr {
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    tr:hover {
+      background: rgba(255,255,255,0.05);
+    }
+    td img {
+      border-radius: 50%;
+      height: 40px; width: 40px;
+      object-fit: cover;
+    }
+    .rank {
+      font-weight: bold;
+      color: #FFD700;
+    }
+    .not-logged {
+      margin-top: 15px;
+      color: #ccc;
+      font-size: 0.9rem;
+    }
+    @media (max-width: 600px) {
+      th, td { font-size: 0.8rem; padding: 8px; }
+      td img { height: 30px; width: 30px; }
+    }
+  </style>
 </head>
 <body>
-<header>
-  <h2>🏆 TyVila Player Rankings</h2>
-</header>
-<main>
-  <table>
-    <thead><tr><th>Rank</th><th>Player</th><th>Points</th><th>Badge</th></tr></thead>
-    <tbody id="rankBody"></tbody>
-  </table>
-</main>
+  <header>
+    <img src="https://www.tyvila.online/cdn/ty.webp" alt="TyVila Logo">
+    <a href="login.html" style="color:#00e6ff; text-decoration:none;">Login</a>
+  </header>
 
-<script type="module">
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
-const supabase=createClient(
- "https://wwcedhbbdoyrmquokyjj.supabase.co",
- "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4"
-)
-function getRank(points){
-  if(points>=1000) return "Crown 👑"
-  if(points>=500) return "Diamond 💎"
-  if(points>=250) return "Gold 🥇"
-  if(points>=100) return "Silver 🥈"
-  return "Bronze 🥉"
-}
-async function loadRanks(){
-  let {data}=await supabase.from("profiles").select("username,points,avatar_url").order("points",{ascending:false}).limit(50)
-  const body=document.getElementById("rankBody");body.innerHTML=""
-  data.forEach((u,i)=>{
-    const tr=document.createElement("tr")
-    tr.innerHTML=`<td>#${i+1}</td><td>${u.username}</td><td>${u.points}</td><td class="rankBadge">${getRank(u.points)}</td>`
-    body.appendChild(tr)
-  })
-}
-loadRanks()
-</script>
+  <h1>🏆 TyVila Top Players</h1>
+
+  <div id="leaderboard">
+    <table>
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>Avatar</th>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Points</th>
+        </tr>
+      </thead>
+      <tbody id="leaderboard-body">
+        <tr><td colspan="5" style="text-align:center;">Loading...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="not-logged">No login needed — everyone can view ranks.</div>
+
+  <script>
+    const supabase = supabase.createClient(
+      "https://wwcedhbbbdoyrmquokyjj.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4"
+    );
+
+    function maskEmail(email) {
+      return email.replace(/(.).+(@.).+(\..+)/,
+        (_, a, b, c) => a + "*****" + b + "***" + c
+      );
+    }
+
+    async function loadLeaderboard() {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("username, email, points, rank, avatar_url")
+        .order("points", { ascending: false })
+        .limit(50);
+
+      if (error) {
+        console.error(error);
+        document.getElementById("leaderboard-body").innerHTML =
+          `<tr><td colspan="5">Error loading ranks</td></tr>`;
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        document.getElementById("leaderboard-body").innerHTML =
+          `<tr><td colspan="5">No players yet</td></tr>`;
+        return;
+      }
+
+      document.getElementById("leaderboard-body").innerHTML = data.map(player => `
+        <tr>
+          <td class="rank">#${player.rank}</td>
+          <td><img src="${player.avatar_url || 'https://api.dicebear.com/9.x/identicon/svg'}"></td>
+          <td>${player.username || "Anonymous"}</td>
+          <td>${maskEmail(player.email || "")}</td>
+          <td>${player.points}</td>
+        </tr>
+      `).join("");
+    }
+
+    loadLeaderboard();
+
+    setInterval(loadLeaderboard, 30000);
+  </script>
 </body>
 </html>
