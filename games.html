@@ -11,100 +11,55 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg1:#050510; --bg2:#0c0c1a;
-  --neon1:#7c3aed; --neon2:#06b6d4;
-  --error:#ff4d6d; --success:#32ff91;
-}
+:root{--bg1:#050510;--bg2:#0c0c1a;--n1:#7c3aed;--n2:#06b6d4;--ok:#32ff91;--mut:#a7b0c0}
 *{box-sizing:border-box;margin:0;padding:0}
-body{
-  font-family:'Inter',sans-serif;
-  background:linear-gradient(180deg,var(--bg1),var(--bg2));
-  color:white; min-height:100vh;
-  display:flex; flex-direction:column;
-}
-header{
-  display:flex; align-items:center; justify-content:space-between;
-  padding:15px 25px; background:rgba(15,15,35,.9);
-  border-bottom:2px solid transparent;
-  border-image:linear-gradient(90deg,var(--neon1),var(--neon2)) 1;
-}
-.header-title{
-  font-family:'Press Start 2P',cursive;
-  font-size:20px; text-align:center;
-  background:linear-gradient(90deg,var(--neon1),var(--neon2));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  display:flex; align-items:center; gap:10px;
-}
-.header-title img{height:40px}
+body{font-family:'Inter',sans-serif;background:linear-gradient(180deg,var(--bg1),var(--bg2));color:#fff;min-height:100vh;display:flex;flex-direction:column}
+header{display:flex;align-items:center;justify-content:space-between;padding:14px 22px;background:rgba(15,15,35,.9);border-bottom:2px solid transparent;border-image:linear-gradient(90deg,var(--n1),var(--n2)) 1}
+.header-title{font-family:'Press Start 2P',cursive;font-size:18px;display:flex;align-items:center;gap:10px;background:linear-gradient(90deg,var(--n1),var(--n2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.header-title img{height:38px;width:38px;border-radius:50%}
 .profile-section{display:flex;align-items:center;gap:10px}
-.profile-avatar img{width:45px;height:45px;border-radius:50%;border:2px solid var(--neon2)}
-.profile-avatar i{font-size:40px;color:var(--neon2)}
+.profile-avatar{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;border:2px solid var(--n2);overflow:hidden;background:rgba(255,255,255,.05)}
+.profile-avatar img{width:100%;height:100%;object-fit:cover}
+.profile-avatar i{font-size:22px;color:var(--n2)}
 .profile-info{display:flex;flex-direction:column}
 .profile-name{font-weight:700}
-.profile-stats{font-size:13px;color:#ccc}
-.header-actions .header-button{
-  padding:8px 14px;border:none;border-radius:8px;
-  background:linear-gradient(90deg,var(--neon1),var(--neon2));
-  color:white;cursor:pointer;font-weight:600;
-}
-.main-content{flex:1;padding:30px;max-width:1100px;margin:auto;width:100%}
-.section-title{
-  font-size:18px;margin-bottom:15px;
-  background:linear-gradient(90deg,var(--neon1),var(--neon2));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  font-family:'Press Start 2P',cursive;
-}
-.games-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:20px}
-.game-card{
-  background:rgba(255,255,255,.05);border-radius:15px;overflow:hidden;
-  cursor:pointer;transition:.2s;display:flex;flex-direction:column
-}
-.game-card:hover{transform:scale(1.05);box-shadow:0 0 20px var(--neon2)}
-.game-card-image{width:100%;height:130px;object-fit:cover}
-.game-card-content{padding:10px;flex:1}
-.game-card-title{font-weight:700;font-size:16px;margin-bottom:5px}
-.game-card-desc{font-size:13px;color:#bbb;margin-bottom:8px}
-.game-card-stats{display:flex;gap:15px;font-size:12px;color:#aaa}
-.top-games{margin-top:40px}
-.top-games-header{display:flex;align-items:center;justify-content:center;gap:10px;font-size:22px;color:gold}
-.top-list{display:flex;gap:20px;margin-top:20px;flex-wrap:wrap}
-.top-card{flex:1;min-width:220px;background:rgba(255,255,255,.05);border-radius:15px;overflow:hidden;position:relative}
+.profile-stats{font-size:12px;color:var(--mut)}
+.header-actions .header-button{padding:8px 14px;border:none;border-radius:10px;background:linear-gradient(90deg,var(--n1),var(--n2));color:#fff;cursor:pointer;font-weight:700}
+.main-content{flex:1;padding:28px;max-width:1150px;margin:auto;width:100%}
+.section-title{font-size:16px;margin-bottom:14px;font-family:'Press Start 2P',cursive;background:linear-gradient(90deg,var(--n1),var(--n2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.games-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:18px}
+.game-card{background:rgba(255,255,255,.06);border-radius:16px;overflow:hidden;cursor:pointer;transition:.18s;display:flex;flex-direction:column;border:1px solid rgba(124,58,237,.25)}
+.game-card:hover{transform:translateY(-3px) scale(1.02);box-shadow:0 0 22px rgba(6,182,212,.35)}
+.game-card-image{width:100%;height:140px;object-fit:cover}
+.game-card-content{padding:12px;flex:1}
+.game-card-title{font-weight:800;font-size:16px;margin-bottom:6px}
+.game-card-desc{font-size:13px;color:#cfd5e1;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.game-card-stats{display:flex;gap:16px;font-size:12px;color:#c9d2e3}
+.top-games{margin-top:36px}
+.top-games-header{display:flex;align-items:center;justify-content:center;gap:12px;color:#ffd94a}
+.top-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin-top:14px}
+.top-card{background:rgba(255,255,255,.06);border:1px solid rgba(6,182,212,.25);border-radius:16px;overflow:hidden;position:relative}
 .top-card img{width:100%;height:120px;object-fit:cover}
 .top-card-content{padding:10px}
-.crown{position:absolute;top:10px;left:10px;font-size:24px}
-#gameModal{
-  display:none;position:fixed;top:0;left:0;width:100%;height:100%;
-  background:rgba(0,0,0,.85);z-index:1000;align-items:center;justify-content:center
-}
-.modal-content{
-  width:90%;max-width:1100px;background:#111;border-radius:15px;overflow:hidden;display:flex;flex-direction:column
-}
-.modal-header{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:12px 18px;background:linear-gradient(90deg,var(--neon1),var(--neon2));
-}
+.crown{position:absolute;top:8px;left:10px;font-size:22px}
+.like-count{margin-top:10px;text-align:center;color:#cfe3ff;font-weight:700}
+#gameModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.86);z-index:1000;align-items:center;justify-content:center;padding:18px}
+.modal-content{width:95%;max-width:1200px;background:#0c0d18;border-radius:16px;overflow:hidden;border:1px solid rgba(124,58,237,.35);display:flex;flex-direction:column}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:linear-gradient(90deg,var(--n1),var(--n2))}
 .modal-header h2{font-size:18px}
-.modal-body{display:flex;flex-direction:row;height:600px}
-#gameFrame{flex:3;border:none;width:100%}
-#gameSide{flex:1;background:#0b0b18;display:flex;flex-direction:column;justify-content:space-between;padding:15px}
-#gameActions button{
-  width:100%;margin-bottom:10px;padding:10px;border:none;border-radius:8px;
-  background:linear-gradient(90deg,var(--neon1),var(--neon2));
-  color:white;cursor:pointer;font-weight:600
-}
-#likeCount{margin-top:auto;font-size:14px;text-align:center;color:#ccc}
-.close-modal{background:none;border:none;color:white;font-size:20px;cursor:pointer}
-.point-notification{
-  position:fixed;top:20px;right:20px;background:var(--success);
-  padding:8px 14px;border-radius:8px;display:none;z-index:2000;font-weight:700
-}
+.close-modal{background:none;border:none;color:#fff;font-size:20px;cursor:pointer}
+.modal-body{display:flex;gap:14px;padding:14px;flex-wrap:wrap}
+#gameFrame{flex:1 1 68%;min-width:320px;height:64vh;border:none;border-radius:12px;background:#000}
+#gameSide{flex:1 1 28%;min-width:280px;max-height:64vh;display:flex;flex-direction:column;gap:10px}
+#gameActions{display:grid;grid-template-columns:1fr;gap:10px}
+#gameActions button{padding:11px;border:none;border-radius:10px;background:linear-gradient(90deg,var(--n1),var(--n2));color:#fff;cursor:pointer;font-weight:800}
+#gameActions button.secondary{background:#1a1c2b;border:1px solid rgba(6,182,212,.35)}
+.point-notification{position:fixed;top:18px;right:18px;background:var(--ok);color:#08230f;padding:8px 12px;border-radius:10px;font-weight:900;display:none;z-index:2000}
+@media(max-width:860px){#gameFrame{height:48vh}}
 </style>
 <script>
 document.addEventListener("contextmenu",e=>e.preventDefault());
-document.addEventListener("keydown",e=>{
-  if(e.ctrlKey && ["u","s","i","j","c"].includes(e.key.toLowerCase())) e.preventDefault();
-});
+document.addEventListener("keydown",e=>{if(e.ctrlKey&&["u","s","i","j","c"].includes(e.key.toLowerCase()))e.preventDefault()});
 </script>
 </head>
 <body>
@@ -116,9 +71,7 @@ document.addEventListener("keydown",e=>{
       <div class="profile-stats" id="profileStats">Points: 0 | Rank: Member</div>
     </div>
   </div>
-  <h1 class="header-title">
-    <img src="https://www.tyvila.online/cdn/ty-gameslogo.webp" alt="TyVila Games Logo"> TyVila Games
-  </h1>
+  <h1 class="header-title"><img src="https://www.tyvila.online/cdn/ty-gameslogo.webp" alt="TyVila">TyVila Games</h1>
   <div class="header-actions">
     <button class="header-button" onclick="window.location.href='account.html'"><i class="fas fa-user-circle"></i> Account</button>
   </div>
@@ -138,16 +91,16 @@ document.addEventListener("keydown",e=>{
   <div class="modal-content">
     <div class="modal-header">
       <h2 id="gameTitle"></h2>
-      <button class="close-modal" onclick="closeModal()"><i class="fas fa-times"></i></button>
+      <button class="close-modal" id="closeBtn"><i class="fas fa-times"></i></button>
     </div>
     <div class="modal-body">
-      <iframe id="gameFrame"></iframe>
+      <iframe id="gameFrame" allowfullscreen></iframe>
       <div id="gameSide">
         <div id="gameActions">
-          <button onclick="likeGame()"><i class="fas fa-thumbs-up"></i> Like</button>
-          <button onclick="shareGame()"><i class="fas fa-share"></i> Share</button>
-          <button onclick="fullscreenGame()"><i class="fas fa-expand"></i> Fullscreen</button>
-          <button onclick="closeModal()"><i class="fas fa-door-open"></i> Exit</button>
+          <button id="likeBtn"><i class="fas fa-thumbs-up"></i> Like</button>
+          <button id="shareBtn"><i class="fas fa-share"></i> Share</button>
+          <button id="fsBtn"><i class="fas fa-expand"></i> Fullscreen</button>
+          <button class="secondary" id="exitBtn"><i class="fas fa-door-open"></i> Exit Game</button>
         </div>
         <div class="like-count" id="likeCount"></div>
       </div>
@@ -159,132 +112,142 @@ document.addEventListener("keydown",e=>{
 
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
-const supabase=createClient("https://wwcedhbbdoyrmquokyjj.supabase.co",
-"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4")
+const supabase=createClient("https://wwcedhbbdoyrmquokyjj.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4")
 
-let currentUser,currentProfile,currentGame,timer,isFullscreen=false
+let currentUser=null
+let currentProfile=null
+let currentGame=null
+let secTimer=null
+let secBuffer=0
+let isFullscreen=false
 
 async function checkAuth(){
   const {data:{user}}=await supabase.auth.getUser()
-  if(!user){window.location.href="login.html";return}
+  if(!user){location.href="login.html";return}
   currentUser=user
-  let {data:profile}=await supabase.from("profiles")
-    .select("username,points,email,rank,avatar_url")
-    .eq("id",user.id).single()
+  let {data:profile}=await supabase.from("profiles").select("id,username,points,email,rank,avatar_url").eq("id",user.id).single()
   if(!profile){
-    const {data:newProfile}=await supabase.from("profiles").insert({
-      id:user.id,email:user.email,
-      username:user.user_metadata?.preferred_username||user.email.split("@")[0],
-      avatar_url:user.user_metadata?.avatar_url||user.user_metadata?.picture,
-      points:0,rank:"Member"
+    const {data:newP}=await supabase.from("profiles").insert({
+      id:user.id,
+      email:user.email,
+      username:user.user_metadata?.preferred_username||user.user_metadata?.name||user.email.split("@")[0],
+      avatar_url:user.user_metadata?.avatar_url||user.user_metadata?.picture||"",
+      points:0,
+      rank:"Member"
     }).select().single()
-    profile=newProfile
+    profile=newP
   }
   currentProfile=profile
-  document.getElementById("profileName").innerText=currentProfile.username
-  document.getElementById("profileStats").innerText=`Points: ${currentProfile.points} | ${currentProfile.rank}`
-  if(currentProfile.avatar_url){
-    document.getElementById("profileAvatar").innerHTML=`<img src="${currentProfile.avatar_url}">`
-  }
+  document.getElementById("profileName").textContent=currentProfile.username||currentUser.email
+  document.getElementById("profileStats").textContent=`Points: ${currentProfile.points||0} | ${currentProfile.rank||"Member"}`
+  const av=document.getElementById("profileAvatar")
+  if(currentProfile.avatar_url){av.innerHTML=`<img src="${currentProfile.avatar_url}" alt="Avatar">`}else{av.innerHTML='<i class="fas fa-user"></i>'}
 }
-checkAuth()
 
-async function addPoints(amount){
-  currentProfile.points+=amount
-  document.getElementById("profileStats").innerText=`Points: ${currentProfile.points} | ${currentProfile.rank}`
-  await supabase.from("profiles").update({points:currentProfile.points}).eq("id",currentUser.id)
-  const notif=document.getElementById("pointNotification")
-  notif.textContent=`+${amount} Point${amount>1?'s':''}!`
-  notif.style.display="block"; setTimeout(()=>notif.style.display="none",2000)
+function showPointsToast(n){
+  const el=document.getElementById("pointNotification")
+  el.textContent=`+${n} Point${n>1?"s":""}!`
+  el.style.display="block"
+  setTimeout(()=>{el.style.display="none"},1400)
+}
+
+async function addPoints(n){
+  currentProfile.points=(currentProfile.points||0)+n
+  document.getElementById("profileStats").textContent=`Points: ${currentProfile.points} | ${currentProfile.rank||"Member"}`
+  await supabase.from("profiles").update({points:currentProfile.points}).eq("id",currentProfile.id)
+  showPointsToast(n)
 }
 
 async function loadGames(){
   const {data}=await supabase.from("games").select("*").order("id")
-  const container=document.getElementById("gamesList")
-  container.innerHTML=""
+  const wrap=document.getElementById("gamesList")
+  wrap.innerHTML=""
   data.forEach(g=>{
-    const div=document.createElement("div")
-    div.className="game-card"
-    div.innerHTML=`
-      <img src="${g.image}" class="game-card-image">
-      <div class="game-card-content">
-        <h3 class="game-card-title">${g.title}</h3>
-        <p class="game-card-desc">${g.description||''}</p>
-        <div class="game-card-stats">
-          <span><i class="fas fa-thumbs-up"></i> ${g.likes||0}</span>
-          <span><i class="fas fa-play-circle"></i> ${g.played||0}</span>
-        </div>
-      </div>`
-    div.onclick=()=>playGame(g)
-    container.appendChild(div)
+    const card=document.createElement("div")
+    card.className="game-card"
+    card.innerHTML=`<img src="${g.image}" class="game-card-image" alt="${g.title}"><div class="game-card-content"><div class="game-card-title">${g.title}</div><div class="game-card-desc">${g.description||""}</div><div class="game-card-stats"><span><i class="fas fa-thumbs-up"></i> ${g.likes||0}</span><span><i class="fas fa-play-circle"></i> ${g.played||0}</span></div></div>`
+    card.addEventListener("click",()=>openGame(g))
+    wrap.appendChild(card)
   })
-  loadTopGames()
+  loadCrownGames()
+  const urlParams=new URLSearchParams(location.search)
+  const qId=urlParams.get("game")
+  if(qId){const match=data.find(x=>String(x.id)===String(qId));if(match) openGame(match)}
 }
 
-async function loadTopGames(){
+async function loadCrownGames(){
   const {data}=await supabase.from("games").select("*").order("played",{ascending:false}).limit(3)
   const top=document.getElementById("topList")
   top.innerHTML=""
   data.forEach((g,i)=>{
-    const card=document.createElement("div")
-    card.className="top-card"
-    card.innerHTML=`
-      ${i===0?'<div class="crown">👑</div>':""}
-      <img src="${g.image}">
-      <div class="top-card-content">
-        <h4 class="top-card-title">${g.title}</h4>
-        <div class="top-card-stats">
-          <span><i class="fas fa-thumbs-up"></i> ${g.likes||0}</span>
-          <span><i class="fas fa-play-circle"></i> ${g.played||0}</span>
-        </div>
-      </div>`
-    top.appendChild(card)
+    const el=document.createElement("div")
+    el.className="top-card"
+    el.innerHTML=`${i===0?'<div class="crown">👑</div>':""}<img src="${g.image}" alt="${g.title}"><div class="top-card-content"><div class="game-card-title">${g.title}</div><div class="game-card-stats"><span><i class="fas fa-thumbs-up"></i> ${g.likes||0}</span><span><i class="fas fa-play-circle"></i> ${g.played||0}</span></div></div>`
+    top.appendChild(el)
   })
 }
 
-async function playGame(g){
-  currentGame=g
-  document.getElementById("gameTitle").innerText=g.title
-  document.getElementById("gameFrame").src=g.embed
+function bindModalControls(){
+  document.getElementById("closeBtn").onclick=closeGame
+  document.getElementById("exitBtn").onclick=closeGame
+  document.getElementById("likeBtn").onclick=likeGame
+  document.getElementById("shareBtn").onclick=shareGame
+  document.getElementById("fsBtn").onclick=toggleFullscreen
+  document.addEventListener("fullscreenchange",()=>{isFullscreen=!!document.fullscreenElement;document.getElementById("fsBtn").innerHTML=isFullscreen?'<i class="fas fa-compress"></i> Exit Fullscreen':'<i class="fas fa-expand"></i> Fullscreen'})
+}
+bindModalControls()
+
+async function openGame(g){
+  currentGame={...g}
+  document.getElementById("gameTitle").textContent=g.title
+  const frame=document.getElementById("gameFrame")
+  frame.src=g.embed
   document.getElementById("gameModal").style.display="flex"
   document.body.style.overflow="hidden"
-  updateLikes()
-  g.played=(g.played||0)+1
-  await supabase.from("games").update({played:g.played}).eq("id",g.id)
-  addPoints(10)
-  timer=setInterval(()=>addPoints(1),1000)
+  updateLikeText()
+  const playedNow=(g.played||0)+1
+  await supabase.from("games").update({played:playedNow}).eq("id",g.id)
+  currentGame.played=playedNow
   document.getElementById("meta-title").content=`Play ${g.title} — TyVila`
   document.getElementById("meta-desc").content=g.description||"Play on TyVila!"
   document.getElementById("meta-image").content=g.image
+  await addPoints(10)
+  secBuffer=0
+  if(secTimer) clearInterval(secTimer)
+  secTimer=setInterval(async()=>{secBuffer++; await addPoints(1)},1000)
 }
 
-function closeModal(){
-  document.getElementById("gameModal").style.display="none"
-  document.getElementById("gameFrame").src=""
-  clearInterval(timer)
-  document.body.style.overflow="auto"
+function updateLikeText(){
+  document.getElementById("likeCount").innerHTML=`<i class="fas fa-thumbs-up"></i> ${currentGame.likes||0} Likes`
 }
 
 async function likeGame(){
-  currentGame.likes=(currentGame.likes||0)+1
-  await supabase.from("games").update({likes:currentGame.likes}).eq("id",currentGame.id)
-  updateLikes(); loadTopGames()
+  const newLikes=(currentGame.likes||0)+1
+  const {error}=await supabase.from("games").update({likes:newLikes}).eq("id",currentGame.id)
+  if(!error){currentGame.likes=newLikes;updateLikeText();loadCrownGames()}
 }
-function updateLikes(){
-  document.getElementById("likeCount").innerHTML=`<i class="fas fa-thumbs-up"></i> ${currentGame.likes||0} Likes`
-}
+
 async function shareGame(){
   const url=`${location.origin}${location.pathname}?game=${currentGame.id}&title=${encodeURIComponent(currentGame.title)}`
   await navigator.clipboard.writeText(url)
   alert("Game link copied!")
 }
-function fullscreenGame(){
+
+function toggleFullscreen(){
   const frame=document.getElementById("gameFrame")
-  if(!isFullscreen){frame.requestFullscreen();isFullscreen=true}
-  else{document.exitFullscreen();isFullscreen=false}
+  if(!document.fullscreenElement){if(frame.requestFullscreen) frame.requestFullscreen()}else{if(document.exitFullscreen) document.exitFullscreen()}
 }
 
-loadGames()
+function closeGame(){
+  document.getElementById("gameModal").style.display="none"
+  document.getElementById("gameFrame").src=""
+  document.body.style.overflow="auto"
+  if(secTimer){clearInterval(secTimer);secTimer=null}
+  if(document.fullscreenElement){document.exitFullscreen()}
+}
+
+await checkAuth()
+await loadGames()
 </script>
 </body>
 </html>
