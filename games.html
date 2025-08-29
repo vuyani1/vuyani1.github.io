@@ -1,253 +1,205 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>TyVila Games</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" href="https://www.tyvila.online/cdn/favicon.ico">
-<meta id="meta-title" property="og:title" content="TyVila Games">
-<meta id="meta-desc" property="og:description" content="Play and compete on TyVila Games!">
-<meta id="meta-image" property="og:image" content="https://www.tyvila.online/cdn/ty-gameslogo.webp">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg1:#050510;--bg2:#0c0c1a;--n1:#7c3aed;--n2:#06b6d4;--ok:#32ff91;--mut:#a7b0c0}
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Inter',sans-serif;background:linear-gradient(180deg,var(--bg1),var(--bg2));color:#fff;min-height:100vh;display:flex;flex-direction:column}
-header{display:flex;align-items:center;justify-content:space-between;padding:14px 22px;background:rgba(15,15,35,.9);border-bottom:2px solid transparent;border-image:linear-gradient(90deg,var(--n1),var(--n2)) 1}
-.header-title{font-family:'Press Start 2P',cursive;font-size:18px;display:flex;align-items:center;gap:10px;background:linear-gradient(90deg,var(--n1),var(--n2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.header-title img{height:38px;width:38px;border-radius:50%}
-.profile-section{display:flex;align-items:center;gap:10px}
-.profile-avatar{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;border:2px solid var(--n2);overflow:hidden;background:rgba(255,255,255,.05)}
-.profile-avatar img{width:100%;height:100%;object-fit:cover}
-.profile-avatar i{font-size:22px;color:var(--n2)}
-.profile-info{display:flex;flex-direction:column}
-.profile-name{font-weight:700}
-.profile-stats{font-size:12px;color:var(--mut)}
-.header-actions .header-button{padding:8px 14px;border:none;border-radius:10px;background:linear-gradient(90deg,var(--n1),var(--n2));color:#fff;cursor:pointer;font-weight:700}
-.main-content{flex:1;padding:28px;max-width:1150px;margin:auto;width:100%}
-.section-title{font-size:16px;margin-bottom:14px;font-family:'Press Start 2P',cursive;background:linear-gradient(90deg,var(--n1),var(--n2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.games-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:18px}
-.game-card{background:rgba(255,255,255,.06);border-radius:16px;overflow:hidden;cursor:pointer;transition:.18s;display:flex;flex-direction:column;border:1px solid rgba(124,58,237,.25)}
-.game-card:hover{transform:translateY(-3px) scale(1.02);box-shadow:0 0 22px rgba(6,182,212,.35)}
-.game-card-image{width:100%;height:140px;object-fit:cover}
-.game-card-content{padding:12px;flex:1}
-.game-card-title{font-weight:800;font-size:16px;margin-bottom:6px}
-.game-card-desc{font-size:13px;color:#cfd5e1;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.game-card-stats{display:flex;gap:16px;font-size:12px;color:#c9d2e3}
-.top-games{margin-top:36px}
-.top-games-header{display:flex;align-items:center;justify-content:center;gap:12px;color:#ffd94a}
-.top-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin-top:14px}
-.top-card{background:rgba(255,255,255,.06);border:1px solid rgba(6,182,212,.25);border-radius:16px;overflow:hidden;position:relative}
-.top-card img{width:100%;height:120px;object-fit:cover}
-.top-card-content{padding:10px}
-.crown{position:absolute;top:8px;left:10px;font-size:22px}
-.like-count{margin-top:10px;text-align:center;color:#cfe3ff;font-weight:700}
-#gameModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.86);z-index:1000;align-items:center;justify-content:center;padding:18px}
-.modal-content{width:95%;max-width:1200px;background:#0c0d18;border-radius:16px;overflow:hidden;border:1px solid rgba(124,58,237,.35);display:flex;flex-direction:column}
-.modal-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:linear-gradient(90deg,var(--n1),var(--n2))}
-.modal-header h2{font-size:18px}
-.close-modal{background:none;border:none;color:#fff;font-size:20px;cursor:pointer}
-.modal-body{display:flex;gap:14px;padding:14px;flex-wrap:wrap}
-#gameFrame{flex:1 1 68%;min-width:320px;height:64vh;border:none;border-radius:12px;background:#000}
-#gameSide{flex:1 1 28%;min-width:280px;max-height:64vh;display:flex;flex-direction:column;gap:10px}
-#gameActions{display:grid;grid-template-columns:1fr;gap:10px}
-#gameActions button{padding:11px;border:none;border-radius:10px;background:linear-gradient(90deg,var(--n1),var(--n2));color:#fff;cursor:pointer;font-weight:800}
-#gameActions button.secondary{background:#1a1c2b;border:1px solid rgba(6,182,212,.35)}
-.point-notification{position:fixed;top:18px;right:18px;background:var(--ok);color:#08230f;padding:8px 12px;border-radius:10px;font-weight:900;display:none;z-index:2000}
-@media(max-width:860px){#gameFrame{height:48vh}}
+:root{--bg:#071023;--card:#07172a;--muted:#94a3b8;--accent:#7c3aed;--accent-2:#06b6d4;--white:#e6eef8}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}
+body{background:linear-gradient(180deg,#041028 0%,var(--bg) 100%);color:var(--white);min-height:100vh;display:flex;flex-direction:column}
+header{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:rgba(255,255,255,0.02);border-bottom:1px solid rgba(255,255,255,0.03)}
+.header-left{display:flex;align-items:center;gap:12px}
+.header-left img{height:44px;border-radius:8px}
+.header-right{display:flex;align-items:center;gap:12px}
+.header-right img{width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--accent-2)}
+.container{max-width:1200px;margin:22px auto;padding:16px;width:100%}
+.hero{display:flex;gap:18px;align-items:center;margin-bottom:18px}
+.hero .title{font-size:22px;color:var(--accent);font-weight:800}
+.layout{display:grid;grid-template-columns:1fr 360px;gap:18px}
+.left{display:flex;flex-direction:column;gap:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.card{background:var(--card);border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,0.03);cursor:pointer}
+.card img{width:100%;height:150px;object-fit:cover}
+.card .info{padding:12px}
+.card .info h3{margin:0;color:var(--white);font-size:16px}
+.card .info p{margin:6px 0;color:var(--muted);font-size:13px}
+.featured{grid-column:span 2;padding:12px;border-radius:14px;background:linear-gradient(90deg,rgba(124,58,237,0.12),rgba(6,182,212,0.06))}
+.player-bar{display:flex;align-items:center;gap:12px}
+.iframe-wrap{background:var(--card);border-radius:12px;padding:10px;border:1px solid rgba(255,255,255,0.03)}
+iframe{width:100%;height:520px;border-radius:10px;border:none}
+.controls{display:flex;gap:10px;margin-top:10px}
+.btn{padding:10px;border-radius:10px;border:none;cursor:pointer;font-weight:700}
+.btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff}
+.btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.05);color:var(--white)}
+.more-games{margin-top:12px}
+@media(max-width:980px){.layout{grid-template-columns:1fr}.iframe-wrap iframe{height:360px}}
 </style>
-<script>
-document.addEventListener("contextmenu",e=>e.preventDefault());
-document.addEventListener("keydown",e=>{if(e.ctrlKey&&["u","s","i","j","c"].includes(e.key.toLowerCase()))e.preventDefault()});
-</script>
 </head>
-<body>
+<body oncontextmenu="return false">
 <header>
-  <div class="profile-section">
-    <div class="profile-avatar" id="profileAvatar"><i class="fas fa-user"></i></div>
-    <div class="profile-info">
-      <div class="profile-name" id="profileName">Player</div>
-      <div class="profile-stats" id="profileStats">Points: 0 | Rank: Member</div>
+  <div class="header-left">
+    <img src="https://www.tyvila.online/cdn/ty.webp" alt="logo">
+    <div>
+      <div class="title">TyVila Games</div>
+      <div class="small" style="color:var(--muted)">Play, like, earn points</div>
     </div>
   </div>
-  <h1 class="header-title"><img src="https://www.tyvila.online/cdn/ty-gameslogo.webp" alt="TyVila">TyVila Games</h1>
-  <div class="header-actions">
-    <button class="header-button" onclick="window.location.href='account.html'"><i class="fas fa-user-circle"></i> Account</button>
+  <div class="header-right">
+    <span id="headerUsername">Loading...</span>
+    <img id="headerAvatar" src="https://www.tyvila.online/cdn/default-avatar.png" alt="avatar">
+    <div id="headerPoints" style="font-weight:700;color:var(--accent);margin-left:8px">0 pts</div>
   </div>
 </header>
-
-<div class="main-content">
-  <h2 class="section-title">Available Games</h2>
-  <div class="games-grid" id="gamesList"></div>
-
-  <div class="top-games">
-    <div class="top-games-header"><i class="fas fa-crown"></i><h2 class="section-title">Crown Games</h2><i class="fas fa-crown"></i></div>
-    <div class="top-list" id="topList"></div>
-  </div>
-</div>
-
-<div id="gameModal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h2 id="gameTitle"></h2>
-      <button class="close-modal" id="closeBtn"><i class="fas fa-times"></i></button>
+<main class="container">
+  <div class="hero">
+    <div style="flex:1">
+      <div style="font-size:20px;font-weight:800;color:var(--accent)">Featured & Popular</div>
+      <div class="small" style="color:var(--muted)">Jump into a game — points collect only while you're playing</div>
     </div>
-    <div class="modal-body">
-      <iframe id="gameFrame" allowfullscreen></iframe>
-      <div id="gameSide">
-        <div id="gameActions">
-          <button id="likeBtn"><i class="fas fa-thumbs-up"></i> Like</button>
-          <button id="shareBtn"><i class="fas fa-share"></i> Share</button>
-          <button id="fsBtn"><i class="fas fa-expand"></i> Fullscreen</button>
-          <button class="secondary" id="exitBtn"><i class="fas fa-door-open"></i> Exit Game</button>
+    <div class="player-bar">
+      <a href="ranks.html" class="btn ghost">Ranks</a>
+      <a href="accounts.html" class="btn ghost">My Account</a>
+    </div>
+  </div>
+
+  <div class="layout">
+    <section class="left">
+      <div id="featured" class="featured card">
+        <div style="display:flex;gap:12px;align-items:center;">
+          <img id="featuredIcon" src="https://www.tyvila.online/cdn/default-avatar.png" style="width:86px;height:86px;border-radius:12px;object-fit:cover">
+          <div>
+            <h2 id="featuredName" style="margin:0;color:var(--white)">Loading...</h2>
+            <div class="small" style="color:var(--muted)" id="featuredDesc"></div>
+            <div style="margin-top:8px"><button id="openFeatured" class="btn primary">Play Featured</button></div>
+          </div>
         </div>
-        <div class="like-count" id="likeCount"></div>
       </div>
-    </div>
-  </div>
-</div>
 
-<div class="point-notification" id="pointNotification">+1 Point!</div>
+      <div id="gamesGrid" class="grid"></div>
+    </section>
+
+    <aside class="card" style="padding:14px">
+      <h3 style="margin-bottom:12px">Now Playing</h3>
+      <div class="iframe-wrap">
+        <iframe id="gameFrame" src=""></iframe>
+        <div class="controls">
+          <button id="likeBtn" class="btn primary">❤️ Like (<span id="likeCount">0</span>)</button>
+          <button id="fsBtn" class="btn ghost">⛶ Fullscreen</button>
+        </div>
+        <div style="margin-top:10px;color:var(--muted)"><strong id="playCount">0</strong> plays</div>
+      </div>
+
+      <div class="more-games">
+        <h4 style="margin-top:14px;margin-bottom:10px">More Games</h4>
+        <div id="moreList" style="display:grid;gap:10px"></div>
+      </div>
+    </aside>
+  </div>
+</main>
 
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
-const supabase=createClient("https://wwcedhbbdoyrmquokyjj.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4")
+const supabase = createClient('https://wwcedhbbdoyrmquokyjj.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzYyNjUsImV4cCI6MjA3MTYxMjI2NX0.s29eO4ZQ74R6Jktn5zKZ-AiH6_QYC-_9WFqAS_m1kj4')
+let currentUser, currentGame, pointInterval, sessionId
 
-let currentUser=null
-let currentProfile=null
-let currentGame=null
-let secTimer=null
-let secBuffer=0
-let isFullscreen=false
+async function init(){
+  const { data:{ user, session } } = await supabase.auth.getUser()
+  if(!user){ window.location.href = 'login.html'; return }
+  currentUser = user
+  sessionId = session?.access_token?.slice(0,24) || Date.now().toString()
+  await loadHeader()
+  await loadGames()
+  const urlParams = new URLSearchParams(window.location.search)
+  const gameName = urlParams.get('game')
+  if(gameName) openByName(gameName)
+}
 
-async function checkAuth(){
-  const {data:{user}}=await supabase.auth.getUser()
-  if(!user){location.href="login.html";return}
-  currentUser=user
-  let {data:profile}=await supabase.from("profiles").select("id,username,points,email,rank,avatar_url").eq("id",user.id).single()
-  if(!profile){
-    const {data:newP}=await supabase.from("profiles").insert({
-      id:user.id,
-      email:user.email,
-      username:user.user_metadata?.preferred_username||user.user_metadata?.name||user.email.split("@")[0],
-      avatar_url:user.user_metadata?.avatar_url||user.user_metadata?.picture||"",
-      points:0,
-      rank:"Member"
-    }).select().single()
-    profile=newP
+async function loadHeader(){
+  const { data } = await supabase.from('profiles').select('*').eq('id',currentUser.id).maybeSingle()
+  if(data){
+    document.getElementById('headerUsername').textContent = data.username
+    document.getElementById('headerAvatar').src = data.avatar_url || 'https://www.tyvila.online/cdn/default-avatar.png'
+    document.getElementById('headerPoints').textContent = (data.points ?? 0) + ' pts'
   }
-  currentProfile=profile
-  document.getElementById("profileName").textContent=currentProfile.username||currentUser.email
-  document.getElementById("profileStats").textContent=`Points: ${currentProfile.points||0} | ${currentProfile.rank||"Member"}`
-  const av=document.getElementById("profileAvatar")
-  if(currentProfile.avatar_url){av.innerHTML=`<img src="${currentProfile.avatar_url}" alt="Avatar">`}else{av.innerHTML='<i class="fas fa-user"></i>'}
-}
-
-function showPointsToast(n){
-  const el=document.getElementById("pointNotification")
-  el.textContent=`+${n} Point${n>1?"s":""}!`
-  el.style.display="block"
-  setTimeout(()=>{el.style.display="none"},1400)
-}
-
-async function addPoints(n){
-  currentProfile.points=(currentProfile.points||0)+n
-  document.getElementById("profileStats").textContent=`Points: ${currentProfile.points} | ${currentProfile.rank||"Member"}`
-  await supabase.from("profiles").update({points:currentProfile.points}).eq("id",currentProfile.id)
-  showPointsToast(n)
 }
 
 async function loadGames(){
-  const {data}=await supabase.from("games").select("*").order("id")
-  const wrap=document.getElementById("gamesList")
-  wrap.innerHTML=""
+  const { data } = await supabase.from('games').select('*').order('plays',{ascending:false})
+  if(!data || data.length===0) return
+  const featured = data[0]
+  document.getElementById('featuredIcon').src = featured.icon_url || featured.image_url || 'https://www.tyvila.online/cdn/default-avatar.png'
+  document.getElementById('featuredName').textContent = featured.name
+  document.getElementById('featuredDesc').textContent = featured.description || ''
+  document.getElementById('openFeatured').addEventListener('click', ()=> openGame(featured))
+
+  const grid = document.getElementById('gamesGrid')
+  grid.innerHTML = ''
   data.forEach(g=>{
-    const card=document.createElement("div")
-    card.className="game-card"
-    card.innerHTML=`<img src="${g.image}" class="game-card-image" alt="${g.title}"><div class="game-card-content"><div class="game-card-title">${g.title}</div><div class="game-card-desc">${g.description||""}</div><div class="game-card-stats"><span><i class="fas fa-thumbs-up"></i> ${g.likes||0}</span><span><i class="fas fa-play-circle"></i> ${g.played||0}</span></div></div>`
-    card.addEventListener("click",()=>openGame(g))
-    wrap.appendChild(card)
-  })
-  loadCrownGames()
-  const urlParams=new URLSearchParams(location.search)
-  const qId=urlParams.get("game")
-  if(qId){const match=data.find(x=>String(x.id)===String(qId));if(match) openGame(match)}
-}
-
-async function loadCrownGames(){
-  const {data}=await supabase.from("games").select("*").order("played",{ascending:false}).limit(3)
-  const top=document.getElementById("topList")
-  top.innerHTML=""
-  data.forEach((g,i)=>{
-    const el=document.createElement("div")
-    el.className="top-card"
-    el.innerHTML=`${i===0?'<div class="crown">👑</div>':""}<img src="${g.image}" alt="${g.title}"><div class="top-card-content"><div class="game-card-title">${g.title}</div><div class="game-card-stats"><span><i class="fas fa-thumbs-up"></i> ${g.likes||0}</span><span><i class="fas fa-play-circle"></i> ${g.played||0}</span></div></div>`
-    top.appendChild(el)
+    const div = document.createElement('div')
+    div.className = 'card'
+    div.innerHTML = `<img src="${g.image_url || 'https://www.tyvila.online/cdn/default-avatar.png'}"><div class="info"><h3>${g.name}</h3><p>${(g.description||'').slice(0,90)}</p></div>`
+    div.addEventListener('click', ()=> openGame(g))
+    grid.appendChild(div)
   })
 }
 
-function bindModalControls(){
-  document.getElementById("closeBtn").onclick=closeGame
-  document.getElementById("exitBtn").onclick=closeGame
-  document.getElementById("likeBtn").onclick=likeGame
-  document.getElementById("shareBtn").onclick=shareGame
-  document.getElementById("fsBtn").onclick=toggleFullscreen
-  document.addEventListener("fullscreenchange",()=>{isFullscreen=!!document.fullscreenElement;document.getElementById("fsBtn").innerHTML=isFullscreen?'<i class="fas fa-compress"></i> Exit Fullscreen':'<i class="fas fa-expand"></i> Fullscreen'})
+async function openByName(name){
+  const { data } = await supabase.from('games').select('*').ilike('name',name).limit(1)
+  if(data && data[0]) openGame(data[0])
 }
-bindModalControls()
 
 async function openGame(g){
-  currentGame={...g}
-  document.getElementById("gameTitle").textContent=g.title
-  const frame=document.getElementById("gameFrame")
-  frame.src=g.embed
-  document.getElementById("gameModal").style.display="flex"
-  document.body.style.overflow="hidden"
-  updateLikeText()
-  const playedNow=(g.played||0)+1
-  await supabase.from("games").update({played:playedNow}).eq("id",g.id)
-  currentGame.played=playedNow
-  document.getElementById("meta-title").content=`Play ${g.title} — TyVila`
-  document.getElementById("meta-desc").content=g.description||"Play on TyVila!"
-  document.getElementById("meta-image").content=g.image
-  await addPoints(10)
-  secBuffer=0
-  if(secTimer) clearInterval(secTimer)
-  secTimer=setInterval(async()=>{secBuffer++; await addPoints(1)},1000)
+  currentGame = g
+  history.pushState({},g.name,'?game='+encodeURIComponent(g.name))
+  document.getElementById('gameFrame').src = g.embed_url
+  document.getElementById('likeCount').textContent = g.likes || 0
+  document.getElementById('playCount').textContent = g.plays || 0
+  await supabase.from('games').update({plays:(g.plays||0)+1}).eq('id',g.id)
+  loadMore(g.id)
+  startPointsLoop()
 }
 
-function updateLikeText(){
-  document.getElementById("likeCount").innerHTML=`<i class="fas fa-thumbs-up"></i> ${currentGame.likes||0} Likes`
+document.getElementById('likeBtn').addEventListener('click', async ()=>{
+  if(!currentGame) return
+  const { data } = await supabase.from('games').update({likes:(currentGame.likes||0)+1}).eq('id',currentGame.id).select().single()
+  currentGame = data
+  document.getElementById('likeCount').textContent = data.likes
+})
+
+document.getElementById('fsBtn').addEventListener('click', ()=>{
+  const iframe = document.getElementById('gameFrame')
+  if(iframe.requestFullscreen) iframe.requestFullscreen()
+})
+
+async function loadMore(excludeId){
+  const { data } = await supabase.from('games').select('*').neq('id',excludeId).limit(5)
+  const list = document.getElementById('moreList')
+  list.innerHTML = ''
+  data.forEach(g=>{
+    const el = document.createElement('div')
+    el.style.display = 'flex'
+    el.style.gap = '10px'
+    el.style.alignItems = 'center'
+    el.style.cursor = 'pointer'
+    el.innerHTML = `<img src="${g.icon_url || g.image_url || 'https://www.tyvila.online/cdn/default-avatar.png'}" style="width:56px;height:40px;object-fit:cover;border-radius:8px"><div><div style="font-weight:700">${g.name}</div><div class="small" style="color:var(--muted)">${g.plays ?? 0} plays</div></div>`
+    el.addEventListener('click', ()=> openGame(g))
+    list.appendChild(el)
+  })
 }
 
-async function likeGame(){
-  const newLikes=(currentGame.likes||0)+1
-  const {error}=await supabase.from("games").update({likes:newLikes}).eq("id",currentGame.id)
-  if(!error){currentGame.likes=newLikes;updateLikeText();loadCrownGames()}
+function startPointsLoop(){
+  if(pointInterval) return
+  pointInterval = setInterval(async ()=>{
+    await supabase.rpc('increment_points',{userid: currentUser.id})
+    const { data } = await supabase.from('profiles').select('points').eq('id',currentUser.id).maybeSingle()
+    document.getElementById('headerPoints').textContent = (data?.points ?? 0) + ' pts'
+  },1000)
 }
 
-async function shareGame(){
-  const url=`${location.origin}${location.pathname}?game=${currentGame.id}&title=${encodeURIComponent(currentGame.title)}`
-  await navigator.clipboard.writeText(url)
-  alert("Game link copied!")
-}
-
-function toggleFullscreen(){
-  const frame=document.getElementById("gameFrame")
-  if(!document.fullscreenElement){if(frame.requestFullscreen) frame.requestFullscreen()}else{if(document.exitFullscreen) document.exitFullscreen()}
-}
-
-function closeGame(){
-  document.getElementById("gameModal").style.display="none"
-  document.getElementById("gameFrame").src=""
-  document.body.style.overflow="auto"
-  if(secTimer){clearInterval(secTimer);secTimer=null}
-  if(document.fullscreenElement){document.exitFullscreen()}
-}
-
-await checkAuth()
-await loadGames()
+init()
 </script>
 </body>
 </html>
