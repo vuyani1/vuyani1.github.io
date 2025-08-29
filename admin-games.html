@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Admin — Games</title>
+<link rel="icon" href="https://www.tyvila.online/cdn/favicon.ico">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#071023;--card:#081226;--muted:#94a3b8;--accent:#7c3aed;--accent-2:#06b6d4;--white:#e6eef8}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}
+body{background:linear-gradient(180deg,#041028 0%,var(--bg)100%);color:var(--white);min-height:100vh}
+.header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid rgba(255,255,255,0.03)}
+.header img{height:44px}
+.container{max-width:1100px;margin:22px auto;padding:16px}
+.grid{display:grid;grid-template-columns:1fr 420px;gap:16px}
+.card{background:var(--card);border-radius:12px;padding:14px;border:1px solid rgba(255,255,255,0.03)}
+.form input, .form textarea{width:100%;padding:10px;margin-top:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--white)}
+.form button{margin-top:12px;padding:10px;border-radius:10px;border:none;background:linear-gradient(90deg,var(--accent),var(--accent-2));font-weight:700;cursor:pointer}
+.list .row{display:flex;align-items:center;gap:12px;padding:10px;border-radius:10px;margin-bottom:8px;background:linear-gradient(180deg,rgba(255,255,255,0.01),transparent)}
+.list img{width:64px;height:44px;object-fit:cover;border-radius:8px}
+.controls{display:flex;gap:8px}
+.btn{padding:8px 10px;border-radius:8px;border:none;cursor:pointer}
+.btn.danger{background:#e53e3e;color:#fff}
+.btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--white)}
+.small{color:var(--muted);font-size:13px}
+</style>
+</head>
+<body oncontextmenu="return false">
+<header class="header">
+  <div style="display:flex;gap:12px;align-items:center"><img src="https://www.tyvila.online/cdn/ty.webp" alt="logo"><div style="font-weight:800;color:var(--accent)">Admin — Games</div></div>
+  <div class="small">Signed in as Admin</div>
+</header>
+<main class="container">
+  <div class="grid">
+    <div class="card">
+      <form id="gameForm" class="form">
+        <label>Game Name</label>
+        <input name="name" required>
+        <label>Game Description</label>
+        <textarea name="description" rows="3"></textarea>
+        <label>Game Image URL</label>
+        <input name="image_url" required>
+        <label>Game Icon URL</label>
+        <input name="icon_url">
+        <label>Embed URL (iframe page)</label>
+        <input name="embed_url" required>
+        <button type="submit">Add / Update Game</button>
+      </form>
+    </div>
+
+    <aside class="card">
+      <h3 style="margin-bottom:10px">All Games</h3>
+      <div id="gamesList" class="list"></div>
+    </aside>
+  </div>
+</main>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+const supabase = createClient('https://wwcedhbbdoyrmquokyjj.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2VkaGJiZG95cm1xdW9reWpqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NjAzNjI2NSwiZXhwIjoyMDcxNjEyMjY1fQ.jmI77PRWjaIP3fjnDhgt8KDxO1n7i0jddvmN6EugfLY')
+let editingId = null
+
+document.getElementById('gameForm').addEventListener('submit', async (e)=>{
+  e.preventDefault()
+  const fd = new FormData(e.target)
+  const body = Object.fromEntries(fd)
+  if(editingId){
+    await supabase.from('games').update(body).eq('id',editingId)
+    editingId = null
+  } else {
+    await supabase.from('games').insert(body)
+  }
+  e.target.reset()
+  loadGames()
+})
+
+async function loadGames(){
+  const { data } = await supabase.from('games').select('*').order('created_at',{ascending:false})
+  const list = document.getElementById('gamesList')
+  list.innerHTML = ''
+  data.forEach(g=>{
+    const row = document.createElement('div')
+    row.className = 'row'
+    row.innerHTML = `<img src="${g.icon_url||g.image_url||'https://www.tyvila.online/cdn/default-avatar.png'}"><div style="flex:1"><div style="font-weight:700">${g.name}</div><div class="small">${g.description||''}</div></div><div class="controls"><button class="btn ghost" data-id="${g.id}" data-action="edit">Edit</button><button class="btn danger" data-id="${g.id}" data-action="delete">Delete</button></div>`
+    list.appendChild(row)
+  })
+  document.querySelectorAll('[data-action]').forEach(btn=>{
+    btn.addEventListener('click', async (ev)=>{
+      const id = ev.currentTarget.getAttribute('data-id')
+      const action = ev.currentTarget.getAttribute('data-action')
+      if(action==='edit'){
+        const { data } = await supabase.from('games').select('*').eq('id',id).maybeSingle()
+        if(data){
+          editingId = id
+          document.querySelector('[name=name]').value = data.name
+          document.querySelector('[name=description]').value = data.description
+          document.querySelector('[name=image_url]').value = data.image_url
+          document.querySelector('[name=icon_url]').value = data.icon_url
+          document.querySelector('[name=embed_url]').value = data.embed_url
+          window.scrollTo({top:0,behavior:'smooth'})
+        }
+      } else if(action==='delete'){
+        if(confirm('Delete this game?')) {
+          await supabase.from('games').delete().eq('id',id)
+          loadGames()
+        }
+      }
+    })
+  })
+}
+
+loadGames()
+</script>
+</body>
+</html>
