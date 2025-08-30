@@ -1,0 +1,92 @@
+:root {
+  --primary:#7c3aed;
+  --secondary:#06b6d4;
+  --dark:#111;
+  --light:#f9f9f9;
+}
+* {margin:0;padding:0;box-sizing:border-box}
+body {
+  font-family:Inter,sans-serif;
+  background:linear-gradient(135deg,var(--primary),var(--secondary));
+  color:#fff;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+#splash {
+  position:fixed;
+  inset:0;
+  background:#111;
+  color:#fff;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  z-index:1000;
+  animation:fadeOut 2.5s forwards;
+}
+#splash img {max-width:120px;margin:10px}
+#splash h1 {font-size:22px;text-align:center}
+#splash p {margin-top:10px}
+@keyframes fadeOut {
+  0%{opacity:1;visibility:visible}
+  80%{opacity:1}
+  100%{opacity:0;visibility:hidden}
+}
+header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:12px 20px;
+  background:rgba(0,0,0,0.25);
+  backdrop-filter:blur(10px);
+}
+header .nav-logo {height:40px}
+.profile img {
+  width:45px;height:45px;border-radius:50%;cursor:pointer;border:2px solid #ffeb3b;
+}
+.dropdown {
+  display:none;
+  position:absolute;right:0;top:55px;
+  background:#fff;color:#000;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,0.2);
+}
+.dropdown button {display:block;width:100%;padding:12px;border:none;background:none;text-align:left;font-weight:600;cursor:pointer}
+.dropdown button:hover {background:#f0f0f0}
+.stats {
+  padding:20px;text-align:center;
+}
+.flash {
+  background:linear-gradient(90deg,#333,#555,#333);
+  background-size:200% 100%;
+  animation:flashAnim 1.2s infinite linear;
+  height:20px;
+  width:200px;
+  margin:8px auto;
+  border-radius:8px;
+}
+@keyframes flashAnim {
+  0%{background-position:200% 0}
+  100%{background-position:-200% 0}
+}
+.gamesGrid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:20px;
+  padding:20px;
+}
+.gameCard {
+  background:#fff;color:#000;border-radius:16px;box-shadow:0 8px 25px rgba(0,0,0,0.15);overflow:hidden;display:flex;flex-direction:column;
+}
+.gameCard img {width:100%;height:160px;object-fit:cover}
+.gameCard .content {padding:15px;flex:1;display:flex;flex-direction:column;justify-content:space-between}
+.gameCard button {
+  margin-top:10px;padding:10px;border:none;border-radius:8px;background:linear-gradient(90deg,var(--primary),var(--secondary));color:#fff;font-weight:600;cursor:pointer
+}
+footer {
+  background:#000c;padding:20px;text-align:center;margin-top:auto
+}
+footer .logos {margin-top:10px;display:flex;justify-content:center;gap:20px;flex-wrap:wrap}
+footer .logos img {height:30px;object-fit:contain}
+.toast {
+  position:fixed;bottom:20px;right:20px;background:#111;color:#fff;padding:12px 20px;border-radius:12px;display:none;z-index:2000
+}
