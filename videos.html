@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- SEO -->
+  <title>CodeHub 2025 | Coding Videos & Tutorials</title>
+  <meta name="description" content="Watch and search coding tutorials from YouTube, featuring FreeCodeCamp, Programming with Mosh, and Traversy Media.">
+  <meta name="keywords" content="coding videos 2025, freeCodeCamp, Programming with Mosh, Traversy Media, learn coding, YouTube coding tutorials">
+  <meta name="author" content="tbsv Vilakazi">
+
+  <!-- Favicon -->
+  <link rel="icon" href="tyvila.online/cdn/favicon.ico">
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    body {
+      background: #0a0f1c;
+      color: #e4e8f0;
+      font-family: 'Fira Code', monospace;
+    }
+    .video-card iframe {
+      border-radius: 12px;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="bg-gray-900 border-b border-gray-700 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto flex items-center justify-between p-4">
+      <div class="flex items-center space-x-2">
+        <img src="tyvila.online/coders/logo.webp" alt="Logo" class="h-10 w-10 rounded">
+        <h1 class="text-2xl font-bold text-blue-400">CodeHub 2025</h1>
+      </div>
+      <nav class="space-x-6 text-lg font-medium">
+        <a href="index.html" class="hover:text-blue-400">Home</a>
+        <a href="top10.html" class="hover:text-blue-400">Top 10</a>
+        <a href="videos.html" class="text-blue-400 font-bold">Videos</a>
+        <a href="learnwithai.html" class="hover:text-blue-400 flex items-center space-x-1">
+          <img src="tyvila.online/coders/gai.png" alt="AI" class="h-6 w-6">
+          <span>Learn with AI</span>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="text-center py-12 bg-gradient-to-r from-blue-800 to-purple-700 text-white">
+    <h2 class="text-4xl md:text-6xl font-extrabold">Coding Videos & Tutorials 🎥</h2>
+    <p class="mt-4 text-lg max-w-2xl mx-auto">
+      Search coding tutorials or explore recommended videos from the best teachers online.
+    </p>
+  </section>
+
+  <!-- Search -->
+  <section class="py-8 max-w-4xl mx-auto px-4">
+    <div class="flex items-center bg-gray-800 border border-gray-600 rounded-lg shadow-lg overflow-hidden">
+      <input id="search-input" type="text" placeholder="Search coding videos..." class="w-full p-3 bg-transparent text-white focus:outline-none">
+      <button id="search-btn" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold">Search</button>
+    </div>
+  </section>
+
+  <!-- Video Results -->
+  <section class="max-w-7xl mx-auto px-4 py-6">
+    <h3 class="text-2xl font-bold text-blue-400 mb-4">Search Results</h3>
+    <div id="video-results" class="grid md:grid-cols-3 gap-6"></div>
+  </section>
+
+  <!-- Recommended Videos -->
+  <section class="bg-gray-900 py-10 px-4">
+    <h3 class="text-3xl font-bold text-center text-purple-400 mb-8">Recommended from Top Teachers</h3>
+    <div class="grid md:grid-cols-3 gap-6 max-w-7xl mx-auto">
+      <!-- FreeCodeCamp -->
+      <div class="video-card bg-gray-800 p-4 rounded-xl shadow-lg">
+        <h4 class="text-xl font-bold mb-3 text-green-400">FreeCodeCamp</h4>
+        <iframe width="100%" height="200" src="https://www.youtube.com/embed/Q33KBiDriJY" frameborder="0" allowfullscreen></iframe>
+      </div>
+      <!-- Mosh -->
+      <div class="video-card bg-gray-800 p-4 rounded-xl shadow-lg">
+        <h4 class="text-xl font-bold mb-3 text-blue-400">Programming with Mosh</h4>
+        <iframe width="100%" height="200" src="https://www.youtube.com/embed/pTB0EiLXUC8" frameborder="0" allowfullscreen></iframe>
+      </div>
+      <!-- Traversy -->
+      <div class="video-card bg-gray-800 p-4 rounded-xl shadow-lg">
+        <h4 class="text-xl font-bold mb-3 text-pink-400">Traversy Media</h4>
+        <iframe width="100%" height="200" src="https://www.youtube.com/embed/Zftx68K-1D4" frameborder="0" allowfullscreen></iframe>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-gray-900 border-t border-gray-700 py-6 text-center text-gray-400 mt-auto">
+    <p>© 2025 CodeHub. Powered by tbsv Vilakazi.</p>
+  </footer>
+
+  <!-- YouTube API Script -->
+  <script>
+    const API_KEY = "AIzaSyDxGRy2naNWgGmoIFQR5QZ969v5vX88Wi8";
+    const searchBtn = document.getElementById("search-btn");
+    const searchInput = document.getElementById("search-input");
+    const videoResults = document.getElementById("video-results");
+
+    async function searchVideos(query) {
+      const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=6&type=video&q=${encodeURIComponent(query)}&key=${API_KEY}`;
+      const res = await fetch(url);
+      const data = await res.json();
+
+      videoResults.innerHTML = "";
+      data.items.forEach(item => {
+        const videoId = item.id.videoId;
+        const title = item.snippet.title;
+        const channel = item.snippet.channelTitle;
+
+        const card = document.createElement("div");
+        card.className = "bg-gray-800 p-4 rounded-xl shadow-lg hover:shadow-2xl transition video-card";
+
+        card.innerHTML = `
+          <iframe width="100%" height="200" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>
+          <h4 class="mt-3 text-lg font-bold text-blue-300">${title}</h4>
+          <p class="text-sm text-gray-400">Channel: ${channel}</p>
+        `;
+        videoResults.appendChild(card);
+      });
+    }
+
+    searchBtn.addEventListener("click", () => {
+      const query = searchInput.value.trim();
+      if (query) searchVideos(query);
+    });
+
+    searchInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        searchBtn.click();
+      }
+    });
+
+    window.addEventListener("DOMContentLoaded", () => {
+      searchVideos("learn coding basics");
+    });
+  </script>
+</body>
+</html>
