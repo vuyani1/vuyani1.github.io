@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Learn with AI - Code Tutor</title>
+  <meta name="description" content="Learn coding with AI. Ask questions, write HTML/CSS/JS, and preview safely. Powered by Google Gemini.">
+  <link rel="icon" href="https://tyvila.online/cdn/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    body {
+      font-family: monospace;
+      background: #0d1117;
+      color: #e6edf3;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      padding: 1rem;
+      background: #161b22;
+      border-bottom: 1px solid #30363d;
+    }
+    header img { height: 40px; margin-right: 1rem; }
+    header h1 { font-size: 1.2rem; }
+    main { flex: 1; display: flex; }
+    .chat, .editor {
+      flex: 1;
+      padding: 1rem;
+      overflow-y: auto;
+    }
+    .chat {
+      border-right: 1px solid #30363d;
+      display: flex;
+      flex-direction: column;
+    }
+    .messages { flex: 1; overflow-y: auto; }
+    .input-area { display: flex; margin-top: 0.5rem; }
+    .input-area input {
+      flex: 1; padding: 0.5rem; border: none;
+      background: #21262d; color: #e6edf3;
+    }
+    .input-area button {
+      padding: 0.5rem 1rem;
+      background: #238636; border: none;
+      color: white; cursor: pointer;
+    }
+    .editor textarea {
+      width: 100%; height: 70%;
+      background: #0d1117; color: #e6edf3;
+      border: 1px solid #30363d;
+      padding: 1rem; font-family: monospace;
+      resize: none;
+    }
+    .editor button {
+      margin-top: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: #1f6feb; border: none;
+      color: white; cursor: pointer;
+    }
+    iframe {
+      width: 100%; height: 30%;
+      border: 1px solid #30363d;
+      background: white;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="https://tyvila.online/coders/gai.png" alt="AI Logo">
+    <h1>Learn with AI - Powered by Gemini</h1>
+  </header>
+
+  <main>
+    <!-- AI Chat Section -->
+    <section class="chat">
+      <h2>Ask the AI Tutor</h2>
+      <div class="messages" id="messages"></div>
+      <div class="input-area">
+        <input type="text" id="userInput" placeholder="Ask how to code...">
+        <button onclick="sendMessage()">Send</button>
+      </div>
+    </section>
+
+    <!-- Code Editor Section -->
+    <section class="editor">
+      <h2>Try Your Code</h2>
+      <textarea id="codeInput" placeholder="Write your HTML/CSS/JS here..."></textarea>
+      <button onclick="runCode()">Run Code</button>
+      <iframe id="preview" src="iframe.html" sandbox="allow-scripts allow-same-origin"></iframe>
+    </section>
+  </main>
+
+  <script>
+    const API_KEY = "AIzaSyBWqzSdeMfA3r77dkyeZSzs2GpLwAgRuWU";
+    const messagesDiv = document.getElementById("messages");
+
+    async function sendMessage() {
+      const input = document.getElementById("userInput");
+      const userText = input.value.trim();
+      if (!userText) return;
+
+      addMessage("You", userText);
+      input.value = "";
+
+      try {
+        const res = await fetch("https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=" + API_KEY, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ contents: [{ parts: [{ text: userText }] }] })
+        });
+        const data = await res.json();
+        const aiText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "AI could not respond.";
+        addMessage("AI", aiText);
+      } catch (err) {
+        addMessage("AI", "Error connecting to Gemini API.");
+      }
+    }
+
+    function addMessage(sender, text) {
+      const div = document.createElement("div");
+      div.innerHTML = `<b>${sender}:</b> ${text}`;
+      messagesDiv.appendChild(div);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+
+    function runCode() {
+      const code = document.getElementById("codeInput").value;
+
+      const blocked = /(fetch|xmlhttprequest|onerror=|onload=|<script src=|eval\(|document\.cookie|window\.location)/i;
+      if (blocked.test(code)) {
+        alert("⚠️ Suspicious code detected. Execution blocked.");
+        return;
+      }
+
+      const iframe = document.getElementById("preview");
+      const doc = iframe.contentWindow.document;
+      doc.open();
+      doc.write(code);
+      doc.close();
+    }
+  </script>
+</body>
+</html>
