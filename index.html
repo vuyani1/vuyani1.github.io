@@ -5,14 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TyVila Online</title>
 
-  <link id="favicon" rel="icon" href="favicon.ico" type="image/x-icon" />
-  <meta name="description" content="Loading TyVila content..." />
+  <!-- Dynamic favicon -->
+  <link id="favicon" rel="icon" href="https://www.tyvila.online/cdn/favicon.ico" type="image/x-icon" />
+
+  <meta name="description" content="Official TyVila Online Portal" />
 
   <link rel="stylesheet" href="assets/style.css" />
   <script defer src="assets/script.js"></script>
 </head>
 <body>
-  <div id="loading">Loading TyVila Online...</div>
-  <div id="page"></div>
+  <div id="app">
+    <div id="loading" class="loading">Loading TyVila content...</div>
+    <iframe id="frame" class="hidden"></iframe>
+    <div id="error-screen" class="hidden">
+      <img src="https://www.tyvila.online/cdn/ty.webp" alt="TyVila Logo" class="logo" />
+      <h2>Oops! Something went wrong.</h2>
+      <p>We couldn’t find the page you’re looking for.</p>
+      <button onclick="window.location.reload()">Retry</button>
+    </div>
+  </div>
 </body>
 </html>
