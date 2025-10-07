@@ -1,0 +1,20 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: #0a0a0a;
+  color: #f2f2f2;
+  font-family: "Poppins", sans-serif;
+}
+
+#loading {
+  text-align: center;
+  padding: 2em;
+  color: #70ffff;
+}
+
+.error {
+  color: #ff6666;
+  text-align: center;
+  margin-top: 2em;
+}
