@@ -2,56 +2,74 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Titan Cloud Player</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Titan Cloud - Secure Player</title>
     <style>
-        body { background-color: #000; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; font-family: sans-serif; }
-        
-        /* Container for the player and the shield */
-        .player-wrapper { position: relative; width: 640px; height: 360px; background: #111; border-radius: 8px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        
-        /* The actual iframe */
-        iframe { width: 100%; height: 100%; border: none; }
+        /* Force the page to have zero margins and no scrollbars */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #000;
+            overflow: hidden; /* Prevents double scrolling */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-        /* The Invisible Shield: Blocks right-clicks and direct selection */
-        .shield {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 10;
-            background: rgba(0,0,0,0); /* Transparent */
-            cursor: default;
+        /* Container scales perfectly to the device screen */
+        #video-wrapper {
+            width: 100%;
+            height: 100%;
+            display: flex;
+        }
+
+        /* The Iframe is forced to fill the entire wrapper */
+        iframe {
+            width: 100vw;
+            height: 100vh;
+            border: none;
+            display: block;
         }
     </style>
 </head>
 <body oncontextmenu="return false;">
 
-    <div class="player-wrapper">
-        <div class="shield" id="shield"></div>
-        
-        <div id="video-container"></div>
-    </div>
+    <div id="video-wrapper">
+        </div>
 
     <script>
-        /** * TITAN CLOUD SOURCE MASKING
-         * This script injects the iframe so it doesn't appear in "View Source"
-         */
         (function() {
-            // We encode the ID to make it harder to read at a glance
-            const _0x1a = "6975e022207ed27b774438c0"; 
-            const _0x2b = "https://tcloud.base44.app/embed/";
+            /** * TITAN CLOUD - SOURCE MASKING & INJECTION
+             * This prevents the URL from showing in "View Source" 
+             */
             
+            // Masked URL components
+            const p1 = "6975e02220";
+            const p2 = "7ed27b774438c0";
+            const host = "https://tcloud.base44.app/embed/";
+
             window.onload = function() {
-                const container = document.getElementById('video-container');
+                const wrapper = document.getElementById('video-wrapper');
                 const frame = document.createElement('iframe');
                 
-                frame.src = _0x2b + _0x1a;
+                // Reassemble the masked source
+                frame.src = host + p1 + p2;
+                
+                // Permissions for a high-end experience
+                frame.setAttribute('allow', 'autoplay; fullscreen; encrypted-media; picture-in-picture');
                 frame.setAttribute('allowfullscreen', 'true');
                 frame.setAttribute('frameborder', '0');
                 
-                container.appendChild(frame);
+                // Fix for iOS/Safari scaling
+                frame.style.width = "100%";
+                frame.style.height = "100%";
+
+                wrapper.appendChild(frame);
             };
 
-            // Disable F12 and Ctrl+Shift+I (Inspect Element)
+            // Anti-Inspect shortcuts
             document.onkeydown = function(e) {
                 if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74))) {
                     return false;
