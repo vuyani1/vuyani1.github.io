@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Titan Cloud Player</title>
+    <style>
+        body { background-color: #000; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; font-family: sans-serif; }
+        
+        /* Container for the player and the shield */
+        .player-wrapper { position: relative; width: 640px; height: 360px; background: #111; border-radius: 8px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        
+        /* The actual iframe */
+        iframe { width: 100%; height: 100%; border: none; }
+
+        /* The Invisible Shield: Blocks right-clicks and direct selection */
+        .shield {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 10;
+            background: rgba(0,0,0,0); /* Transparent */
+            cursor: default;
+        }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+    <div class="player-wrapper">
+        <div class="shield" id="shield"></div>
+        
+        <div id="video-container"></div>
+    </div>
+
+    <script>
+        /** * TITAN CLOUD SOURCE MASKING
+         * This script injects the iframe so it doesn't appear in "View Source"
+         */
+        (function() {
+            // We encode the ID to make it harder to read at a glance
+            const _0x1a = "6975e022207ed27b774438c0"; 
+            const _0x2b = "https://tcloud.base44.app/embed/";
+            
+            window.onload = function() {
+                const container = document.getElementById('video-container');
+                const frame = document.createElement('iframe');
+                
+                frame.src = _0x2b + _0x1a;
+                frame.setAttribute('allowfullscreen', 'true');
+                frame.setAttribute('frameborder', '0');
+                
+                container.appendChild(frame);
+            };
+
+            // Disable F12 and Ctrl+Shift+I (Inspect Element)
+            document.onkeydown = function(e) {
+                if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74))) {
+                    return false;
+                }
+            };
+        })();
+    </script>
+</body>
+</html>
