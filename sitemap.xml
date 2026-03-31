@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
   <sitemap>
-    <loc>https://tyvila.online/sitemap-pages.xml</loc>
-    <lastmod>2026-03-31</lastmod>
+    <loc>https://squids.co.za/api/sitemap/index.xml</loc>
+    <lastmod>2026-03-31T20:00:00+02:00</lastmod>
   </sitemap>
-  <sitemap>
-    <loc>https://squids.co.za/sitemap.xml</loc>
-    <lastmod>2026-03-31</lastmod>
-  </sitemap>
+
 </sitemapindex>
