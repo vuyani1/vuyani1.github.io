@@ -1,21 +1,34 @@
 <!DOCTYPE html>
-<html lang="en-ZA">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>404 — Page Not Found | Squids</title>
-<meta name="robots" content="noindex">
-<link rel="stylesheet" href="/assets/css/s.css">
+<title>404 — TyVila × SQUIDS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=IBM+Plex+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--sq-orange:#ff4500;--sq-dark:#0f1117;--sq-border:#2a2d35;--sq-muted:#6b7280;--sq-soft:#9ca3af;--white:#f8f9fa;--font-head:'Syne',sans-serif;--font-body:'IBM Plex Sans',sans-serif}
+body{background:var(--sq-dark);color:var(--white);font-family:var(--font-body);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 24px}
+.big{font-family:var(--font-head);font-size:clamp(5rem,20vw,12rem);font-weight:800;line-height:1;color:var(--sq-orange);opacity:.15;user-select:none;letter-spacing:-.04em}
+h1{font-family:var(--font-head);font-size:1.8rem;font-weight:800;margin-bottom:12px;margin-top:-20px}
+p{color:var(--sq-soft);font-size:.95rem;font-weight:300;max-width:380px;line-height:1.7;margin-bottom:32px}
+.actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.btn{padding:11px 24px;border-radius:999px;font-weight:600;font-size:.875rem;transition:all .2s;font-family:var(--font-body)}
+.btn-primary{background:var(--sq-orange);color:#fff;text-decoration:none}
+.btn-primary:hover{background:#cc3700}
+.btn-outline{background:transparent;color:var(--white);border:1px solid var(--sq-border);text-decoration:none}
+.btn-outline:hover{border-color:var(--sq-orange);color:var(--sq-orange)}
+</style>
 </head>
 <body>
-<div class="sq-noise" aria-hidden="true"></div>
-<main style="min-height:100svh;display:flex;align-items:center;justify-content:center;text-align:center;padding:2rem">
-  <div>
-    <div style="font-size:6rem;margin-bottom:1rem">🦑</div>
-    <h1 style="font-family:'Bebas Neue',sans-serif;font-size:5rem;line-height:1;background:var(--cg);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">404</h1>
-    <p style="color:var(--cs);margin:1rem 0 2rem;font-family:'DM Mono',monospace;font-size:.85rem;letter-spacing:.1em">THIS PAGE SWAM AWAY</p>
-    <a href="/" style="font-family:'DM Mono',monospace;font-size:.8rem;color:var(--co);letter-spacing:.1em;text-transform:uppercase">← Back Home</a>
-  </div>
-</main>
+<div class="big">404</div>
+<h1>Page not found</h1>
+<p>The page you're looking for doesn't exist here. It might have moved or you may have followed a broken link.</p>
+<div class="actions">
+  <a href="/" class="btn btn-primary">Go home</a>
+  <a href="https://squids.co.za" target="_blank" class="btn btn-outline">Open SQUIDS</a>
+</div>
 </body>
 </html>

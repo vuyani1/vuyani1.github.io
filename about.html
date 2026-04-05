@@ -1,69 +1,162 @@
 <!DOCTYPE html>
-<html lang="en-ZA">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>About Squids — South Africa's Community Discussion Platform</title>
-<meta name="description" content="Learn about Squids, the discussion platform built for South Africa. Our story, our mission, and how we're building a better space for local voices.">
-<meta name="robots" content="index,follow">
-<link rel="canonical" href="https://tyvila.online/about.html">
-<link rel="sitemap" type="application/xml" href="https://tyvila.online/sitemap.xml">
-<meta property="og:title" content="About Squids — South Africa's Community Discussion Platform">
-<meta property="og:description" content="Learn about Squids, the discussion platform built for South Africa.">
-<meta property="og:url" content="https://tyvila.online/about.html">
-<meta property="og:type" content="website">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"AboutPage","url":"https://tyvila.online/about.html","name":"About Squids","description":"About Squids — South Africa's Community Discussion Platform","isPartOf":{"@type":"WebSite","url":"https://tyvila.online/"},"breadcrumb":{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://tyvila.online/"},{"@type":"ListItem","position":2,"name":"About","item":"https://tyvila.online/about.html"}]}}</script>
+<title>About — TyVila × SQUIDS</title>
+<meta name="description" content="About SQUIDS — our story, our mission and the values that guide everything we build.">
+<link rel="canonical" href="https://www.tyvila.online/about.html">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="/assets/css/s.css">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--sq-orange:#ff4500;--sq-orange-dim:#cc3700;--sq-dark:#0f1117;--sq-card:#1a1d23;--sq-border:#2a2d35;--sq-muted:#6b7280;--sq-soft:#9ca3af;--white:#f8f9fa;--font-head:'Syne',sans-serif;--font-body:'IBM Plex Sans',sans-serif}
+html{scroll-behavior:smooth}
+body{background:var(--sq-dark);color:var(--white);font-family:var(--font-body);overflow-x:hidden;line-height:1.6}
+a{color:inherit;text-decoration:none}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 5%;height:62px;display:flex;align-items:center;justify-content:space-between;background:rgba(15,17,23,0.95);backdrop-filter:blur(14px);border-bottom:1px solid var(--sq-border)}
+.nav-brand{display:flex;align-items:center;gap:12px;font-family:var(--font-head);font-weight:700;font-size:.9rem}
+.nav-links{display:flex;gap:24px;align-items:center}
+.nav-links a{font-size:.85rem;color:var(--sq-soft);font-weight:500;transition:color .2s}
+.nav-links a:hover,.nav-links a.active{color:var(--white)}
+.nav-cta{background:var(--sq-orange);color:#fff!important;padding:8px 20px;border-radius:999px;font-weight:600;font-size:.83rem;transition:background .2s}
+.nav-cta:hover{background:var(--sq-orange-dim)!important}
+.page-hero{padding:140px 5% 80px;max-width:1140px;margin:0 auto}
+.page-tag{display:inline-block;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--sq-orange);background:rgba(255,69,0,.08);border:1px solid rgba(255,69,0,.2);padding:4px 12px;border-radius:999px;margin-bottom:16px}
+.page-hero h1{font-family:var(--font-head);font-size:clamp(2.2rem,5vw,4rem);font-weight:800;line-height:1.05;letter-spacing:-.02em;margin-bottom:20px}
+.page-hero p{font-size:1.05rem;color:var(--sq-soft);max-width:580px;font-weight:300;line-height:1.75}
+.content{max-width:1140px;margin:0 auto;padding:0 5% 100px}
+.content-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;margin-bottom:60px}
+.prose h2{font-family:var(--font-head);font-size:1.5rem;font-weight:800;margin-bottom:16px;letter-spacing:-.01em}
+.prose p{color:var(--sq-soft);font-size:.95rem;line-height:1.85;margin-bottom:16px;font-weight:300}
+.prose p strong{color:var(--white);font-weight:600}
+.divider{height:1px;background:var(--sq-border);margin:48px 0}
+.manifesto{background:var(--sq-card);border:1px solid var(--sq-border);border-left:3px solid var(--sq-orange);border-radius:0 12px 12px 0;padding:28px 32px;margin-bottom:40px}
+.manifesto p{color:var(--sq-soft);font-size:1rem;line-height:1.9;font-weight:300;font-style:italic}
+.manifesto p strong{color:var(--white);font-style:normal;font-weight:700}
+.stand-for{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:32px}
+.stand-item{background:var(--sq-card);border:1px solid var(--sq-border);border-radius:12px;padding:20px}
+.stand-item svg{margin-bottom:12px}
+.stand-item h3{font-family:var(--font-head);font-size:.9rem;font-weight:700;margin-bottom:6px}
+.stand-item p{font-size:.78rem;color:var(--sq-muted);line-height:1.5}
+footer{background:var(--sq-dark);border-top:1px solid var(--sq-border);padding:32px 5%}
+.footer-inner{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;max-width:1140px;margin:0 auto}
+.footer-copy{font-size:.75rem;color:var(--sq-muted)}
+.footer-links{display:flex;gap:18px}
+.footer-links a{font-size:.78rem;color:var(--sq-muted);transition:color .15s}
+.footer-links a:hover{color:var(--sq-orange)}
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}
+.reveal.in{opacity:1;transform:none}
+@media(max-width:800px){.content-grid{grid-template-columns:1fr}.stand-for{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.nav-links{display:none}.stand-for{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
-<div class="sq-noise" aria-hidden="true"></div>
-<header>
-<nav class="sq-nav" role="navigation" aria-label="Main navigation">
-  <a class="sq-logo" href="/" aria-label="Squids home">SQUIDS</a>
-  <button class="sq-nav-toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="main-nav-a">
-    <span></span><span></span><span></span>
-  </button>
-  <ul class="sq-nav-links" id="main-nav-a" role="list">
-    <li><a href="/#features">Features</a></li>
-    <li><a href="/#demo">Demo</a></li>
-    <li><a href="/about.html" aria-current="page">About</a></li>
-    <li><a href="https://squids.co.za" rel="noopener" target="_blank" class="sq-pill">Open App</a></li>
-  </ul>
+<nav>
+  <div class="nav-brand">
+    <svg width="22" height="22" viewBox="0 0 28 28"><text x="1" y="21" font-family="sans-serif" font-size="22" font-weight="900" fill="#fff">T</text></svg>
+    <span style="color:var(--sq-muted);font-size:.75rem">×</span>
+    <svg width="22" height="22" viewBox="0 0 28 28"><rect width="28" height="28" rx="7" fill="#ff4500"/><path d="M7 10c0-1.66 1.34-3 3-3h5c1.66 0 3 1.34 3 3s-1.34 3-3 3h-5c-1.66 0-3 1.34-3 3s1.34 3 3 3h5.5c1.66 0 3 1.34 3 3" stroke="#fff" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+    TyVila × SQUIDS
+  </div>
+  <div class="nav-links">
+    <a href="/">Home</a>
+    <a href="/about.html" class="active">About</a>
+    <a href="/communities.html">Communities</a>
+    <a href="/policies.html">Policies</a>
+    <a href="https://squids.co.za" target="_blank" class="nav-cta">Open App</a>
+  </div>
 </nav>
-</header>
-<main>
-<section class="sq-hero" style="min-height:60svh" aria-labelledby="about-h1">
-  <p class="sq-hero-eyebrow">Our Story</p>
-  <h1 class="sq-hero-h1" id="about-h1">ABOUT<br><em>SQUIDS</em></h1>
-  <p class="sq-hero-sub">A platform with a simple mission: give South Africa a place to talk.</p>
-</section>
-<div class="sq-div"></div>
-<section class="sq-section">
-  <p class="sq-section-label">The Mission</p>
-  <h2 class="sq-section-h2">WHY WE<br>EXIST</h2>
-  <div style="max-width:640px;color:var(--cs);line-height:1.85;font-size:1rem">
-    <p style="margin-bottom:1.2rem">South Africa has a rich culture of debate, storytelling, and community. But most of the internet's major platforms weren't built with South Africa in mind — they're shaped by different priorities, different cultures, and often, different time zones.</p>
-    <p style="margin-bottom:1.2rem">Squids was built to fix that. A discussion platform where SA communities form naturally, where good ideas get upvoted, and where the feed is shaped by what people actually care about — not what advertisers want you to see.</p>
-    <p>We're in early beta. We're building in public. And we're listening.</p>
-  </div>
-  <div style="margin-top:3rem">
-    <button class="sq-cta-btn primary sq-cta-btn" aria-label="Join Squids">Join Squids →</button>
-  </div>
-</section>
-</main>
-<footer>
-<div class="sq-footer">
-  <div><div class="sq-footer-brand">SQUIDS</div><div class="sq-footer-sub">South Africa's discussion platform</div></div>
-  <nav class="sq-footer-links" aria-label="Footer navigation">
-    <a href="https://squids.co.za" rel="noopener" target="_blank">Open App</a>
-    <a href="https://policies.squids.co.za" rel="noopener" target="_blank">Privacy Policy</a>
-    <a href="/sitemap.xml">Sitemap</a>
-  </nav>
-  <div class="sq-footer-copy">© 2026 Squids Platform. All rights reserved.</div>
+
+<div class="page-hero">
+  <span class="page-tag reveal">Our Story</span>
+  <h1 class="reveal">Built with purpose.<br>Grounded in truth.</h1>
+  <p class="reveal">SQUIDS is more than a platform. It's a space where people come not just to consume ideas — but to shape them, challenge them, and bring better ones to life.</p>
 </div>
+
+<div class="content">
+  <div class="manifesto reveal">
+    <p>Our slogan, <strong>"Where ideas surface,"</strong> isn't about passively finding inspiration. It's about something deeper. What you see, read, and experience here should push you to think further, question more, and refine your own vision. <strong>Because real ideas aren't given — they are discovered inside you.</strong></p>
+  </div>
+
+  <div class="content-grid">
+    <div class="prose reveal">
+      <h2>Our Purpose</h2>
+      <p>SQUIDS was created with a clear mission: to build a space where <strong>truth matters</strong>, where young people are informed, and where real conversations shape the future.</p>
+      <p>We are especially focused on creating a platform that represents <strong>Africa as it truly is</strong> — its growth, its challenges, its innovation, and its people. For too long, conversations about the continent have been shaped elsewhere.</p>
+      <p>Here, we tell our own stories. We share our own knowledge. We define our own narrative. But SQUIDS is not only for Africans — it is for anyone who wants to understand Africa through real voices, real experiences, and real perspectives.</p>
+    </div>
+    <div class="prose reveal">
+      <h2>A Different Kind of Platform</h2>
+      <p>SQUIDS takes a stand on something important: we are actively working toward limiting the influence of AI-generated content and bots that distort reality and mislead people — especially the youth.</p>
+      <p>This is a space for <strong>human voices</strong>. For lived experiences. For authenticity. Because the next generation deserves clarity, not confusion.</p>
+      <p>We believe in a future where information is accurate and empowering, communities are built on trust, and everyone has an equal chance to be heard.</p>
+    </div>
+  </div>
+
+  <div class="divider reveal"></div>
+
+  <h2 class="reveal" style="font-family:var(--font-head);font-size:1.5rem;font-weight:800;margin-bottom:28px;letter-spacing:-.01em">What We Stand For</h2>
+  <div class="stand-for">
+    <div class="stand-item reveal">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ff4500" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <h3>Honesty</h3>
+      <p>Truth over noise. We don't tolerate misinformation or manipulation.</p>
+    </div>
+    <div class="stand-item reveal">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ff4500" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <h3>Transparency</h3>
+      <p>No hidden agendas. Our policies are public. Our reasoning is open.</p>
+    </div>
+    <div class="stand-item reveal">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ff4500" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+      <h3>Respect</h3>
+      <p>Every voice matters. Different doesn't mean wrong.</p>
+    </div>
+    <div class="stand-item reveal">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ff4500" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <h3>Curiosity</h3>
+      <p>Question, learn, grow. The best conversations start with not knowing.</p>
+    </div>
+    <div class="stand-item reveal">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ff4500" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+      <h3>Humor</h3>
+      <p>Laughter connects us. Don't forget to enjoy it.</p>
+    </div>
+    <div class="stand-item reveal">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ff4500" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+      <h3>Safety</h3>
+      <p>A space where people feel secure to express themselves freely.</p>
+    </div>
+  </div>
+
+  <div class="divider reveal"></div>
+
+  <div class="prose reveal" style="max-width:640px">
+    <h2>Why "Squids"?</h2>
+    <p>Squids have three hearts. At SQUIDS, that means something to us. We believe everyone deserves more than one chance — in fact, we believe in three. But just like those three hearts, they can all be broken at once if we forget what matters.</p>
+    <p>So we ask for one simple thing: <strong>Respect the space. Respect the people. Respect the truth.</strong></p>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <span class="footer-copy">© 2026 Vuyani Siyanda Vilakazi. All rights reserved.</span>
+    <div class="footer-links">
+      <a href="/">Home</a>
+      <a href="https://squids.co.za" target="_blank">SQUIDS App</a>
+      <a href="/policies.html">Policies</a>
+      <a href="mailto:vuyani@squids.co.za">Contact</a>
+    </div>
+  </div>
 </footer>
-<script src="/assets/js/s.js" defer></script>
+
+<script>
+var els=document.querySelectorAll('.reveal');
+var o=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');o.unobserve(e.target);}});},{threshold:.12,rootMargin:'0px 0px -30px 0px'});
+els.forEach(function(el){o.observe(el);});
+</script>
 </body>
 </html>
