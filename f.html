@@ -25,7 +25,6 @@
       margin: 0 auto;
     }
 
-    /* header */
     .header {
       display: flex;
       justify-content: space-between;
@@ -75,7 +74,6 @@
       color: #b8acff;
     }
 
-    /* controls */
     .controls-card {
       background: rgba(18, 25, 45, 0.8);
       backdrop-filter: blur(16px);
@@ -193,7 +191,6 @@
       color: #b8acff;
     }
 
-    /* feed grid */
     .feed-grid {
       display: flex;
       flex-direction: column;
@@ -385,14 +382,14 @@
       <h1>Loolio · Public Feed</h1>
     </div>
     <div class="test-badge">
-      <span>🧪 test.loolio.com · Public Endpoints Only</span>
+      <span>🌐 Hosted at test.loolio.com → API: api.loolio.com</span>
     </div>
   </div>
 
   <div class="controls-card">
     <div class="controls-row">
       <div class="endpoint-selector">
-        <label>📡 PUBLIC ENDPOINTS</label>
+        <label>📡 PUBLIC ENDPOINTS (api.loolio.com)</label>
         <div class="endpoint-buttons">
           <button class="endpoint-btn active" data-endpoint="feed">🏠 Home Feed</button>
           <button class="endpoint-btn" data-endpoint="trending">🔥 Trending</button>
@@ -412,7 +409,7 @@
         Fetch Data
       </button>
     </div>
-    <p style="font-size: 0.7rem; margin-top: 14px; color: #7a8cae;">✨ Using official public APIs · No CORS bypass · Respects test.loolio.com CORS policy</p>
+    <p style="font-size: 0.7rem; margin-top: 14px; color: #7a8cae;">✨ Using official api.loolio.com endpoints · CORS configured for test.loolio.com · Public data only</p>
   </div>
 
   <div class="info-bar">
@@ -427,12 +424,12 @@
         <path d="M8 16v2c0 1.1.9 2 2 2h4c1.1 0 2-.9 2-2v-2"/>
       </svg>
       <p style="margin-top: 16px;">Select an endpoint and click Fetch</p>
-      <p style="font-size:0.8rem; margin-top:8px;">Public feed data from test.loolio.com</p>
+      <p style="font-size:0.8rem; margin-top:8px;">Public data from api.loolio.com</p>
     </div>
   </div>
 
   <footer>
-    🔐 Using only public endpoints · No CORS bypass · Respects API rate limits · For testing purposes only
+    🔐 Using public api.loolio.com endpoints · CORS respected · No proxy bypass · For testing at test.loolio.com
   </footer>
 </div>
 
@@ -473,10 +470,10 @@
   trendingBtn.addEventListener('click', () => setActiveEndpoint('trending'));
   searchBtn.addEventListener('click', () => setActiveEndpoint('search'));
 
-  // Build API URL based on selected endpoint
+  // Build API URL - using api.loolio.com (NOT test.loolio.com)
   function buildApiUrl() {
     const limit = parseInt(limitInput.value) || 20;
-    const baseUrl = 'https://test.loolio.com';
+    const baseUrl = 'https://api.loolio.com';
     
     switch(currentEndpoint) {
       case 'feed':
@@ -533,7 +530,7 @@
 
   // Render avatar with fallback
   function renderAvatar(avatarUrl, displayName, size = 48) {
-    if (avatarUrl && avatarUrl !== 'https://d3uq5573ht7ov5.cloudfront.net/defaults/profile-avatar.png') {
+    if (avatarUrl && avatarUrl !== 'https://d3uq5573ht7ov5.cloudfront.net/defaults/profile-avatar.png' && avatarUrl !== '') {
       return `<img class="author-avatar" src="${escapeHtml(avatarUrl)}" alt="${escapeHtml(displayName)}" style="width:${size}px;height:${size}px;" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'avatar-fallback\\' style=\\'width:${size}px;height:${size}px;\\'>${escapeHtml((displayName || 'U').charAt(0).toUpperCase())}</div>';">`;
     }
     return `<div class="avatar-fallback" style="width:${size}px;height:${size}px;">${escapeHtml((displayName || 'U').charAt(0).toUpperCase())}</div>`;
@@ -562,7 +559,7 @@
     }
     
     // Media
-    if (media.length > 0) {
+    if (media && media.length > 0) {
       media.forEach(m => {
         if (m.type === 'IMAGE') {
           contentHtml += `<div class="post-media"><img class="media-image" src="${escapeHtml(m.url)}" loading="lazy" onerror="this.style.display='none'"></div>`;
@@ -631,7 +628,7 @@
         ${users.map(user => `
           <div class="post-card">
             <div class="post-header">
-              ${renderAvatar(user.avatarUrl, user.displayName, 56)}
+              ${renderAvatar(user.avatarUrl, user.displayName || user.username, 56)}
               <div class="author-info">
                 <div class="display-name">
                   ${escapeHtml(user.displayName || user.username)}
@@ -666,7 +663,7 @@
     resultsContainer.innerHTML = `
       <div class="loading">
         <div class="spinner"></div>
-        <span>Fetching from test.loolio.com ...</span>
+        <span>Fetching from api.loolio.com ...</span>
       </div>
     `;
   }
@@ -680,7 +677,7 @@
           <circle cx="12" cy="16" r="0.5"/>
         </svg>
         <p style="margin-top:12px; color:#ff8866;">${escapeHtml(message)}</p>
-        <p style="font-size:0.75rem; margin-top:8px;">Make sure you're on test.loolio.com domain</p>
+        <p style="font-size:0.75rem; margin-top:8px;">Make sure test.loolio.com has CORS configured for api.loolio.com</p>
       </div>
     `;
     statusText.innerHTML = `⚠️ Error: ${message.substring(0, 80)}`;
@@ -691,7 +688,7 @@
     
     try {
       const url = buildApiUrl();
-      statusText.innerHTML = `🔄 Fetching: ${currentEndpoint} ...`;
+      statusText.innerHTML = `🔄 Fetching from api.loolio.com: ${currentEndpoint} ...`;
       
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 15000);
@@ -716,15 +713,15 @@
       if (currentEndpoint === 'search') {
         const users = extractItems(data);
         resultsContainer.innerHTML = renderSearchResults(users);
-        statusText.innerHTML = `✅ Found ${users.length} user${users.length !== 1 ? 's' : ''} · test.loolio.com`;
+        statusText.innerHTML = `✅ Found ${users.length} user${users.length !== 1 ? 's' : ''} · api.loolio.com (search)`;
       } else {
         const items = extractItems(data);
         if (items.length === 0) {
           resultsContainer.innerHTML = `<div class="empty-state"><p>No posts found in feed.</p></div>`;
-          statusText.innerHTML = `📭 No content · test.loolio.com`;
+          statusText.innerHTML = `📭 No content · api.loolio.com`;
         } else {
           resultsContainer.innerHTML = `<div class="feed-grid">${items.map(item => renderPost(item)).join('')}</div>`;
-          statusText.innerHTML = `✅ ${items.length} post${items.length !== 1 ? 's' : ''} · ${currentEndpoint} feed · test.loolio.com`;
+          statusText.innerHTML = `✅ ${items.length} post${items.length !== 1 ? 's' : ''} · ${currentEndpoint} feed · api.loolio.com`;
         }
       }
       
@@ -733,7 +730,9 @@
       if (err.name === 'AbortError') {
         showError('Request timeout — API may be slow');
       } else if (err.message.includes('Failed to fetch')) {
-        showError('Network error — CORS policy may require test.loolio.com domain');
+        showError('CORS error or network issue — verify CORS policy for test.loolio.com → api.loolio.com');
+      } else if (err.message === 'Please enter a search query (e.g., fortune)') {
+        showError(err.message);
       } else {
         showError(err.message);
       }
